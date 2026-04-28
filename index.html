@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATEX Levantamiento — CCU Planta Temuco</title>
+<link rel="stylesheet" href="src/styles.css">
+<style>
+body { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: var(--ink); }
+.login-wrap {
+  width: 100%; max-width: 400px; padding: 16px;
+}
+.login-card {
+  background: var(--paper);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,.5);
+  border-top: 3px solid var(--accent);
+}
+.login-header {
+  background: var(--ink2);
+  padding: 28px 28px 24px;
+  border-bottom: 1px solid #2a2f40;
+  text-align: center;
+}
+.login-logo {
+  display: inline-flex; align-items: center; gap: 10px;
+  margin-bottom: 14px;
+}
+.login-title {
+  font-family: var(--mono); font-size: 22px; font-weight: 600;
+  color: var(--paper); letter-spacing: 3px;
+}
+.login-sub {
+  font-size: 12px; color: #888; margin-top: 6px;
+  font-family: var(--mono);
+}
+.login-body { padding: 28px; display: flex; flex-direction: column; gap: 16px; }
+.login-footer { padding: 16px 28px; border-top: 1px solid var(--paper3); text-align: center; }
+.login-footer a { font-size: 12px; color: var(--accent); cursor: pointer; }
+.login-footer a:hover { text-decoration: underline; }
+
+.tabs-mini { display: flex; gap: 0; margin-bottom: 20px; border: 1px solid var(--paper3); border-radius: var(--rad); overflow: hidden; }
+.tab-mini {
+  flex: 1; padding: 8px;
+  text-align: center;
+  font-family: var(--mono); font-size: 11px; font-weight: 600;
+  cursor: pointer; transition: all .15s;
+  color: var(--muted);
+  background: var(--paper2);
+  letter-spacing: .5px;
+}
+.tab-mini.active { background: var(--ink); color: var(--paper); }
+
+.divider {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 11px; color: var(--muted);
+  font-family: var(--mono);
+}
+.divider::before, .divider::after {
+  content:''; flex: 1; height: 1px; background: var(--paper3);
+}
+
+.accent-line {
+  width: 40px; height: 3px;
+  background: var(--accent);
+  border-radius: 2px;
+  margin: 0 auto 12px;
+}
+
+.btn-login {
+  background: var(--accent);
+  color: #fff;
+  border: none; border-radius: var(--rad);
+  padding: 11px;
+  font-family: var(--mono); font-size: 12px; font-weight: 600;
+  cursor: pointer; letter-spacing: 1px;
+  transition: background .15s;
+  width: 100%;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-login:hover { background: #b8400a; }
+.btn-login:disabled { opacity: .5; cursor: not-allowed; }
+
+#msg { display: none; }
+#form-register { display: none; }
+</style>
+</head>
+<body>
+
+<div class="login-wrap">
+  <div class="login-card">
+    <div class="login-header">
+      <div class="login-logo">
+        <span class="logo-badge" style="font-size:14px;padding:5px 12px">ATEX</span>
+      </div>
+      <div class="accent-line"></div>
+      <div class="login-title">LEVANTAMIENTO</div>
+      <div class="login-sub">CCU Chile · Planta Temuco · Edificio Molino</div>
+    </div>
+
+    <div class="login-body">
+      <div class="tabs-mini">
+        <div class="tab-mini active" id="tab-in"  onclick="switchTab('in')">INGRESAR</div>
+        <div class="tab-mini"        id="tab-reg" onclick="switchTab('reg')">REGISTRAR</div>
+      </div>
+
+      <!-- ALERTA -->
+      <div id="msg" class="alert"></div>
+
+      <!-- FORM LOGIN -->
+      <form id="form-login" onsubmit="doLogin(event)">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div class="field">
+            <div class="field-lbl">Email</div>
+            <input class="field-input" type="email" id="li-email" placeholder="inspector@ccu.cl" required autocomplete="email">
+          </div>
+          <div class="field">
+            <div class="field-lbl">Contraseña</div>
+            <input class="field-input" type="password" id="li-pass" placeholder="••••••••" required autocomplete="current-password">
+          </div>
+          <button class="btn-login" type="submit" id="btn-li">
+            <span id="btn-li-txt">INGRESAR</span>
+          </button>
+        </div>
+      </form>
+
+      <!-- FORM REGISTRO -->
+      <form id="form-register" onsubmit="doRegister(event)">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div class="field">
+            <div class="field-lbl">Nombre completo</div>
+            <input class="field-input" type="text" id="rg-name" placeholder="Nombre Apellido" required>
+          </div>
+          <div class="field">
+            <div class="field-lbl">Email</div>
+            <input class="field-input" type="email" id="rg-email" placeholder="inspector@ccu.cl" required autocomplete="email">
+          </div>
+          <div class="field">
+            <div class="field-lbl">Contraseña (mín. 8 caracteres)</div>
+            <input class="field-input" type="password" id="rg-pass" placeholder="••••••••" required minlength="8" autocomplete="new-password">
+          </div>
+          <button class="btn-login" type="submit" id="btn-rg">
+            <span id="btn-rg-txt">CREAR CUENTA</span>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="login-footer">
+      <span>¿Problemas para ingresar? Contacta al administrador</span>
+    </div>
+  </div>
+
+  <div style="text-align:center;margin-top:16px;font-family:var(--mono);font-size:10px;color:#444;letter-spacing:.5px">
+    UNE-EN 60079-10-2:2010 · IEC 60079-10-2:2009
+  </div>
+</div>
+
+<script type="module">
+import { signIn, signUp, getSession } from './src/supabase.js';
+
+// Si ya hay sesión, redirigir directamente
+(async () => {
+  const s = await getSession();
+  if (s) window.location.href = 'app.html';
+})();
+
+window.switchTab = (tab) => {
+  const isIn = tab === 'in';
+  document.getElementById('tab-in').classList.toggle('active', isIn);
+  document.getElementById('tab-reg').classList.toggle('active', !isIn);
+  document.getElementById('form-login').style.display    = isIn ? 'block' : 'none';
+  document.getElementById('form-register').style.display = isIn ? 'none'  : 'block';
+  hideMsg();
+};
+
+function showMsg(txt, type = 'error') {
+  const el = document.getElementById('msg');
+  el.textContent = txt;
+  el.className = `alert alert-${type}`;
+  el.style.display = 'flex';
+}
+function hideMsg() {
+  document.getElementById('msg').style.display = 'none';
+}
+
+window.doLogin = async (e) => {
+  e.preventDefault();
+  hideMsg();
+  const btn = document.getElementById('btn-li');
+  const txt = document.getElementById('btn-li-txt');
+  btn.disabled = true;
+  txt.innerHTML = '<span class="spinner" style="width:14px;height:14px;border-width:2px"></span> Ingresando…';
+  try {
+    await signIn(
+      document.getElementById('li-email').value.trim(),
+      document.getElementById('li-pass').value
+    );
+    window.location.href = 'app.html';
+  } catch(err) {
+    showMsg('Credenciales incorrectas. Verifica tu email y contraseña.', 'error');
+    btn.disabled = false;
+    txt.textContent = 'INGRESAR';
+  }
+};
+
+window.doRegister = async (e) => {
+  e.preventDefault();
+  hideMsg();
+  const btn = document.getElementById('btn-rg');
+  const txt = document.getElementById('btn-rg-txt');
+  btn.disabled = true;
+  txt.innerHTML = '<span class="spinner" style="width:14px;height:14px;border-width:2px"></span> Creando cuenta…';
+  try {
+    await signUp(
+      document.getElementById('rg-email').value.trim(),
+      document.getElementById('rg-pass').value,
+      document.getElementById('rg-name').value.trim()
+    );
+    showMsg('Cuenta creada. Revisa tu email para confirmar y luego ingresa.', 'success');
+    switchTab('in');
+  } catch(err) {
+    showMsg(err.message || 'Error al crear la cuenta.', 'error');
+  } finally {
+    btn.disabled = false;
+    txt.textContent = 'CREAR CUENTA';
+  }
+};
+</script>
+</body>
+</html>
