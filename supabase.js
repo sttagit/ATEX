@@ -8,7 +8,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 // ── CONFIG ────────────────────────────────────────────────────────────────────
 // Estas variables se inyectan desde vercel.json / .env en producción.
 // En desarrollo local, edítalas directamente aquí o usa un .env.
-export const SUPABASE_URL  = window.__SUPABASE_URL__  || 'https://nyqqaaqxjdmedggpkxbj.supabase.co';
+export const SUPABASE_URL  = window.__SUPABASE_URL__  || 'https://nyqqaaqxjdmedggpkxbj.supabase.co/rest/v1/';
 export const SUPABASE_ANON = window.__SUPABASE_ANON__ || 'sb_publishable_mtcCcCdVScjQQHtIQxUpYQ_awU9gt_j';
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
