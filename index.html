@@ -531,11 +531,12 @@ input[type="file"]{display:none}
   </div>
 </div>
 
-<script type="module">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
+<script>
 // ═══════════════════════════════════════════════════════════════════════
-//  SUPABASE IMPORT
+//  SUPABASE — usando UMD global (window.supabase)
 // ═══════════════════════════════════════════════════════════════════════
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/+esm';
+const { createClient } = window.supabase;
 
 // ─── CONFIG (editar con tus credenciales o usar el tab SQL Setup) ──────
 let SUPA_URL = 'https://nyqqaaqxjdmedggpkxbj.supabase.co'; // ← URL de tu proyecto (sin /rest/v1/)
