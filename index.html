@@ -232,6 +232,11 @@ input[type="file"]{display:none}
   .equip-grid{grid-template-columns:1fr}
   .page-wrap{padding:14px 12px 60px}
 }
+.hidden{display:none!important}
+.show-block{display:block!important}
+.show-flex{display:flex!important}
+#app-shell{width:100%;min-height:100vh;box-sizing:border-box}
+#tab-equipos,#tab-resumen,#tab-informe{width:100%;box-sizing:border-box}
 </style>
 </head>
 <body>
@@ -674,10 +679,9 @@ async function boot() {
 }
 
 async function loadProfileAndApp() {
-  showLoader(true);
-
-  // Mostrar app inmediatamente — no esperar a que carguen los datos
+  // Mostrar app ANTES de cualquier operación async
   showApp();
+  showLoader(true);
 
   // Cargar perfil (si falla, usar email como nombre)
   try {
@@ -711,10 +715,24 @@ async function loadProfileAndApp() {
 }
 
 function showApp() {
+  // Ocultar login
   document.getElementById('page-login').style.display = 'none';
-  document.getElementById('app-shell').style.display = 'block';
-  document.getElementById('tab-equipos').style.display = 'block';
-  document.querySelector('.nav-tab[data-tab="equipos"]').classList.add('active');
+
+  // Mostrar app-shell con dimensiones explícitas
+  const shell = document.getElementById('app-shell');
+  shell.style.display    = 'block';
+  shell.style.width      = '100%';
+  shell.style.minHeight  = '100vh';
+
+  // Mostrar tab equipos con dimensiones explícitas
+  const tabEq = document.getElementById('tab-equipos');
+  tabEq.style.display   = 'block';
+  tabEq.style.width     = '100%';
+  tabEq.style.minHeight = '200px';
+
+  // Nav tab activo
+  const navTab = document.querySelector('[data-tab="equipos"]');
+  if (navTab) navTab.classList.add('active');
 }
 
 // ═══════════════════════════════════════════════════════════════════════
