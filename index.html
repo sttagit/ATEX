@@ -39,6 +39,7 @@ img{max-width:100%;display:block}
 /* ─── PAGES ─────────────────────────────────────────────────────────── */
 .page{display:none}
 .page.active{display:block}
+#page-login.active{display:flex}
 
 /* ─── TOPBAR ─────────────────────────────────────────────────────────── */
 .topbar{
@@ -646,16 +647,32 @@ let confFilter = 'all';
 //  BOOT
 // ═══════════════════════════════════════════════════════════════════════
 async function boot() {
+  // Mostrar login SIEMPRE primero
+  document.getElementById('page-login').classList.add('active');
 
+  // Avisar si las credenciales no están configuradas
+  if (SUPA_URL.includes('TU_PROYECTO') || SUPA_KEY.includes('TU_ANON')) {
+    const msg = document.getElementById('auth-msg');
+    msg.className = 'alert alert-warn';
+    msg.textContent = 'Configura las credenciales de Supabase en las líneas 541-542 del index.html';
+    msg.style.display = 'flex';
+    return;
+  }
 
-  // Check session
+  // Verificar sesión activa
   try {
     const { data } = await sb.auth.getSession();
     if (data.session) {
       session = data.session;
       await loadProfileAndApp();
     }
-  } catch(e) { console.warn('Supabase error:', e.message); }
+  } catch(e) {
+    console.warn('Supabase error:', e.message);
+    const msg = document.getElementById('auth-msg');
+    msg.className = 'alert alert-error';
+    msg.textContent = 'Error de conexión: ' + e.message;
+    msg.style.display = 'flex';
+  }
 }
 
 async function loadProfileAndApp() {
