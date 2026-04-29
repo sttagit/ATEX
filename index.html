@@ -37,9 +37,7 @@ img{max-width:100%;display:block}
 ::-webkit-scrollbar-thumb{background:var(--paper4);border-radius:3px}
 
 /* ─── PAGES ─────────────────────────────────────────────────────────── */
-.page{display:none}
-.page.active{display:block}
-#page-login.active{display:flex}
+/* pages hidden by JS after load */
 
 /* ─── TOPBAR ─────────────────────────────────────────────────────────── */
 .topbar{
@@ -251,7 +249,7 @@ input[type="file"]{display:none}
 <!-- ═══════════════════════════════════════════════
      PAGE: LOGIN
 ═══════════════════════════════════════════════════ -->
-<div class="page active" id="page-login">
+<div class="page" id="page-login" style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--ink)">
   <div class="login-card">
     <div class="login-header">
       <div style="display:inline-flex;align-items:center;gap:10px;margin-bottom:14px">
@@ -323,7 +321,7 @@ input[type="file"]{display:none}
   </nav>
 
   <!-- ─── TAB: EQUIPOS ──────────────────────────────────────────────── -->
-  <div class="page active" id="tab-equipos">
+  <div class="page" id="tab-equipos" style="display:none">
     <div class="page-wrap">
       <div class="filter-bar">
         <span class="filter-lbl">PISO</span>
@@ -354,7 +352,7 @@ input[type="file"]{display:none}
   </div>
 
   <!-- ─── TAB: RESUMEN ──────────────────────────────────────────────── -->
-  <div class="page" id="tab-resumen">
+  <div class="page" id="tab-resumen" style="display:none">
     <div class="page-wrap">
       <div style="background:var(--ink);color:var(--paper);border-radius:var(--rad-lg);padding:20px 24px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
         <div>
@@ -402,7 +400,7 @@ input[type="file"]{display:none}
   </div>
 
   <!-- ─── TAB: INFORME ──────────────────────────────────────────────── -->
-  <div class="page" id="tab-informe">
+  <div class="page" id="tab-informe" style="display:none">
     <div class="page-wrap">
       <div class="section-hd" style="margin-top:0">Datos del informe</div>
       <div class="card" style="margin-bottom:20px">
@@ -648,8 +646,7 @@ let confFilter = 'all';
 //  BOOT
 // ═══════════════════════════════════════════════════════════════════════
 async function boot() {
-  // Mostrar login SIEMPRE primero
-  document.getElementById('page-login').classList.add('active');
+  // Login ya visible por CSS inline en el HTML
 
   // Avisar si las credenciales no están configuradas
   if (SUPA_URL.includes('TU_PROYECTO') || SUPA_KEY.includes('TU_ANON')) {
@@ -678,31 +675,46 @@ async function boot() {
 
 async function loadProfileAndApp() {
   showLoader(true);
+
+  // Mostrar app inmediatamente — no esperar a que carguen los datos
+  showApp();
+
+  // Cargar perfil (si falla, usar email como nombre)
   try {
     const { data } = await sb.from('profiles').select('*').eq('id', session.user.id).single();
     profile = data;
-    document.getElementById('user-name-top').style.display = 'block';
-    document.getElementById('user-name-top').textContent = profile?.full_name || session.user.email;
+  } catch(e) {
+    console.warn('Perfil no disponible (¿ejecutaste el schema.sql?):', e.message);
+    profile = { full_name: session.user.email };
+  }
 
-    // Prefill informe
-    document.getElementById('i-inspector').value = profile?.full_name || '';
-    document.getElementById('i-fecha').value = new Date().toISOString().slice(0,10);
+  // Mostrar nombre en topbar
+  const userName = profile?.full_name || session.user.email;
+  document.getElementById('user-name-top').style.display = 'block';
+  document.getElementById('user-name-top').textContent = userName;
 
+  // Prefill informe
+  document.getElementById('i-inspector').value = userName;
+  document.getElementById('i-fecha').value = new Date().toISOString().slice(0,10);
+
+  // Cargar registros (si falla, mostrar lista vacía igual)
+  try {
     const recs = await getAllRegistros();
     recs.forEach(r => { allRecords[r.equipo_id] = r; });
-
-    showApp();
-    renderEquipList();
   } catch(e) {
-    toast('Error al cargar: ' + e.message, 'error');
-  } finally {
-    showLoader(false);
+    console.warn('Registros no disponibles (¿ejecutaste el schema.sql?):', e.message);
+    toast('Ejecuta el schema.sql en Supabase para activar la base de datos', 'warn');
   }
+
+  renderEquipList();
+  showLoader(false);
 }
 
 function showApp() {
   document.getElementById('page-login').style.display = 'none';
   document.getElementById('app-shell').style.display = 'block';
+  document.getElementById('tab-equipos').style.display = 'block';
+  document.querySelector('.nav-tab[data-tab="equipos"]').classList.add('active');
 }
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -777,9 +789,11 @@ window.doLogout = async () => {
 // ═══════════════════════════════════════════════════════════════════════
 window.showTab = (name, el) => {
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('#app-shell .page').forEach(p => p.classList.remove('active'));
+  ['tab-equipos','tab-resumen','tab-informe'].forEach(id => {
+    document.getElementById(id).style.display = 'none';
+  });
   if (el) el.classList.add('active');
-  document.getElementById('tab-'+name).classList.add('active');
+  document.getElementById('tab-'+name).style.display = 'block';
   if (name === 'resumen') loadResumen();
   if (name === 'informe') { loadResumen(); loadFindings(); }
 };
