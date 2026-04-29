@@ -535,11 +535,11 @@ input[type="file"]{display:none}
 // ═══════════════════════════════════════════════════════════════════════
 //  SUPABASE IMPORT
 // ═══════════════════════════════════════════════════════════════════════
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/+esm';
 
 // ─── CONFIG (editar con tus credenciales o usar el tab SQL Setup) ──────
-let SUPA_URL = 'https://nyqqaaqxjdmedggpkxbj.supabase.co/rest/v1/'; // ← reemplaza con tu Project URL
-let SUPA_KEY = 'sb_publishable_mtcCcCdVScjQQHtIQxUpYQ_awU9gt_j'; // ← reemplaza con tu Anon Key
+let SUPA_URL = 'https://nyqqaaqxjdmedggpkxbj.supabase.co'; // ← URL de tu proyecto (sin /rest/v1/)
+let SUPA_KEY = 'sb_publishable_mtcCcCdVScjQQHtIQxUpYQ_awU9gt_j'; // ← Publishable key
 let sb;
 
 function initSupabase(){
