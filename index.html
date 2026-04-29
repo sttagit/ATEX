@@ -314,8 +314,12 @@ input[type=file]{display:none}
       <div style="font-size:10px;font-weight:600;color:#d4500a;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">Fotografías</div>
       <div class="photo-zone">
         <div class="photo-grid" id="pgrid"></div>
-        <button class="btn-dark" onclick="document.getElementById('fin').click()" style="font-size:11px;padding:6px 14px">📷 Agregar foto</button>
-        <input type="file" id="fin" accept="image/*" multiple onchange="addPhotos(event)">
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn-dark" onclick="document.getElementById('fin-cam').click()" style="font-size:11px;padding:6px 14px">📷 Tomar foto</button>
+          <button class="btn-dark" onclick="document.getElementById('fin-gal').click()" style="font-size:11px;padding:6px 14px;background:#444">🖼 Galería</button>
+        </div>
+        <input type="file" id="fin-cam" accept="image/*" capture="environment" onchange="addPhotos(event)">
+        <input type="file" id="fin-gal" accept="image/*" multiple onchange="addPhotos(event)">
         <div style="font-size:9px;color:#aaa;margin-top:6px;font-family:monospace">Fotografíe la placa de datos y el marcado Ex</div>
       </div>
       <div id="m-prev" style="display:none;padding:8px 10px;background:#eceae3;border-radius:4px;font-size:11px;color:#6b7280;font-family:monospace"></div>
