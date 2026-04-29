@@ -242,6 +242,19 @@ input[type="file"]{display:none}
 <body>
 
 <!-- ═══════════════ LOADER + TOAST ═══════════════ -->
+<div id="js-error" style="display:none;position:fixed;top:0;left:0;right:0;background:#dc2626;color:#fff;padding:12px 16px;font-family:monospace;font-size:12px;z-index:9999;white-space:pre-wrap"></div>
+<script>
+window.onerror = function(msg,src,line,col,err){
+  var el = document.getElementById('js-error');
+  el.style.display = 'block';
+  el.textContent = 'ERROR L'+line+': '+msg;
+};
+window.addEventListener('unhandledrejection',function(e){
+  var el = document.getElementById('js-error');
+  el.style.display = 'block';
+  el.textContent = 'PROMISE ERROR: '+(e.reason?.message||e.reason||'unknown');
+});
+</script>
 <div id="loader"><div class="loader-box"><span class="spinner"></span> Cargando…</div></div>
 <div id="toast-ct"></div>
 
@@ -254,7 +267,7 @@ input[type="file"]{display:none}
 <!-- ═══════════════════════════════════════════════
      PAGE: LOGIN
 ═══════════════════════════════════════════════════ -->
-<div class="page" id="page-login" style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--ink)">
+<div id="page-login" style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--ink)">
   <div class="login-card">
     <div class="login-header">
       <div style="display:inline-flex;align-items:center;gap:10px;margin-bottom:14px">
@@ -301,7 +314,7 @@ input[type="file"]{display:none}
 <!-- ═══════════════════════════════════════════════
      APP SHELL (visible when logged in)
 ═══════════════════════════════════════════════════ -->
-<div id="app-shell" style="display:none">
+<div id="app-shell" style="display:none;width:100%;min-height:100vh">
 
   <!-- TOPBAR -->
   <div class="topbar">
@@ -326,7 +339,7 @@ input[type="file"]{display:none}
   </nav>
 
   <!-- ─── TAB: EQUIPOS ──────────────────────────────────────────────── -->
-  <div class="page" id="tab-equipos" style="display:none">
+  <div id="tab-equipos">
     <div class="page-wrap">
       <div class="filter-bar">
         <span class="filter-lbl">PISO</span>
@@ -357,7 +370,7 @@ input[type="file"]{display:none}
   </div>
 
   <!-- ─── TAB: RESUMEN ──────────────────────────────────────────────── -->
-  <div class="page" id="tab-resumen" style="display:none">
+  <div id="tab-resumen" style="display:none">
     <div class="page-wrap">
       <div style="background:var(--ink);color:var(--paper);border-radius:var(--rad-lg);padding:20px 24px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
         <div>
@@ -405,7 +418,7 @@ input[type="file"]{display:none}
   </div>
 
   <!-- ─── TAB: INFORME ──────────────────────────────────────────────── -->
-  <div class="page" id="tab-informe" style="display:none">
+  <div id="tab-informe" style="display:none">
     <div class="page-wrap">
       <div class="section-hd" style="margin-top:0">Datos del informe</div>
       <div class="card" style="margin-bottom:20px">
@@ -715,22 +728,9 @@ async function loadProfileAndApp() {
 }
 
 function showApp() {
-  // Ocultar login
   document.getElementById('page-login').style.display = 'none';
-
-  // Mostrar app-shell con dimensiones explícitas
-  const shell = document.getElementById('app-shell');
-  shell.style.display    = 'block';
-  shell.style.width      = '100%';
-  shell.style.minHeight  = '100vh';
-
-  // Mostrar tab equipos con dimensiones explícitas
-  const tabEq = document.getElementById('tab-equipos');
-  tabEq.style.display   = 'block';
-  tabEq.style.width     = '100%';
-  tabEq.style.minHeight = '200px';
-
-  // Nav tab activo
+  document.getElementById('app-shell').style.display  = 'block';
+  document.getElementById('tab-equipos').style.display = 'block';
   const navTab = document.querySelector('[data-tab="equipos"]');
   if (navTab) navTab.classList.add('active');
 }
