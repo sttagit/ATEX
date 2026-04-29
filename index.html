@@ -59,7 +59,7 @@ img{max-width:100%;display:block}
 .nav-tab.active{color:var(--accent2);border-bottom-color:var(--accent2)}
 
 /* ─── LAYOUT ─────────────────────────────────────────────────────────── */
-.page-wrap{max-width:960px;margin:0 auto;padding:18px 16px 60px}
+.page-wrap{display:block;width:100%;max-width:960px;margin:0 auto;padding:18px 16px 60px;box-sizing:border-box}
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
 
@@ -236,7 +236,7 @@ input[type="file"]{display:none}
 .show-block{display:block!important}
 .show-flex{display:flex!important}
 #app-shell{width:100%;min-height:100vh;box-sizing:border-box}
-#tab-equipos,#tab-resumen,#tab-informe{width:100%;box-sizing:border-box}
+#tab-equipos,#tab-resumen,#tab-informe{display:block;width:100%;box-sizing:border-box}
 </style>
 </head>
 <body>
