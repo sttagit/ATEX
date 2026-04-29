@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATEX — CCU Temuco</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:sans-serif;background:#f5f3ee;color:#0f1117;min-height:100vh}
+/* ── LOGIN ── */
+#login{position:fixed;inset:0;background:#0f1117;display:flex;align-items:center;justify-content:center;z-index:100}
+.login-box{background:#f5f3ee;border-radius:10px;border-top:3px solid #d4500a;width:100%;max-width:400px;margin:16px;overflow:hidden}
+.login-head{background:#1e2230;padding:28px;text-align:center;color:#f5f3ee}
+.login-body{padding:28px;display:flex;flex-direction:column;gap:14px}
+.lbl{font-size:10px;font-weight:600;color:#d4500a;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+input{width:100%;padding:8px 10px;border:1px solid #ddd9d0;border-radius:4px;font-size:13px}
+.btn-orange{background:#d4500a;color:#fff;border:none;border-radius:4px;padding:11px;width:100%;font-size:13px;font-weight:600;cursor:pointer}
+.btn-orange:hover{background:#b8400a}
+.msg{padding:10px 14px;border-radius:4px;font-size:13px;display:none}
+.msg.err{background:#fee2e2;color:#991b1b;border-left:3px solid #dc2626}
+.msg.ok{background:#d1fae5;color:#065f46;border-left:3px solid #059669}
+.tabs{display:flex;border:1px solid #ddd9d0;border-radius:4px;overflow:hidden;margin-bottom:4px}
+.tab{flex:1;padding:8px;text-align:center;font-size:11px;font-weight:600;cursor:pointer;background:#eceae3;color:#6b7280}
+.tab.on{background:#0f1117;color:#fff}
+/* ── APP ── */
+#app{display:none;flex-direction:column;min-height:100vh}
+.topbar{background:#0f1117;border-bottom:2px solid #d4500a;padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.logo{background:#d4500a;color:#fff;font-size:11px;font-weight:600;padding:3px 9px;border-radius:2px;letter-spacing:1px}
+.topbar-title{color:#f5f3ee;font-size:13px;font-weight:500;margin-left:10px}
+.nav{display:flex;background:#1e2230;border-bottom:1px solid #2a2f40;overflow-x:auto}
+.nav-btn{padding:11px 18px;font-size:11px;font-weight:600;color:#666;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;font-family:monospace;letter-spacing:.5px}
+.nav-btn.on{color:#e8820a;border-bottom-color:#e8820a}
+.page-wrap{max-width:960px;margin:0 auto;padding:18px 16px 60px;width:100%}
+/* ── EQUIPOS ── */
+.filter-bar{display:flex;gap:6px;flex-wrap:wrap;padding:10px 14px;background:#fff;border:1px solid #ddd9d0;border-radius:4px;margin-bottom:14px;align-items:center}
+.chip{padding:4px 10px;border:1px solid #ddd9d0;border-radius:20px;font-size:11px;cursor:pointer;color:#6b7280}
+.chip.on{background:#0f1117;color:#fff;border-color:#0f1117}
+.sec-hd{font-size:10px;font-weight:600;color:#d4500a;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin:20px 0 12px}
+.sec-hd:first-child{margin-top:0}
+.eq-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;margin-bottom:8px}
+.eq-card{background:#fff;border:1px solid #ddd9d0;border-left:3px solid #ccc8be;border-radius:4px;padding:10px 13px;cursor:pointer;transition:box-shadow .12s}
+.eq-card:hover{box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.eq-card.z20{border-left-color:#7c3aed}
+.eq-card.z21{border-left-color:#d97706}
+.eq-card.z22{border-left-color:#059669}
+.eq-card.done{background:#fffdf7}
+.eq-name{font-size:13px;font-weight:500;margin-bottom:5px;line-height:1.35}
+.eq-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.zpill{font-size:9px;font-weight:600;padding:1px 7px;border-radius:2px;font-family:monospace}
+.z20p{background:#ede9fe;color:#5b21b6}
+.z21p{background:#fef3c7;color:#92400e}
+.z22p{background:#d1fae5;color:#065f46}
+.zdp{background:#f3f4f6;color:#6b7280}
+.dot{width:7px;height:7px;border-radius:50%;margin-left:auto}
+.dC{background:#059669}.dNC{background:#dc2626}.dOBS{background:#d97706}.d-{background:#ddd9d0}
+/* ── MODAL ── */
+#modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;padding:16px;overflow-y:auto}
+#modal-bg.on{display:flex;align-items:flex-start;justify-content:center}
+.modal{background:#f5f3ee;border-radius:8px;width:100%;max-width:660px;margin:auto;border-top:3px solid #d4500a;overflow:hidden}
+.modal-head{background:#0f1117;color:#f5f3ee;padding:14px 20px;display:flex;align-items:flex-start;justify-content:space-between}
+.modal-body{padding:20px;display:flex;flex-direction:column;gap:12px}
+.modal-foot{padding:14px 20px;border-top:1px solid #ddd9d0;background:#eceae3;display:flex;gap:8px;justify-content:flex-end}
+.field-lbl{font-size:10px;font-weight:600;color:#d4500a;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.field-input,.field-sel,.field-ta{width:100%;padding:7px 10px;border:1px solid #ddd9d0;border-radius:4px;font-size:13px;background:#fff}
+.field-ta{min-height:68px;resize:vertical}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.radio-grp{display:flex;gap:6px;flex-wrap:wrap}
+.ropt{padding:6px 13px;border:1.5px solid #ddd9d0;border-radius:4px;font-size:11px;font-weight:600;cursor:pointer;color:#6b7280;font-family:monospace}
+.ropt.sC{border-color:#059669;background:#d1fae5;color:#065f46}
+.ropt.sNC{border-color:#dc2626;background:#fee2e2;color:#991b1b}
+.ropt.sOBS{border-color:#d97706;background:#fef3c7;color:#92400e}
+.ropt.sNA{border-color:#6b7280;background:#f3f4f6;color:#6b7280}
+.photo-zone{border:1.5px dashed #ddd9d0;border-radius:8px;padding:12px;background:#f5f3ee}
+.photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:8px;margin-bottom:10px}
+.photo-wrap{position:relative}
+.photo-wrap img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:4px;border:1px solid #ddd9d0;cursor:pointer}
+.photo-rm{position:absolute;top:-5px;right:-5px;background:#dc2626;color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.btn-dark{background:#0f1117;color:#f5f3ee;border:none;border-radius:4px;padding:8px 18px;font-size:11px;font-weight:600;cursor:pointer;font-family:monospace}
+.btn-dark:hover{background:#d4500a}
+.btn-out{background:none;border:1.5px solid #ddd9d0;border-radius:4px;padding:8px 16px;font-size:11px;font-weight:600;cursor:pointer;font-family:monospace}
+.btn-save{background:#d4500a;color:#fff;border:none;border-radius:4px;padding:8px 20px;font-size:11px;font-weight:600;cursor:pointer;font-family:monospace}
+/* ── RESUMEN ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.kpi{background:#fff;border:1px solid #ddd9d0;border-radius:4px;padding:14px;text-align:center}
+.kpi-n{font-size:30px;font-weight:600;font-family:monospace}
+.kpi-l{font-size:11px;color:#6b7280;margin-top:4px}
+.prog-wrap{background:#ddd9d0;border-radius:2px;height:5px;overflow:hidden;margin-bottom:16px}
+.prog{height:100%;background:#e8820a;border-radius:2px;transition:width .4s}
+.dt{background:#fff;border:1px solid #ddd9d0;border-radius:4px;overflow:hidden}
+.dt-head{background:#0f1117;color:#fff;padding:9px 14px;display:grid;gap:10px;font-size:10px;font-weight:600;font-family:monospace;letter-spacing:.5px}
+.dt-row{padding:9px 14px;display:grid;gap:10px;border-bottom:1px solid #ddd9d0;font-size:12px;align-items:start}
+.dt-row:nth-child(odd){background:#fafaf8}
+.dt-row:last-child{border-bottom:none}
+.cbadge{font-size:10px;font-weight:600;padding:2px 9px;border-radius:2px;font-family:monospace}
+.bC{background:#d1fae5;color:#065f46}.bNC{background:#fee2e2;color:#991b1b}.bOBS{background:#fef3c7;color:#92400e}.bNA{background:#f3f4f6;color:#6b7280}
+/* ── INFORME ── */
+.card{background:#fff;border:1px solid #ddd9d0;border-radius:8px;padding:16px 18px}
+.btn-lg{padding:11px 24px;font-size:12px}
+/* ── LOADER/TOAST ── */
+#loader{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:300;align-items:center;justify-content:center}
+#loader.on{display:flex}
+.loader-box{background:#0f1117;color:#fff;border-radius:8px;padding:20px 28px;display:flex;align-items:center;gap:14px;font-family:monospace;font-size:12px}
+.spin{display:inline-block;width:16px;height:16px;border:2px solid #444;border-top-color:#d4500a;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#toasts{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:8px;z-index:400}
+.toast{background:#0f1117;color:#fff;border-radius:4px;padding:10px 16px;font-size:13px;box-shadow:0 4px 16px rgba(0,0,0,.2);border-left:3px solid #d4500a;max-width:280px}
+.toast.ok{border-left-color:#059669}.toast.err{border-left-color:#dc2626}
+input[type=file]{display:none}
+/* ── LIGHTBOX ── */
+#lb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:500;align-items:center;justify-content:center}
+#lb.on{display:flex}
+#lb img{max-width:90vw;max-height:90vh;border-radius:4px}
+#lb-close{position:fixed;top:16px;right:16px;background:none;border:none;color:#fff;font-size:28px;cursor:pointer}
+@media(max-width:640px){.two-col{grid-template-columns:1fr}.kpi-grid{grid-template-columns:1fr 1fr}.eq-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div id="loader"><div class="loader-box"><span class="spin"></span> Cargando…</div></div>
+<div id="toasts"></div>
+<div id="lb" onclick="closeLb()"><button id="lb-close" onclick="closeLb()">✕</button><img id="lb-img" src="" alt="foto"></div>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="login-box">
+    <div class="login-head">
+      <div style="margin-bottom:12px"><span class="logo">ATEX</span></div>
+      <div style="width:40px;height:3px;background:#d4500a;border-radius:2px;margin:0 auto 12px"></div>
+      <div style="font-family:monospace;font-size:22px;font-weight:600;letter-spacing:3px">LEVANTAMIENTO</div>
+      <div style="font-size:12px;color:#888;margin-top:6px">CCU Chile · Planta Temuco · Edificio Molino</div>
+    </div>
+    <div class="login-body">
+      <div class="tabs">
+        <div class="tab on" id="tli" onclick="authTab('li')">INGRESAR</div>
+        <div class="tab" id="trg" onclick="authTab('rg')">REGISTRAR</div>
+      </div>
+      <div id="auth-msg" class="msg"></div>
+      <form id="form-li" onsubmit="doLogin(event)" style="display:flex;flex-direction:column;gap:12px">
+        <div><div class="lbl">Email</div><input id="li-e" type="email" placeholder="inspector@ccu.cl" required></div>
+        <div><div class="lbl">Contraseña</div><input id="li-p" type="password" placeholder="••••••••" required></div>
+        <button class="btn-orange" type="submit" id="btn-li">INGRESAR</button>
+      </form>
+      <form id="form-rg" onsubmit="doRegister(event)" style="display:none;flex-direction:column;gap:12px">
+        <div><div class="lbl">Nombre completo</div><input id="rg-n" type="text" placeholder="Nombre Apellido" required></div>
+        <div><div class="lbl">Email</div><input id="rg-e" type="email" placeholder="inspector@ccu.cl" required></div>
+        <div><div class="lbl">Contraseña (mín. 8)</div><input id="rg-p" type="password" placeholder="••••••••" required minlength="8"></div>
+        <button class="btn-orange" type="submit" id="btn-rg">CREAR CUENTA</button>
+      </form>
+    </div>
+    <div style="padding:14px 28px;border-top:1px solid #ddd9d0;text-align:center;font-size:12px;color:#6b7280">UNE-EN 60079-10-2:2010 · IEC 60079-10-2:2009</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="topbar">
+    <div style="display:flex;align-items:center">
+      <span class="logo">ATEX</span>
+      <span class="topbar-title">Levantamiento Equipos Ex</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span id="user-lbl" style="font-family:monospace;font-size:10px;color:#888"></span>
+      <button onclick="doLogout()" style="background:none;border:none;color:#666;font-size:18px;cursor:pointer" title="Salir">⎋</button>
+    </div>
+  </div>
+  <div class="nav">
+    <div class="nav-btn on" onclick="goTab('eq',this)">📋 EQUIPOS</div>
+    <div class="nav-btn" onclick="goTab('rs',this)">📊 RESUMEN</div>
+    <div class="nav-btn" onclick="goTab('inf',this)">📄 INFORME</div>
+  </div>
+
+  <!-- TAB EQUIPOS -->
+  <div id="tab-eq">
+    <div class="page-wrap">
+      <div class="filter-bar">
+        <span style="font-size:10px;color:#aaa;font-family:monospace">PISO</span>
+        <span class="chip on" onclick="setFloor('all',this)">TODOS</span>
+        <span class="chip" onclick="setFloor('1',this)">P1</span>
+        <span class="chip" onclick="setFloor('2',this)">P2</span>
+        <span class="chip" onclick="setFloor('3',this)">P3</span>
+        <span class="chip" onclick="setFloor('4',this)">P4</span>
+        <span class="chip" onclick="setFloor('5',this)">P5</span>
+        <span class="chip" onclick="setFloor('6',this)">P6</span>
+        <span class="chip" onclick="setFloor('7',this)">P7</span>
+        <span class="chip" onclick="setFloor('hangar',this)">HANGAR</span>
+        <span id="eq-cnt" style="margin-left:auto;font-size:10px;color:#aaa;font-family:monospace"></span>
+      </div>
+      <div id="eq-list"></div>
+    </div>
+  </div>
+
+  <!-- TAB RESUMEN -->
+  <div id="tab-rs" style="display:none">
+    <div class="page-wrap">
+      <div style="background:#0f1117;color:#fff;border-radius:8px;padding:20px 24px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+        <div>
+          <div style="font-size:16px;font-weight:600">Edificio de Molino — Recepción y Molienda</div>
+          <div style="font-family:monospace;font-size:10px;color:#888;margin-top:3px">UNE-EN 60079-10-2:2010</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-family:monospace;font-size:10px;color:#888">AVANCE</div>
+          <div id="pct" style="font-family:monospace;font-size:36px;font-weight:600;color:#e8820a">0%</div>
+        </div>
+      </div>
+      <div class="prog-wrap"><div class="prog" id="prog" style="width:0%"></div></div>
+      <div class="kpi-grid">
+        <div class="kpi"><div class="kpi-n" id="kTotal">—</div><div class="kpi-l">Registrados</div></div>
+        <div class="kpi"><div class="kpi-n" id="kC" style="color:#059669">—</div><div class="kpi-l">Conformes</div></div>
+        <div class="kpi"><div class="kpi-n" id="kNC" style="color:#dc2626">—</div><div class="kpi-l">No conformes</div></div>
+        <div class="kpi"><div class="kpi-n" id="kOBS" style="color:#d97706">—</div><div class="kpi-l">Observaciones</div></div>
+      </div>
+      <div class="sec-hd">Hallazgos</div>
+      <div class="dt">
+        <div class="dt-head" style="grid-template-columns:2.5fr 0.8fr 0.7fr 2.5fr">
+          <div>EQUIPO</div><div>ZONA</div><div>ESTADO</div><div>HALLAZGO</div>
+        </div>
+        <div id="gap-rows"><div style="padding:28px;text-align:center;color:#6b7280">Sin registros</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB INFORME -->
+  <div id="tab-inf" style="display:none">
+    <div class="page-wrap">
+      <div class="sec-hd" style="margin-top:0">Datos del informe</div>
+      <div class="card" style="margin-bottom:20px">
+        <div class="two-col" style="gap:14px">
+          <div><div class="field-lbl">Inspector</div><input class="field-input" id="i-insp" placeholder="Nombre y cargo"></div>
+          <div><div class="field-lbl">Fecha</div><input class="field-input" id="i-fecha" type="date"></div>
+          <div><div class="field-lbl">Área</div><input class="field-input" id="i-area" value="Edificio de Molino — Recepción y Molienda"></div>
+          <div><div class="field-lbl">Revisión N°</div><input class="field-input" id="i-rev" placeholder="1"></div>
+          <div style="grid-column:1/-1"><div class="field-lbl">Conclusiones</div><textarea class="field-ta" id="i-concl" placeholder="Principales brechas y recomendaciones…" style="min-height:80px"></textarea></div>
+        </div>
+      </div>
+      <div class="sec-hd">No conformidades</div>
+      <div id="nc-sum" style="margin-bottom:20px"></div>
+      <div class="sec-hd">Tabla completa</div>
+      <div class="dt" style="overflow-x:auto">
+        <div class="dt-head" style="grid-template-columns:2fr 0.7fr 0.7fr 2.5fr 2fr;min-width:700px">
+          <div>EQUIPO</div><div>ZONA</div><div>ESTADO</div><div>HALLAZGO</div><div>ACCIÓN</div>
+        </div>
+        <div id="findings" style="min-width:700px"><div style="padding:28px;text-align:center;color:#6b7280">Sin datos</div></div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:22px;flex-wrap:wrap">
+        <button class="btn-dark btn-lg" onclick="exportCSV()">⬇ CSV</button>
+        <button class="btn-dark btn-lg" onclick="copyMD()">📋 Markdown</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div id="modal-bg" onclick="closeMBg(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <div style="flex:1">
+        <div id="m-name" style="font-size:15px;font-weight:600;margin-bottom:4px"></div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span id="m-zpill" class="zpill"></span>
+          <span id="m-floor" style="font-family:monospace;font-size:10px;color:#888"></span>
+          <span id="m-grp" style="font-family:monospace;font-size:10px;color:#666"></span>
+        </div>
+      </div>
+      <button onclick="closeModal()" style="background:none;border:none;color:#666;font-size:20px;cursor:pointer">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:10px;font-weight:600;color:#d4500a;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0">Datos de placa</div>
+      <div class="two-col">
+        <div><div class="field-lbl">Marca</div><input class="field-input" id="f-marca" placeholder="Siemens, SEW…"></div>
+        <div><div class="field-lbl">Modelo</div><input class="field-input" id="f-modelo" placeholder="Referencia"></div>
+      </div>
+      <div class="two-col">
+        <div><div class="field-lbl">N° Serie / Tag</div><input class="field-input" id="f-serie" placeholder="Tag planta"></div>
+        <div><div class="field-lbl">Potencia / Tensión</div><input class="field-input" id="f-pot" placeholder="11 kW / 380V"></div>
+      </div>
+      <div style="font-size:10px;font-weight:600;color:#d4500a;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">Clasificación ATEX</div>
+      <div class="two-col">
+        <div><div class="field-lbl">Marcado Ex</div><input class="field-input" id="f-mex" placeholder="Ex db IIB T3 Gb"></div>
+        <div><div class="field-lbl">EPL / Categoría</div>
+          <select class="field-sel" id="f-epl">
+            <option value="">— seleccionar —</option>
+            <option>EPL Da / Cat. 1D — Muy alta</option>
+            <option>EPL Db / Cat. 2D — Alta</option>
+            <option>EPL Dc / Cat. 3D — Mejorada</option>
+            <option>Sin marcado Ex — requiere reemplazo</option>
+            <option>Marcado no visible / ilegible</option>
+            <option>Equipo no eléctrico / mecánico</option>
+          </select>
+        </div>
+      </div>
+      <div class="two-col">
+        <div><div class="field-lbl">Zona asignada</div>
+          <select class="field-sel" id="f-zona">
+            <option value="">— clasificar —</option>
+            <option value="20">Zona 20</option>
+            <option value="21">Zona 21</option>
+            <option value="22">Zona 22</option>
+            <option value="NG">No peligroso</option>
+          </select>
+        </div>
+        <div><div class="field-lbl">Temp. superficial máx.</div><input class="field-input" id="f-temp" placeholder="T3 (200°C)"></div>
+      </div>
+      <div style="font-size:10px;font-weight:600;color:#d4500a;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">Conformidad</div>
+      <div class="radio-grp" id="rgrp">
+        <span class="ropt" data-v="C" onclick="setConf('C',this)">C — Conforme</span>
+        <span class="ropt" data-v="NC" onclick="setConf('NC',this)">NC — No conforme</span>
+        <span class="ropt" data-v="OBS" onclick="setConf('OBS',this)">OBS — Observación</span>
+        <span class="ropt" data-v="NA" onclick="setConf('NA',this)">NA — No aplica</span>
+      </div>
+      <div style="font-size:10px;font-weight:600;color:#d4500a;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">Hallazgos</div>
+      <div><div class="field-lbl">Brechas detectadas</div><textarea class="field-ta" id="f-hall" placeholder="Marcado faltante, EPL inadecuado…"></textarea></div>
+      <div><div class="field-lbl">Acción correctiva</div><textarea class="field-ta" id="f-acc" placeholder="Reemplazo, re-certificación…"></textarea></div>
+      <div style="font-size:10px;font-weight:600;color:#d4500a;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">Fotografías</div>
+      <div class="photo-zone">
+        <div class="photo-grid" id="pgrid"></div>
+        <button class="btn-dark" onclick="document.getElementById('fin').click()" style="font-size:11px;padding:6px 14px">📷 Agregar foto</button>
+        <input type="file" id="fin" accept="image/*" multiple onchange="addPhotos(event)">
+        <div style="font-size:9px;color:#aaa;margin-top:6px;font-family:monospace">Fotografíe la placa de datos y el marcado Ex</div>
+      </div>
+      <div id="m-prev" style="display:none;padding:8px 10px;background:#eceae3;border-radius:4px;font-size:11px;color:#6b7280;font-family:monospace"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-out" onclick="closeModal()">Cancelar</button>
+      <button class="btn-save" onclick="saveEq()" id="btn-sv">GUARDAR</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  CONFIG — edita estas dos líneas con tus credenciales
+// ═══════════════════════════════════════════════════════════
+const SUPA_URL = 'https://nyqqaaqxjdmedggpkxbj.supabase.co';
+const SUPA_KEY = 'sb_publishable_mtcCcCdVScjQQHtIQxUpYQ_awU9gt_j';
+
+// ═══════════════════════════════════════════════════════════
+//  SUPABASE INIT
+// ═══════════════════════════════════════════════════════════
+const sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+
+// ═══════════════════════════════════════════════════════════
+//  CATÁLOGO DE EQUIPOS
+// ═══════════════════════════════════════════════════════════
+const EQ = [
+  {id:'e001',n:'Redlers y elevadores de capacho',p:'1',g:'Transporte',z:'21'},
+  {id:'e002',n:'Cono salida silos de malta',p:'1',g:'Almacenamiento',z:''},
+  {id:'e003',n:'Cono salida silos de arroz',p:'1',g:'Almacenamiento',z:''},
+  {id:'e004',n:'Compuertas de silos de malta',p:'1',g:'Válvulas',z:''},
+  {id:'e005',n:'Compuertas silos malta y arroz',p:'1',g:'Válvulas',z:''},
+  {id:'e006',n:'Transporte preparación de carga e intersilos',p:'1',g:'Transporte',z:'21'},
+  {id:'e007',n:'Succión polvos descarga de malta (x2)',p:'1',g:'Aspiración',z:'21'},
+  {id:'e008',n:'Redler transporte descarga de malta',p:'1',g:'Transporte',z:'21'},
+  {id:'e009',n:'Agua proceso al premacerador',p:'1',g:'Servicios',z:'NG'},
+  {id:'e010',n:'Compresor tolva polvo recepción malta',p:'2',g:'Compresor',z:'22'},
+  {id:'e011',n:'Tolva de polvo (parte inferior)',p:'2',g:'Contenedor polvo',z:'20'},
+  {id:'e012',n:'Ciclón filtro manga recepción arroz',p:'2',g:'Filtración polvo',z:'21'},
+  {id:'e013',n:'Tolva harina de malta (parte inferior)',p:'2',g:'Contenedor polvo',z:'20'},
+  {id:'e014',n:'Tolva harina de arroz (parte inferior)',p:'2',g:'Contenedor polvo',z:'20'},
+  {id:'e015',n:'Elevador de capachos (despedradora→acondicionador)',p:'2',g:'Transporte',z:'21'},
+  {id:'e016',n:'Filtro separador mangas descarga arroz',p:'2',g:'Filtración polvo',z:'22'},
+  {id:'e017',n:'Tolva polvos malta a silos de orujo',p:'2',g:'Contenedor polvo',z:'20'},
+  {id:'e018',n:'Compresor polvo sistema recepción arroz',p:'3',g:'Compresor',z:'22'},
+  {id:'e019',n:'Tolva de polvo / Tolva de malta (inf.)',p:'3',g:'Contenedor polvo',z:'20'},
+  {id:'e020',n:'Molino parte inferior — descarga a redler',p:'3',g:'Molienda',z:'21'},
+  {id:'e021',n:'Despedradora de malta',p:'3',g:'Limpieza grano',z:'21'},
+  {id:'e022',n:'Tolva de arroz',p:'3',g:'Almacenamiento',z:'21'},
+  {id:'e023',n:'Compuerta silo batch',p:'3',g:'Válvulas',z:''},
+  {id:'e024',n:'Tolva de harina de malta',p:'3',g:'Contenedor polvo',z:'20'},
+  {id:'e025',n:'Molino de malta (6 cilindros — 11 t/h)',p:'4',g:'Molienda',z:'21'},
+  {id:'e026',n:'Silo batch malta (parte inferior — 11,5 t)',p:'4',g:'Contenedor polvo',z:'20'},
+  {id:'e027',n:'Molino de arroz (2 cilindros — 5 t/h)',p:'4',g:'Molienda',z:'21'},
+  {id:'e028',n:'Succión polvos molino de malta',p:'4',g:'Aspiración',z:'21'},
+  {id:'e029',n:'Succión polvos malta a humectación',p:'4',g:'Aspiración',z:'21'},
+  {id:'e030',n:'Filtro manga tolva recepción (parte inf.)',p:'5',g:'Filtración polvo',z:'22'},
+  {id:'e031',n:'Tornillo acondicionador / humectador (11 t/h)',p:'5',g:'Acondicionamiento',z:'22'},
+  {id:'e032',n:'Silo Batch malta (parte superior)',p:'5',g:'Contenedor polvo',z:'20'},
+  {id:'e033',n:'Filtro manga polvo equipos malta (inf.)',p:'5',g:'Filtración polvo',z:'22'},
+  {id:'e034',n:'Filtro manga polvo equipos arroz (inf.)',p:'5',g:'Filtración polvo',z:'22'},
+  {id:'e035',n:'Despedradora de arroz (8 t/h)',p:'5',g:'Limpieza grano',z:'21'},
+  {id:'e036',n:'Filtro manga arroz a molienda (inf.) + desvíos',p:'5',g:'Filtración polvo',z:'22'},
+  {id:'e037',n:'Succión polvos despedradora de arroz',p:'5',g:'Aspiración',z:'21'},
+  {id:'e038',n:'Filtro manga polvo tolva recepción (sup.)',p:'6',g:'Filtración polvo',z:'22'},
+  {id:'e039',n:'Redlers alimentación criba circular malta',p:'6',g:'Transporte',z:'21'},
+  {id:'e040',n:'Criba circular de malta / limpiadora (20 t/h)',p:'6',g:'Limpieza grano',z:'21'},
+  {id:'e041',n:'Filtro manga polvo equipos malta (sup.)',p:'6',g:'Filtración polvo',z:'22'},
+  {id:'e042',n:'Filtro manga polvo equipos arroz (sup.)',p:'6',g:'Filtración polvo',z:'22'},
+  {id:'e043',n:'Compresor neumático arroz a molienda + ciclón',p:'6',g:'Compresor',z:'22'},
+  {id:'e044',n:'Elevador alimentación criba circular arroz',p:'6',g:'Transporte',z:'21'},
+  {id:'e045',n:'Criba circular arroz (20 t/h)',p:'6',g:'Limpieza grano',z:'21'},
+  {id:'e046',n:'Ventilador filtro manga polvo malta',p:'6',g:'Ventilación',z:'22'},
+  {id:'e047',n:'Ventilador filtro manga polvo arroz',p:'6',g:'Ventilación',z:'22'},
+  {id:'e048',n:'Filtro separador mangas ambiente arroz y malta',p:'6',g:'Filtración polvo',z:'22'},
+  {id:'e049',n:'Terminación elevador de malta',p:'7',g:'Transporte',z:'21'},
+  {id:'e050',n:'Terminación elevador de arroz',p:'7',g:'Transporte',z:'21'},
+  {id:'e051',n:'Balanza en línea malta (50 t/h)',p:'7',g:'Pesaje',z:'21'},
+  {id:'e052',n:'Balanza en línea arroz',p:'7',g:'Pesaje',z:'21'},
+  {id:'e053',n:'Silos de malta (6 silos — 600 t total)',p:'7',g:'Almacenamiento',z:'20'},
+  {id:'e054',n:'Sistema extracción polvo tolva recepción',p:'7',g:'Aspiración',z:'21'},
+  {id:'e055',n:'Succión polvos distribuidor malta a silos',p:'7',g:'Aspiración',z:'21'},
+  {id:'e056',n:'Succión polvos arroz a intersilos',p:'7',g:'Aspiración',z:'21'},
+  {id:'e057',n:'Tolva de recepción malta (6 m³ — 2.300 kg)',p:'hangar',g:'Contenedor polvo',z:'21'},
+  {id:'e058',n:'Pre-limpiadora malta',p:'hangar',g:'Limpieza grano',z:'21'},
+  {id:'e059',n:'Transportadores cadena recepción malta (50 t/h)',p:'hangar',g:'Transporte',z:'21'},
+  {id:'e060',n:'Elevador capachos recepción malta (50 t/h)',p:'hangar',g:'Transporte',z:'21'},
+  {id:'e061',n:'Sistema neumático aspiración arroz (30 t/h)',p:'hangar',g:'Transporte',z:'21'},
+  {id:'e062',n:'Silos de arroz / intersilos (325 t)',p:'hangar',g:'Almacenamiento',z:'20'},
+];
+const FL = {'1':'Primer piso','2':'Segundo piso','3':'Tercer piso','4':'Cuarto piso','5':'Quinto piso','6':'Sexto piso','7':'Séptimo piso','hangar':'Hangar / Patio'};
+
+// ═══════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════
+let session, profile, recs={}, curEq=null, curConf='', pendFiles=[], exPaths=[], floorF='all', allRaw=[];
+
+// ═══════════════════════════════════════════════════════════
+//  BOOT
+// ═══════════════════════════════════════════════════════════
+(async()=>{
+  try {
+    const {data} = await sb.auth.getSession();
+    if(data.session){ session=data.session; await loadApp(); }
+  } catch(e){ console.warn(e); }
+})();
+
+async function loadApp(){
+  loader(1);
+  // Show app immediately
+  document.getElementById('login').style.display='none';
+  document.getElementById('app').style.display='flex';
+  // Load profile
+  try {
+    const {data} = await sb.from('profiles').select('*').eq('id',session.user.id).single();
+    profile=data;
+  } catch(e){ profile={full_name:session.user.email}; }
+  const name = profile?.full_name||session.user.email;
+  document.getElementById('user-lbl').textContent=name;
+  document.getElementById('i-insp').value=name;
+  document.getElementById('i-fecha').value=new Date().toISOString().slice(0,10);
+  // Load records
+  try {
+    const {data} = await sb.from('registros').select('*, profiles(full_name)').order('updated_at',{ascending:false});
+    if(data) data.forEach(r=>{ recs[r.equipo_id]=r; allRaw=data; });
+  } catch(e){ toast('Ejecuta el schema.sql en Supabase para activar la base de datos','err'); }
+  renderEq();
+  loader(0);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  AUTH
+// ═══════════════════════════════════════════════════════════
+function authTab(t){
+  document.getElementById('tli').classList.toggle('on',t==='li');
+  document.getElementById('trg').classList.toggle('on',t==='rg');
+  document.getElementById('form-li').style.display=t==='li'?'flex':'none';
+  document.getElementById('form-rg').style.display=t==='rg'?'flex':'none';
+  setMsg('','');
+}
+function setMsg(txt,type){
+  const el=document.getElementById('auth-msg');
+  el.textContent=txt; el.className='msg'+(type?' '+type:'');
+  el.style.display=txt?'block':'none';
+}
+async function doLogin(e){
+  e.preventDefault(); setMsg('','');
+  const btn=document.getElementById('btn-li');
+  btn.disabled=1; btn.textContent='Ingresando…';
+  try {
+    const {data,error}=await sb.auth.signInWithPassword({email:document.getElementById('li-e').value.trim(),password:document.getElementById('li-p').value});
+    if(error)throw error;
+    session=data.session; await loadApp();
+  } catch(err){ setMsg('Credenciales incorrectas.','err'); btn.disabled=0; btn.textContent='INGRESAR'; }
+}
+async function doRegister(e){
+  e.preventDefault(); setMsg('','');
+  const btn=document.getElementById('btn-rg');
+  btn.disabled=1; btn.textContent='Creando…';
+  try {
+    const {error}=await sb.auth.signUp({email:document.getElementById('rg-e').value.trim(),password:document.getElementById('rg-p').value,options:{data:{full_name:document.getElementById('rg-n').value.trim()}}});
+    if(error)throw error;
+    setMsg('Cuenta creada. Revisa tu email y luego ingresa.','ok');
+    authTab('li');
+  } catch(err){ setMsg(err.message||'Error.','err'); }
+  btn.disabled=0; btn.textContent='CREAR CUENTA';
+}
+async function doLogout(){
+  await sb.auth.signOut();
+  document.getElementById('app').style.display='none';
+  document.getElementById('login').style.display='flex';
+}
+
+// ═══════════════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════════════
+function goTab(name,el){
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  ['eq','rs','inf'].forEach(t=>{ document.getElementById('tab-'+t).style.display=t===name?'block':'none'; });
+  if(name==='rs') renderResumen();
+  if(name==='inf'){ renderResumen(); renderFindings(); }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  EQUIPOS
+// ═══════════════════════════════════════════════════════════
+function zpillHtml(z){
+  const cls={20:'z20p',21:'z21p',22:'z22p',NG:'zdp','':'zdp'}[z]||'zdp';
+  return `<span class="zpill ${cls}">${z?'Z'+z:'—'}</span>`;
+}
+function renderEq(){
+  const list=document.getElementById('eq-list');
+  const items=floorF==='all'?EQ:EQ.filter(e=>e.p===floorF);
+  document.getElementById('eq-cnt').textContent=items.length+' equipos';
+  const floors=[...new Set(items.map(e=>e.p))];
+  let h='';
+  for(const fl of floors){
+    h+=`<div class="sec-hd">${FL[fl]||fl}</div><div class="eq-grid">`;
+    for(const eq of items.filter(e=>e.p===fl)){
+      const r=recs[eq.id]||{};
+      const z=r.zona||eq.z||'';
+      h+=`<div class="eq-card${z?' z'+z:''} ${r.conformidad?'done':''}" onclick="openModal('${eq.id}')">
+        <div class="eq-name">${eq.n}</div>
+        <div class="eq-meta">${zpillHtml(z)}<span style="font-family:monospace;font-size:9px;color:#bbb">${eq.g}</span>
+        <span class="dot d${r.conformidad||'-'}"></span></div>
+        ${r.marca?`<div style="font-family:monospace;font-size:9px;color:#aaa;margin-top:4px">${r.marca}${r.modelo?' · '+r.modelo:''}</div>`:''}
+      </div>`;
+    }
+    h+='</div>';
+  }
+  list.innerHTML=h||'<div style="padding:40px;text-align:center;color:#6b7280">Sin equipos</div>';
+}
+function setFloor(fl,el){
+  floorF=fl;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  renderEq();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  MODAL
+// ═══════════════════════════════════════════════════════════
+async function openModal(id){
+  curEq=id; curConf=''; pendFiles=[]; exPaths=[];
+  const eq=EQ.find(e=>e.id===id), r=recs[id]||{};
+  document.getElementById('m-name').textContent=eq.n;
+  document.getElementById('m-floor').textContent=FL[eq.p]||eq.p;
+  document.getElementById('m-grp').textContent=eq.g;
+  const z=r.zona||eq.z||'';
+  const pill=document.getElementById('m-zpill');
+  pill.textContent=z?'Zona '+z:'Sin clasificar';
+  pill.className='zpill '+({20:'z20p',21:'z21p',22:'z22p',NG:'zdp','':'zdp'}[z]||'zdp');
+  const fv=(id,v)=>{document.getElementById(id).value=v||'';};
+  fv('f-marca',r.marca); fv('f-modelo',r.modelo); fv('f-serie',r.serie);
+  fv('f-pot',r.potencia); fv('f-mex',r.marcado_ex); fv('f-epl',r.epl);
+  fv('f-zona',r.zona||eq.z); fv('f-temp',r.temp_max);
+  fv('f-hall',r.hallazgo); fv('f-acc',r.accion);
+  curConf=r.conformidad||''; renderRadios();
+  exPaths=r.fotos||[]; await renderPhotos();
+  const prev=document.getElementById('m-prev');
+  if(r.inspector_nombre&&r.updated_at){
+    prev.style.display='block';
+    prev.textContent='Última actualización: '+r.inspector_nombre+' · '+new Date(r.updated_at).toLocaleString('es-CL');
+  } else { prev.style.display='none'; }
+  document.getElementById('modal-bg').classList.add('on');
+  document.body.style.overflow='hidden';
+}
+function closeModal(){ document.getElementById('modal-bg').classList.remove('on'); document.body.style.overflow=''; curEq=null; }
+function closeMBg(e){ if(e.target===document.getElementById('modal-bg')) closeModal(); }
+function setConf(v){ curConf=v; renderRadios(); }
+function renderRadios(){ document.querySelectorAll('.ropt').forEach(b=>{ b.className='ropt'; if(b.dataset.v===curConf) b.classList.add('s'+curConf); }); }
+function addPhotos(e){ pendFiles.push(...e.target.files); e.target.value=''; renderPhotos(); }
+async function renderPhotos(){
+  const g=document.getElementById('pgrid'); let h='';
+  for(let i=0;i<exPaths.length;i++){
+    try{ const {data}=await sb.storage.from('atex-fotos').createSignedUrl(exPaths[i],3600);
+      h+=`<div class="photo-wrap"><img src="${data.signedUrl}" onclick="openLb('${data.signedUrl}')"><button class="photo-rm" onclick="exPaths.splice(${i},1);renderPhotos()">✕</button></div>`;
+    }catch(e){ h+=`<div style="aspect-ratio:1;background:#eee;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px">Error</div>`; }
+  }
+  for(let i=0;i<pendFiles.length;i++){
+    const u=URL.createObjectURL(pendFiles[i]);
+    h+=`<div class="photo-wrap"><img src="${u}" onclick="openLb('${u}')"><button class="photo-rm" onclick="pendFiles.splice(${i},1);renderPhotos()">✕</button></div>`;
+  }
+  g.innerHTML=h;
+}
+async function saveEq(){
+  if(!curEq)return;
+  const btn=document.getElementById('btn-sv');
+  btn.disabled=1; btn.textContent='Guardando…';
+  try {
+    const newPaths=[];
+    for(const f of pendFiles){
+      const ext=f.name.split('.').pop(), path=`${session.user.id}/${curEq}/${Date.now()}.${ext}`;
+      await sb.storage.from('atex-fotos').upload(path,f,{contentType:f.type});
+      newPaths.push(path);
+    }
+    const eq=EQ.find(e=>e.id===curEq);
+    const payload={
+      equipo_id:curEq, equipo_nombre:eq.n, piso:eq.p, grupo:eq.g,
+      marca:document.getElementById('f-marca').value.trim(),
+      modelo:document.getElementById('f-modelo').value.trim(),
+      serie:document.getElementById('f-serie').value.trim(),
+      potencia:document.getElementById('f-pot').value.trim(),
+      marcado_ex:document.getElementById('f-mex').value.trim(),
+      epl:document.getElementById('f-epl').value,
+      zona:document.getElementById('f-zona').value,
+      temp_max:document.getElementById('f-temp').value.trim(),
+      conformidad:curConf,
+      hallazgo:document.getElementById('f-hall').value.trim(),
+      accion:document.getElementById('f-acc').value.trim(),
+      fotos:[...exPaths,...newPaths],
+      inspector_id:session.user.id,
+      inspector_nombre:profile?.full_name||session.user.email,
+    };
+    const {data:ex}=await sb.from('registros').select('id').eq('equipo_id',curEq).eq('inspector_id',session.user.id).maybeSingle();
+    let saved;
+    if(ex){ const {data}=await sb.from('registros').update(payload).eq('id',ex.id).select().single(); saved=data; }
+    else { const {data}=await sb.from('registros').insert(payload).select().single(); saved=data; }
+    recs[curEq]={...saved,profiles:{full_name:profile?.full_name}};
+    toast('Equipo guardado ✓','ok');
+    closeModal(); renderEq();
+  } catch(err){ toast('Error: '+err.message,'err'); }
+  btn.disabled=0; btn.textContent='GUARDAR';
+}
+
+// ═══════════════════════════════════════════════════════════
+//  RESUMEN
+// ═══════════════════════════════════════════════════════════
+async function renderResumen(){
+  loader(1);
+  try {
+    const {data}=await sb.from('registros').select('*, profiles(full_name)');
+    allRaw=data||[];
+    const total=allRaw.length, C=allRaw.filter(r=>r.conformidad==='C').length,
+          NC=allRaw.filter(r=>r.conformidad==='NC').length, OBS=allRaw.filter(r=>r.conformidad==='OBS').length;
+    const pct=Math.round(total/EQ.length*100);
+    document.getElementById('pct').textContent=pct+'%';
+    document.getElementById('prog').style.width=pct+'%';
+    document.getElementById('kTotal').textContent=total;
+    document.getElementById('kC').textContent=C;
+    document.getElementById('kNC').textContent=NC;
+    document.getElementById('kOBS').textContent=OBS;
+    renderGapRows();
+  } catch(e){ toast('Error cargando resumen','err'); }
+  loader(0);
+}
+function renderGapRows(){
+  const rows=document.getElementById('gap-rows');
+  if(!allRaw.length){ rows.innerHTML='<div style="padding:28px;text-align:center;color:#6b7280">Sin registros</div>'; return; }
+  rows.innerHTML=allRaw.map(r=>`<div class="dt-row" style="grid-template-columns:2.5fr 0.8fr 0.7fr 2.5fr">
+    <div><div style="font-weight:500;font-size:12px">${r.equipo_nombre}</div><div style="font-family:monospace;font-size:9px;color:#aaa">${FL[r.piso]||r.piso}</div></div>
+    <div>${zpillHtml(r.zona||'')}</div>
+    <div><span class="cbadge b${r.conformidad}">${r.conformidad}</span></div>
+    <div style="font-size:11px;color:#6b7280">${r.hallazgo||'—'}</div>
+  </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  INFORME
+// ═══════════════════════════════════════════════════════════
+function renderFindings(){
+  const nc=allRaw.filter(r=>r.conformidad==='NC');
+  const el=document.getElementById('nc-sum');
+  if(!nc.length){ el.innerHTML='<div style="padding:10px 14px;background:#d1fae5;color:#065f46;border-left:3px solid #059669;border-radius:4px;font-size:13px">✓ Sin no conformidades.</div>'; }
+  else { el.innerHTML=`<div style="padding:10px 14px;background:#fee2e2;color:#991b1b;border-left:3px solid #dc2626;border-radius:4px;font-size:13px;margin-bottom:10px">⚠ ${nc.length} no conformidad${nc.length>1?'es':''}</div>`
+    +nc.map(r=>`<div style="padding:10px 14px;background:#fff;border:1px solid #ddd9d0;border-left:3px solid #dc2626;border-radius:4px;margin-bottom:8px">
+      <div style="font-weight:500;font-size:13px">${r.equipo_nombre}</div>
+      <div style="font-size:10px;color:#aaa;font-family:monospace;margin-bottom:5px">${FL[r.piso]||r.piso}</div>
+      <div style="font-size:12px;margin-bottom:3px"><strong>Hallazgo:</strong> ${r.hallazgo||'—'}</div>
+      <div style="font-size:12px;color:#6b7280"><strong>Acción:</strong> ${r.accion||'—'}</div>
+    </div>`).join(''); }
+  document.getElementById('findings').innerHTML=allRaw.map(r=>`<div class="dt-row" style="grid-template-columns:2fr 0.7fr 0.7fr 2.5fr 2fr">
+    <div><div style="font-weight:500;font-size:12px">${r.equipo_nombre}</div><div style="font-family:monospace;font-size:9px;color:#aaa">${FL[r.piso]||r.piso}</div></div>
+    <div>${zpillHtml(r.zona||'')}</div>
+    <div><span class="cbadge b${r.conformidad}">${r.conformidad}</span></div>
+    <div style="font-size:11px">${r.hallazgo||'—'}</div>
+    <div style="font-size:11px;color:#6b7280">${r.accion||'—'}</div>
+  </div>`).join('');
+}
+function exportCSV(){
+  const rows=[['Equipo','Piso','Zona','Conformidad','Hallazgo','Acción','Inspector'],
+    ...allRaw.map(r=>[`"${r.equipo_nombre}"`,r.piso,r.zona||'',r.conformidad||'',`"${(r.hallazgo||'').replace(/"/g,"'")}"`,`"${(r.accion||'').replace(/"/g,"'")}"`,`"${r.inspector_nombre||''}"`])];
+  const blob=new Blob(['\ufeff'+rows.map(r=>r.join(',')).join('\n')],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`ATEX_CCU_${new Date().toISOString().slice(0,10)}.csv`; a.click();
+  toast('CSV descargado ✓','ok');
+}
+function copyMD(){
+  let md=`# Informe ATEX — CCU Chile · Planta Temuco\n\n**Inspector:** ${document.getElementById('i-insp').value||'—'}  \n**Fecha:** ${document.getElementById('i-fecha').value||'—'}  \n**Norma:** UNE-EN 60079-10-2:2010\n\n`;
+  md+=`| Equipo | Piso | Zona | Estado | Hallazgo |\n|---|---|---|---|---|\n`;
+  allRaw.forEach(r=>{ md+=`| ${r.equipo_nombre} | ${FL[r.piso]||r.piso} | ${r.zona?'Z'+r.zona:'—'} | ${r.conformidad} | ${r.hallazgo||'—'} |\n`; });
+  navigator.clipboard.writeText(md).then(()=>toast('Markdown copiado ✓','ok')).catch(()=>toast('Error al copiar','err'));
+}
+
+// ═══════════════════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════════════════
+function loader(v){ document.getElementById('loader').classList.toggle('on',!!v); }
+function toast(msg,type=''){
+  const el=document.createElement('div'); el.className='toast '+(type||''); el.textContent=msg;
+  document.getElementById('toasts').appendChild(el); setTimeout(()=>el.remove(),3500);
+}
+function openLb(url){ document.getElementById('lb-img').src=url; document.getElementById('lb').classList.add('on'); }
+function closeLb(){ document.getElementById('lb').classList.remove('on'); }
+</script>
+</body>
+</html>
