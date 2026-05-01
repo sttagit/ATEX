@@ -107,6 +107,17 @@ input{width:100%;padding:8px 10px;border:1px solid #ddd9d0;border-radius:4px;fon
 .toast{background:#0f1117;color:#fff;border-radius:4px;padding:10px 16px;font-size:13px;box-shadow:0 4px 16px rgba(0,0,0,.2);border-left:3px solid #d4500a;max-width:280px}
 .toast.ok{border-left-color:#059669}.toast.err{border-left-color:#dc2626}
 input[type=file]{display:none}
+/* ── SUBCOMPONENTS ── */
+.eq-expand{display:none;border-top:1px solid #f0ece4;margin-top:8px;padding-top:8px}
+.eq-card.expanded .eq-expand{display:block}
+.comp-row{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:4px;cursor:pointer;transition:background .1s;border:1px solid #f0ece4;margin-bottom:4px;background:#fafaf8}
+.comp-row:hover{background:#f5f3ee}
+.comp-name{font-size:12px;font-weight:500;flex:1}
+.comp-type{font-family:monospace;font-size:9px;color:#aaa;background:#f0ece4;padding:1px 6px;border-radius:2px}
+.comp-add{display:flex;align-items:center;gap:6px;padding:5px 8px;border:1.5px dashed #ddd9d0;border-radius:4px;cursor:pointer;color:#aaa;font-size:11px;font-family:monospace;transition:all .1s;margin-top:4px}
+.comp-add:hover{border-color:#d4500a;color:#d4500a}
+.eq-card .eq-toggle{font-family:monospace;font-size:9px;color:#aaa;margin-left:auto;padding:2px 6px;border:1px solid #eee;border-radius:2px;background:#fafafa;cursor:pointer;user-select:none;white-space:nowrap}
+.eq-card .eq-toggle:hover{border-color:#d4500a;color:#d4500a}
 /* ── LIGHTBOX ── */
 #lb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:500;align-items:center;justify-content:center}
 #lb.on{display:flex}
@@ -331,6 +342,88 @@ input[type=file]{display:none}
   </div>
 </div>
 
+<!-- SUB MODAL -->
+<div id="smodal-bg" onclick="closeSMBg(event)" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;padding:16px;overflow-y:auto;align-items:flex-start;justify-content:center">
+  <div class="modal" style="border-top-color:#7c3aed">
+    <div class="modal-head" style="background:#1e1030">
+      <div style="flex:1">
+        <div style="font-size:11px;font-family:monospace;color:#a78bfa;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">COMPONENTE DE:</div>
+        <div id="sm-parent-name" style="font-size:14px;font-weight:600;margin-bottom:4px"></div>
+        <input id="sm-tipo" placeholder="Tipo: Motor, Sensor, Detector, Actuador…" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:4px;padding:5px 10px;color:#fff;font-size:12px;width:100%;margin-bottom:4px">
+        <input id="sm-nombre" placeholder="Nombre/descripción del componente" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:4px;padding:5px 10px;color:#fff;font-size:12px;width:100%">
+      </div>
+      <button onclick="closeSubModal()" style="background:none;border:none;color:#666;font-size:20px;cursor:pointer;margin-left:12px;flex-shrink:0">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:10px;font-weight:600;color:#7c3aed;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0">Datos de placa</div>
+      <div class="two-col">
+        <div><div class="field-lbl">Marca</div><input class="field-input" id="sm-marca" placeholder="Siemens, SEW…"></div>
+        <div><div class="field-lbl">Modelo</div><input class="field-input" id="sm-modelo" placeholder="Referencia"></div>
+      </div>
+      <div class="two-col">
+        <div><div class="field-lbl">N° Serie / Tag</div><input class="field-input" id="sm-serie" placeholder="Tag planta"></div>
+        <div><div class="field-lbl">Potencia / Tensión</div><input class="field-input" id="sm-pot" placeholder="11 kW / 380V"></div>
+      </div>
+      <div style="font-size:10px;font-weight:600;color:#7c3aed;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">Clasificación ATEX</div>
+      <div class="two-col">
+        <div><div class="field-lbl">Marcado Ex</div><input class="field-input" id="sm-mex" placeholder="Ex db IIB T3 Gb"></div>
+        <div><div class="field-lbl">EPL / Categoría</div>
+          <select class="field-sel" id="sm-epl">
+            <option value="">— seleccionar —</option>
+            <option>EPL Da / Cat. 1D — Muy alta</option>
+            <option>EPL Db / Cat. 2D — Alta</option>
+            <option>EPL Dc / Cat. 3D — Mejorada</option>
+            <option>Sin marcado Ex — requiere reemplazo</option>
+            <option>Marcado no visible / ilegible</option>
+            <option>Equipo no eléctrico / mecánico</option>
+          </select>
+        </div>
+      </div>
+      <div class="two-col">
+        <div><div class="field-lbl">Zona asignada</div>
+          <select class="field-sel" id="sm-zona">
+            <option value="">— clasificar —</option>
+            <option value="20">Zona 20</option>
+            <option value="21">Zona 21</option>
+            <option value="22">Zona 22</option>
+            <option value="NG">No peligroso</option>
+          </select>
+        </div>
+        <div><div class="field-lbl">Temp. superficial máx.</div><input class="field-input" id="sm-temp" placeholder="T3 (200°C)"></div>
+      </div>
+      <div style="font-size:10px;font-weight:600;color:#7c3aed;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">Conformidad</div>
+      <div class="radio-grp" id="sm-rgrp">
+        <span class="ropt" data-v="C" onclick="setSubConf('C',this)">C — Conforme</span>
+        <span class="ropt" data-v="NC" onclick="setSubConf('NC',this)">NC — No conforme</span>
+        <span class="ropt" data-v="OBS" onclick="setSubConf('OBS',this)">OBS — Observación</span>
+        <span class="ropt" data-v="NA" onclick="setSubConf('NA',this)">NA — No aplica</span>
+      </div>
+      <div style="font-size:10px;font-weight:600;color:#7c3aed;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">Hallazgos</div>
+      <div><div class="field-lbl">Brechas detectadas</div><textarea class="field-ta" id="sm-hall" placeholder="Marcado faltante, EPL inadecuado…"></textarea></div>
+      <div><div class="field-lbl">Acción correctiva</div><textarea class="field-ta" id="sm-acc" placeholder="Reemplazo, re-certificación…"></textarea></div>
+      <div style="font-size:10px;font-weight:600;color:#7c3aed;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">Fotografías</div>
+      <div class="photo-zone">
+        <div class="photo-grid" id="sm-pgrid"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn-dark" onclick="document.getElementById('sm-cam').click()" style="font-size:11px;padding:6px 14px">📷 Tomar foto</button>
+          <button class="btn-dark" onclick="document.getElementById('sm-gal').click()" style="font-size:11px;padding:6px 14px;background:#444">🖼 Galería</button>
+        </div>
+        <input type="file" id="sm-cam" accept="image/*" capture="environment" onchange="addSubPhotos(event)">
+        <input type="file" id="sm-gal" accept="image/*" multiple onchange="addSubPhotos(event)">
+        <div style="font-size:9px;color:#aaa;margin-top:6px;font-family:monospace">Fotografíe la placa y marcado Ex del componente</div>
+      </div>
+      <div id="sm-prev" style="display:none;padding:8px 10px;background:#eceae3;border-radius:4px;font-size:11px;color:#6b7280;font-family:monospace"></div>
+      <div id="sm-del-wrap" style="display:none">
+        <button onclick="deleteComp()" style="background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;border-radius:4px;padding:6px 14px;font-size:11px;font-family:monospace;cursor:pointer">🗑 Eliminar componente</button>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-out" onclick="closeSubModal()">Cancelar</button>
+      <button class="btn-save" onclick="saveComp()" id="sm-sv" style="background:#7c3aed">GUARDAR COMPONENTE</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ═══════════════════════════════════════════════════════════
 //  CONFIG — edita estas dos líneas con tus credenciales
@@ -415,7 +508,8 @@ const FL = {'1':'Primer piso','2':'Segundo piso','3':'Tercer piso','4':'Cuarto p
 // ═══════════════════════════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════════════════════════
-let session, profile, recs={}, curEq=null, curConf='', pendFiles=[], exPaths=[], floorF='all', allRaw=[];
+let session, profile, recs={}, subRecs={}, curEq=null, curComp=null, curConf='', pendFiles=[], exPaths=[], floorF='all', allRaw=[], allSubRaw=[];
+let modalMode='main'; // 'main' | 'sub'
 
 // ═══════════════════════════════════════════════════════════
 //  BOOT
@@ -444,8 +538,13 @@ async function loadApp(){
   // Load records
   try {
     const {data} = await sb.from('registros').select('*, profiles(full_name)').order('updated_at',{ascending:false});
-    if(data) data.forEach(r=>{ recs[r.equipo_id]=r; allRaw=data; });
+    if(data){ data.forEach(r=>{ recs[r.equipo_id]=r; }); allRaw=data; }
   } catch(e){ toast('Ejecuta el schema.sql en Supabase para activar la base de datos','err'); }
+  // Load subcomponents
+  try {
+    const {data:sd}=await sb.from('componentes').select('*, profiles(full_name)').order('created_at',{ascending:true});
+    if(sd){ allSubRaw=sd; subRecs={}; sd.forEach(c=>{ if(!subRecs[c.equipo_id]) subRecs[c.equipo_id]=[]; subRecs[c.equipo_id].push(c); }); }
+  } catch(e){ console.warn('componentes table not found'); }
   renderEq();
   loader(0);
 }
@@ -511,6 +610,25 @@ function zpillHtml(z){
   const cls={20:'z20p',21:'z21p',22:'z22p',NG:'zdp','':'zdp'}[z]||'zdp';
   return `<span class="zpill ${cls}">${z?'Z'+z:'—'}</span>`;
 }
+function worstConf(eqId){
+  const comps=(subRecs[eqId]||[]);
+  const order=['NC','OBS','C','NA',''];
+  let worst='';
+  for(const c of comps){ if(order.indexOf(c.conformidad)<order.indexOf(worst)||worst==='') worst=c.conformidad||''; }
+  return worst;
+}
+
+function eqConf(eqId){
+  const main=(recs[eqId]||{}).conformidad||'';
+  const sub=worstConf(eqId);
+  const order=['NC','OBS','C','NA',''];
+  const mi=order.indexOf(main), si=order.indexOf(sub);
+  if(mi===-1&&si===-1) return '';
+  if(mi===-1) return sub;
+  if(si===-1) return main;
+  return mi<=si?main:sub;
+}
+
 function renderEq(){
   const list=document.getElementById('eq-list');
   const items=floorF==='all'?EQ:EQ.filter(e=>e.p===floorF);
@@ -522,16 +640,47 @@ function renderEq(){
     for(const eq of items.filter(e=>e.p===fl)){
       const r=recs[eq.id]||{};
       const z=r.zona||eq.z||'';
-      h+=`<div class="eq-card${z?' z'+z:''} ${r.conformidad?'done':''}" onclick="openModal('${eq.id}')">
-        <div class="eq-name">${eq.n}</div>
-        <div class="eq-meta">${zpillHtml(z)}<span style="font-family:monospace;font-size:9px;color:#bbb">${eq.g}</span>
-        <span class="dot d${r.conformidad||'-'}"></span></div>
+      const conf=eqConf(eq.id);
+      const comps=subRecs[eq.id]||[];
+      const compCount=comps.length;
+      h+=`<div class="eq-card${z?' z'+z:''} ${r.conformidad?'done':''}" id="card-${eq.id}">
+        <div class="eq-name" onclick="openModal('${eq.id}')" style="cursor:pointer">${eq.n}</div>
+        <div class="eq-meta">
+          ${zpillHtml(z)}
+          <span style="font-family:monospace;font-size:9px;color:#bbb">${eq.g}</span>
+          <span class="dot d${conf||'-'}"></span>
+          <span class="eq-toggle" onclick="toggleExpand('${eq.id}',this)">
+            ${compCount?compCount+' comp ▾':'componentes ▾'}
+          </span>
+        </div>
         ${r.marca?`<div style="font-family:monospace;font-size:9px;color:#aaa;margin-top:4px">${r.marca}${r.modelo?' · '+r.modelo:''}</div>`:''}
+        <div class="eq-expand" id="exp-${eq.id}">
+          ${comps.map(c=>`
+            <div class="comp-row" onclick="openSubModal(null,'${eq.id}','${c.id}')">
+              <span class="comp-type">${c.tipo||'—'}</span>
+              <span class="comp-name">${c.nombre_comp||c.equipo_nombre}</span>
+              <span class="dot d${c.conformidad||'-'}"></span>
+            </div>`).join('')}
+          <div class="comp-add" onclick="openSubModal('new','${eq.id}')">
+            ＋ Agregar componente
+          </div>
+        </div>
       </div>`;
     }
     h+='</div>';
   }
   list.innerHTML=h||'<div style="padding:40px;text-align:center;color:#6b7280">Sin equipos</div>';
+}
+
+function toggleExpand(eqId, btn){
+  const exp=document.getElementById('exp-'+eqId);
+  const card=document.getElementById('card-'+eqId);
+  if(!exp) return;
+  const open=exp.style.display==='block';
+  exp.style.display=open?'none':'block';
+  card.classList.toggle('expanded',!open);
+  const comps=subRecs[eqId]||[];
+  btn.textContent=open?(comps.length?comps.length+' comp ▾':'componentes ▾'):(comps.length?comps.length+' comp ▴':'componentes ▴');
 }
 function setFloor(fl,el){
   floorF=fl;
@@ -692,6 +841,138 @@ function copyMD(){
   md+=`| Equipo | Piso | Zona | Estado | Hallazgo |\n|---|---|---|---|---|\n`;
   allRaw.forEach(r=>{ md+=`| ${r.equipo_nombre} | ${FL[r.piso]||r.piso} | ${r.zona?'Z'+r.zona:'—'} | ${r.conformidad} | ${r.hallazgo||'—'} |\n`; });
   navigator.clipboard.writeText(md).then(()=>toast('Markdown copiado ✓','ok')).catch(()=>toast('Error al copiar','err'));
+}
+
+// ═══════════════════════════════════════════════════════════
+//  SUBCOMPONENT MODAL
+// ═══════════════════════════════════════════════════════════
+let curParentEq=null, curCompId=null, subConf='', subPendFiles=[], subExPaths=[];
+
+async function openSubModal(mode, parentEqId, compId){
+  curParentEq=parentEqId; curCompId=compId||null; subConf=''; subPendFiles=[]; subExPaths=[];
+  const eq=EQ.find(e=>e.id===parentEqId);
+  document.getElementById('sm-parent-name').textContent=eq?eq.n:'';
+
+  let comp={};
+  if(compId){
+    comp=(subRecs[parentEqId]||[]).find(c=>c.id===compId)||{};
+  }
+
+  // Fill fields
+  const sv=(id,v)=>{document.getElementById(id).value=v||'';};
+  sv('sm-tipo',comp.tipo); sv('sm-nombre',comp.nombre_comp);
+  sv('sm-marca',comp.marca); sv('sm-modelo',comp.modelo);
+  sv('sm-serie',comp.serie); sv('sm-pot',comp.potencia);
+  sv('sm-mex',comp.marcado_ex); sv('sm-epl',comp.epl);
+  sv('sm-zona',comp.zona); sv('sm-temp',comp.temp_max);
+  sv('sm-hall',comp.hallazgo); sv('sm-acc',comp.accion);
+  subConf=comp.conformidad||''; renderSubRadios();
+  subExPaths=comp.fotos||[]; await renderSubPhotos();
+
+  const prev=document.getElementById('sm-prev');
+  if(comp.inspector_nombre&&comp.updated_at){
+    prev.style.display='block';
+    prev.textContent='Actualizado: '+comp.inspector_nombre+' · '+new Date(comp.updated_at).toLocaleString('es-CL');
+  } else { prev.style.display='none'; }
+
+  document.getElementById('sm-del-wrap').style.display=compId?'block':'none';
+
+  const bg=document.getElementById('smodal-bg');
+  bg.style.display='flex'; bg.style.alignItems='flex-start'; bg.style.justifyContent='center';
+  document.body.style.overflow='hidden';
+}
+
+function closeSubModal(){
+  document.getElementById('smodal-bg').style.display='none';
+  document.body.style.overflow='';
+  curParentEq=null; curCompId=null;
+}
+function closeSMBg(e){ if(e.target===document.getElementById('smodal-bg')) closeSubModal(); }
+
+function setSubConf(v){ subConf=v; renderSubRadios(); }
+function renderSubRadios(){
+  document.querySelectorAll('#sm-rgrp .ropt').forEach(b=>{
+    b.className='ropt'; if(b.dataset.v===subConf) b.classList.add('s'+subConf);
+  });
+}
+function addSubPhotos(e){ subPendFiles.push(...e.target.files); e.target.value=''; renderSubPhotos(); }
+async function renderSubPhotos(){
+  const g=document.getElementById('sm-pgrid'); let h='';
+  for(let i=0;i<subExPaths.length;i++){
+    try{ const {data}=await sb.storage.from('atex-fotos').createSignedUrl(subExPaths[i],3600);
+      h+=`<div class="photo-wrap"><img src="${data.signedUrl}" onclick="openLb('${data.signedUrl}')"><button class="photo-rm" onclick="subExPaths.splice(${i},1);renderSubPhotos()">✕</button></div>`;
+    }catch(e){ h+=`<div style="aspect-ratio:1;background:#eee;border-radius:4px"></div>`; }
+  }
+  for(let i=0;i<subPendFiles.length;i++){
+    const u=URL.createObjectURL(subPendFiles[i]);
+    h+=`<div class="photo-wrap"><img src="${u}" onclick="openLb('${u}')"><button class="photo-rm" onclick="subPendFiles.splice(${i},1);renderSubPhotos()">✕</button></div>`;
+  }
+  g.innerHTML=h;
+}
+
+async function saveComp(){
+  if(!curParentEq) return;
+  const tipo=document.getElementById('sm-tipo').value.trim();
+  const nombre=document.getElementById('sm-nombre').value.trim();
+  if(!tipo&&!nombre){ toast('Ingresa al menos el tipo o nombre del componente','err'); return; }
+  const btn=document.getElementById('sm-sv');
+  btn.disabled=1; btn.textContent='Guardando…';
+  try {
+    // Upload photos
+    const newPaths=[];
+    for(const f of subPendFiles){
+      const ext=f.name.split('.').pop();
+      const path=`${session.user.id}/${curParentEq}/comp_${Date.now()}.${ext}`;
+      await sb.storage.from('atex-fotos').upload(path,f,{contentType:f.type});
+      newPaths.push(path);
+    }
+    const payload={
+      equipo_id:      curParentEq,
+      tipo:           tipo,
+      nombre_comp:    nombre||tipo,
+      marca:          document.getElementById('sm-marca').value.trim(),
+      modelo:         document.getElementById('sm-modelo').value.trim(),
+      serie:          document.getElementById('sm-serie').value.trim(),
+      potencia:       document.getElementById('sm-pot').value.trim(),
+      marcado_ex:     document.getElementById('sm-mex').value.trim(),
+      epl:            document.getElementById('sm-epl').value,
+      zona:           document.getElementById('sm-zona').value,
+      temp_max:       document.getElementById('sm-temp').value.trim(),
+      conformidad:    subConf,
+      hallazgo:       document.getElementById('sm-hall').value.trim(),
+      accion:         document.getElementById('sm-acc').value.trim(),
+      fotos:          [...subExPaths,...newPaths],
+      inspector_id:   session.user.id,
+      inspector_nombre: profile?.full_name||session.user.email,
+    };
+    let saved;
+    if(curCompId){
+      const {data,error}=await sb.from('componentes').update(payload).eq('id',curCompId).select().single();
+      if(error)throw error; saved=data;
+    } else {
+      const {data,error}=await sb.from('componentes').insert(payload).select().single();
+      if(error)throw error; saved=data;
+    }
+    // Update local state
+    if(!subRecs[curParentEq]) subRecs[curParentEq]=[];
+    const idx=subRecs[curParentEq].findIndex(c=>c.id===saved.id);
+    if(idx>=0) subRecs[curParentEq][idx]={...saved,profiles:{full_name:profile?.full_name}};
+    else subRecs[curParentEq].push({...saved,profiles:{full_name:profile?.full_name}});
+    toast('Componente guardado ✓','ok');
+    closeSubModal(); renderEq();
+  } catch(err){ toast('Error: '+err.message,'err'); }
+  btn.disabled=0; btn.textContent='GUARDAR COMPONENTE';
+}
+
+async function deleteComp(){
+  if(!curCompId||!confirm('¿Eliminar este componente?')) return;
+  try {
+    const {error}=await sb.from('componentes').delete().eq('id',curCompId);
+    if(error)throw error;
+    subRecs[curParentEq]=(subRecs[curParentEq]||[]).filter(c=>c.id!==curCompId);
+    toast('Componente eliminado','ok');
+    closeSubModal(); renderEq();
+  } catch(e){ toast('Error: '+e.message,'err'); }
 }
 
 // ═══════════════════════════════════════════════════════════
