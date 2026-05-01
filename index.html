@@ -449,7 +449,11 @@ const sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
 //  CATÁLOGO DE EQUIPOS
 // ═══════════════════════════════════════════════════════════
 const EQ = [
-  {id:'e001',n:'Redlers y elevadores de capacho',p:'1',g:'Transporte',z:'21'},
+  {id:'e001',n:'Redlers descarga de malta (SEEGER)',p:'1sub',g:'Transporte',z:'21'},
+  {id:'e001b',n:'Elevador de capachos recepción arroz',p:'1',g:'Transporte',z:'21'},
+  {id:'e001c',n:'Elevador de capachos preparación malta — silos→molinos (SEEGER)',p:'1sub',g:'Transporte',z:'21'},
+  {id:'e001d',n:'Elevador de capachos malta procesada N°1 (BÜHLER)',p:'1',g:'Transporte',z:'21'},
+  {id:'e001e',n:'Elevador de capachos malta procesada N°2 (BÜHLER)',p:'1',g:'Transporte',z:'21'},
   {id:'e002',n:'Cono salida silos de malta',p:'1',g:'Almacenamiento',z:''},
   {id:'e003',n:'Cono salida silos de arroz',p:'1',g:'Almacenamiento',z:''},
   {id:'e004',n:'Compuertas de silos de malta',p:'1',g:'Válvulas',z:''},
@@ -512,7 +516,7 @@ const EQ = [
   {id:'e061',n:'Sistema neumático aspiración arroz (30 t/h)',p:'hangar',g:'Transporte',z:'21'},
   {id:'e062',n:'Silos de arroz / intersilos (325 t)',p:'hangar',g:'Almacenamiento',z:'20'},
 ];
-const FL = {'1':'Primer piso','2':'Segundo piso','3':'Tercer piso','4':'Cuarto piso','5':'Quinto piso','6':'Sexto piso','7':'Séptimo piso','hangar':'Hangar / Patio'};
+const FL = {'1sub':'Primer piso — Subterráneo','1':'Primer piso','2':'Segundo piso','3':'Tercer piso','4':'Cuarto piso','5':'Quinto piso','6':'Sexto piso','7':'Séptimo piso','hangar':'Hangar / Patio'};
 
 // ═══════════════════════════════════════════════════════════
 //  STATE
