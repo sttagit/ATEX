@@ -249,8 +249,8 @@ input[type=file]{display:none}
       <div id="nc-sum" style="margin-bottom:20px"></div>
       <div class="sec-hd">Tabla completa</div>
       <div class="dt" style="overflow-x:auto">
-        <div class="dt-head" style="grid-template-columns:2fr 0.7fr 0.7fr 2.5fr 2fr;min-width:700px">
-          <div>EQUIPO</div><div>ZONA</div><div>ESTADO</div><div>HALLAZGO</div><div>ACCIÓN</div>
+        <div class="dt-head" style="grid-template-columns:2fr 0.7fr 0.6fr 0.7fr 2fr 2fr;min-width:700px">
+          <div>EQUIPO</div><div>ZONA</div><div>FABRICACIÓN</div><div>ESTADO</div><div>HALLAZGO</div><div>ACCIÓN</div>
         </div>
         <div id="findings" style="min-width:700px"><div style="padding:28px;text-align:center;color:#6b7280">Sin datos</div></div>
       </div>
@@ -285,6 +285,10 @@ input[type=file]{display:none}
       <div class="two-col">
         <div><div class="field-lbl">N° Serie / Tag</div><input class="field-input" id="f-serie" placeholder="Tag planta"></div>
         <div><div class="field-lbl">Potencia / Tensión</div><input class="field-input" id="f-pot" placeholder="11 kW / 380V"></div>
+      </div>
+      <div class="two-col">
+        <div><div class="field-lbl">Fecha de fabricación</div><input class="field-input" id="f-fab" type="month" placeholder="AAAA-MM"></div>
+        <div></div>
       </div>
       <div style="font-size:10px;font-weight:600;color:#d4500a;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">Clasificación ATEX</div>
       <div class="two-col">
@@ -371,6 +375,10 @@ input[type=file]{display:none}
       <div class="two-col">
         <div><div class="field-lbl">N° Serie / Tag</div><input class="field-input" id="sm-serie" placeholder="Tag planta"></div>
         <div><div class="field-lbl">Potencia / Tensión</div><input class="field-input" id="sm-pot" placeholder="11 kW / 380V"></div>
+      </div>
+      <div class="two-col">
+        <div><div class="field-lbl">Fecha de fabricación</div><input class="field-input" id="sm-fab" type="month" placeholder="AAAA-MM"></div>
+        <div></div>
       </div>
       <div style="font-size:10px;font-weight:600;color:#7c3aed;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">Clasificación ATEX</div>
       <div class="two-col">
@@ -700,7 +708,7 @@ function renderEq(){
           <span class="dot d${conf||'-'}"></span>
           <span class="eq-toggle" onclick="toggleExpand('${eq.id}',this)">${cc?cc+' comp ▾':'+ comp'}</span>
         </div>
-        ${r.marca?`<div style="font-family:monospace;font-size:9px;color:#aaa;margin-top:4px">${r.marca}${r.modelo?' · '+r.modelo:''}</div>`:''}
+        ${r.marca?`<div style="font-family:monospace;font-size:9px;color:#aaa;margin-top:4px">${r.marca}${r.modelo?' · '+r.modelo:''}${r.fecha_fab?' · '+r.fecha_fab:''}</div>`:''}
         <div class="eq-expand" id="exp-${eq.id}">
           ${comps.map(c=>`
             <div class="comp-row" onclick="openSubModal(null,'${eq.id}','${c.id}')">
@@ -749,7 +757,8 @@ async function openModal(id){
   pill.className='zpill '+({20:'z20p',21:'z21p',22:'z22p',NG:'zdp','':'zdp'}[z]||'zdp');
   const fv=(fid,v)=>{document.getElementById(fid).value=v||'';};
   fv('f-marca',r.marca); fv('f-modelo',r.modelo); fv('f-serie',r.serie);
-  fv('f-pot',r.potencia); fv('f-mex',r.marcado_ex); fv('f-epl',r.epl);
+  fv('f-pot',r.potencia); fv('f-fab',r.fecha_fab);
+  fv('f-mex',r.marcado_ex); fv('f-epl',r.epl);
   fv('f-zona',r.zona||eq.z); fv('f-temp',r.temp_max);
   fv('f-hall',r.hallazgo); fv('f-acc',r.accion);
   curConf=r.conformidad||''; renderRadios();
@@ -815,6 +824,7 @@ async function saveEq(){
       modelo:document.getElementById('f-modelo').value.trim(),
       serie:document.getElementById('f-serie').value.trim(),
       potencia:document.getElementById('f-pot').value.trim(),
+      fecha_fab:document.getElementById('f-fab').value||null,
       marcado_ex:document.getElementById('f-mex').value.trim(),
       epl:document.getElementById('f-epl').value,
       zona:document.getElementById('f-zona').value,
@@ -890,17 +900,18 @@ function renderFindings(){
       </div>`).join('');
   }
   document.getElementById('findings').innerHTML=allRaw.map(r=>`
-    <div class="dt-row" style="grid-template-columns:2fr 0.7fr 0.7fr 2.5fr 2fr">
+    <div class="dt-row" style="grid-template-columns:2fr 0.7fr 0.6fr 0.7fr 2fr 2fr">
       <div><div style="font-weight:500;font-size:12px">${r.equipo_nombre}</div><div style="font-family:monospace;font-size:9px;color:#aaa">${FL[r.piso]||r.piso}</div></div>
       <div>${zpillHtml(r.zona||'')}</div>
+      <div style="font-family:monospace;font-size:10px;color:#6b7280">${r.fecha_fab||'—'}</div>
       <div><span class="cbadge b${r.conformidad}">${r.conformidad}</span></div>
       <div style="font-size:11px">${r.hallazgo||'—'}</div>
       <div style="font-size:11px;color:#6b7280">${r.accion||'—'}</div>
     </div>`).join('');
 }
 function exportCSV(){
-  const rows=[['Equipo','Piso','Zona','Conformidad','Hallazgo','Acción','Inspector'],
-    ...allRaw.map(r=>[`"${r.equipo_nombre}"`,r.piso,r.zona||'',r.conformidad||'',
+  const rows=[['Equipo','Piso','Zona','Fabricación','Conformidad','Hallazgo','Acción','Inspector'],
+    ...allRaw.map(r=>[`"${r.equipo_nombre}"`,r.piso,r.zona||'',r.fecha_fab||'',r.conformidad||'',
       `"${(r.hallazgo||'').replace(/"/g,"'")}"`,`"${(r.accion||'').replace(/"/g,"'")}"`,
       `"${r.inspector_nombre||''}"`])];
   const blob=new Blob(['\ufeff'+rows.map(r=>r.join(',')).join('\n')],{type:'text/csv;charset=utf-8'});
@@ -910,8 +921,8 @@ function exportCSV(){
 }
 function copyMD(){
   let md=`# Informe ATEX — CCU Chile · Planta Temuco\n\n**Inspector:** ${document.getElementById('i-insp').value||'—'}  \n**Fecha:** ${document.getElementById('i-fecha').value||'—'}  \n**Norma:** UNE-EN 60079-10-2:2010\n\n`;
-  md+=`| Equipo | Piso | Zona | Estado | Hallazgo |\n|---|---|---|---|---|\n`;
-  allRaw.forEach(r=>{ md+=`| ${r.equipo_nombre} | ${FL[r.piso]||r.piso} | ${r.zona?'Z'+r.zona:'—'} | ${r.conformidad} | ${r.hallazgo||'—'} |\n`; });
+  md+=`| Equipo | Piso | Zona | Fabricación | Estado | Hallazgo |\n|---|---|---|---|---|---|\n`;
+  allRaw.forEach(r=>{ md+=`| ${r.equipo_nombre} | ${FL[r.piso]||r.piso} | ${r.zona?'Z'+r.zona:'—'} | ${r.fecha_fab||'—'} | ${r.conformidad} | ${r.hallazgo||'—'} |\n`; });
   navigator.clipboard.writeText(md).then(()=>toast('Markdown copiado ✓','ok')).catch(()=>toast('Error al copiar','err'));
 }
 
@@ -928,6 +939,7 @@ async function openSubModal(mode, parentEqId, compId){
   sv('sm-tipo',comp.tipo); sv('sm-nombre',comp.nombre_comp);
   sv('sm-marca',comp.marca); sv('sm-modelo',comp.modelo);
   sv('sm-serie',comp.serie); sv('sm-pot',comp.potencia);
+  sv('sm-fab',comp.fecha_fab);
   sv('sm-mex',comp.marcado_ex); sv('sm-epl',comp.epl);
   sv('sm-zona',comp.zona); sv('sm-temp',comp.temp_max);
   sv('sm-hall',comp.hallazgo); sv('sm-acc',comp.accion);
@@ -990,6 +1002,7 @@ async function saveComp(){
       modelo:document.getElementById('sm-modelo').value.trim(),
       serie:document.getElementById('sm-serie').value.trim(),
       potencia:document.getElementById('sm-pot').value.trim(),
+      fecha_fab:document.getElementById('sm-fab').value||null,
       marcado_ex:document.getElementById('sm-mex').value.trim(),
       epl:document.getElementById('sm-epl').value,
       zona:document.getElementById('sm-zona').value,
