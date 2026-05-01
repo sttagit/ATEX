@@ -334,10 +334,19 @@ input[type=file]{display:none}
         <div style="font-size:9px;color:#aaa;margin-top:6px;font-family:monospace">Fotografíe la placa de datos y el marcado Ex</div>
       </div>
       <div id="m-prev" style="display:none;padding:8px 10px;background:#eceae3;border-radius:4px;font-size:11px;color:#6b7280;font-family:monospace"></div>
+
+      <!-- COMPONENTES SECTION inside main modal -->
+      <div style="font-size:10px;font-weight:600;color:#7c3aed;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">
+        Componentes del equipo
+      </div>
+      <div id="m-comp-list" style="display:flex;flex-direction:column;gap:4px"></div>
+      <div class="comp-add" id="m-comp-add" onclick="openSubModal('new', curEq)">
+        ＋ Agregar componente (motor, sensor, detector…)
+      </div>
     </div>
     <div class="modal-foot">
       <button class="btn-out" onclick="closeModal()">Cancelar</button>
-      <button class="btn-save" onclick="saveEq()" id="btn-sv">GUARDAR</button>
+      <button class="btn-save" onclick="saveEq()" id="btn-sv">GUARDAR EQUIPO</button>
     </div>
   </div>
 </div>
@@ -714,8 +723,26 @@ async function openModal(id){
     prev.style.display='block';
     prev.textContent='Última actualización: '+r.inspector_nombre+' · '+new Date(r.updated_at).toLocaleString('es-CL');
   } else { prev.style.display='none'; }
+  renderModalComps(id);
   document.getElementById('modal-bg').classList.add('on');
   document.body.style.overflow='hidden';
+}
+
+function renderModalComps(eqId){
+  const comps=subRecs[eqId]||[];
+  const el=document.getElementById('m-comp-list');
+  if(!el) return;
+  if(!comps.length){
+    el.innerHTML='<div style="font-size:11px;color:#aaa;font-family:monospace;padding:4px 0">Sin componentes registrados</div>';
+    return;
+  }
+  el.innerHTML=comps.map(c=>`
+    <div class="comp-row" onclick="openSubModal(null,'${eqId}','${c.id}')">
+      <span class="comp-type">${c.tipo||'—'}</span>
+      <span class="comp-name">${c.nombre_comp||c.tipo}</span>
+      ${c.marca?`<span style="font-family:monospace;font-size:9px;color:#aaa">${c.marca}</span>`:''}
+      <span class="dot d${c.conformidad||'-'}" style="margin-left:auto;flex-shrink:0"></span>
+    </div>`).join('');
 }
 function closeModal(){ document.getElementById('modal-bg').classList.remove('on'); document.body.style.overflow=''; curEq=null; }
 function closeMBg(e){ if(e.target===document.getElementById('modal-bg')) closeModal(); }
@@ -959,7 +986,9 @@ async function saveComp(){
     if(idx>=0) subRecs[curParentEq][idx]={...saved,profiles:{full_name:profile?.full_name}};
     else subRecs[curParentEq].push({...saved,profiles:{full_name:profile?.full_name}});
     toast('Componente guardado ✓','ok');
-    closeSubModal(); renderEq();
+    closeSubModal();
+    renderEq();
+    if(curEq) renderModalComps(curEq);
   } catch(err){ toast('Error: '+err.message,'err'); }
   btn.disabled=0; btn.textContent='GUARDAR COMPONENTE';
 }
@@ -972,6 +1001,7 @@ async function deleteComp(){
     subRecs[curParentEq]=(subRecs[curParentEq]||[]).filter(c=>c.id!==curCompId);
     toast('Componente eliminado','ok');
     closeSubModal(); renderEq();
+    if(curEq) renderModalComps(curEq);
   } catch(e){ toast('Error: '+e.message,'err'); }
 }
 
