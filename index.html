@@ -187,7 +187,7 @@ input[type=file]{display:none}
       <div class="filter-bar">
         <span style="font-size:10px;color:#aaa;font-family:monospace">PISO</span>
         <span class="chip on" onclick="setFloor('all',this)">TODOS</span>
-        <span class="chip" onclick="setFloor('1sub',this)">P1-SUB</span>
+        <span class="chip" onclick="setFloor('1sub',this)">SUBTERRÁNEO</span>
         <span class="chip" onclick="setFloor('1',this)">P1</span>
         <span class="chip" onclick="setFloor('2',this)">P2</span>
         <span class="chip" onclick="setFloor('3',this)">P3</span>
@@ -262,7 +262,7 @@ input[type=file]{display:none}
   </div>
 </div>
 
-<!-- MODAL -->
+<!-- MODAL EQUIPO -->
 <div id="modal-bg" onclick="closeMBg(event)">
   <div class="modal">
     <div class="modal-head">
@@ -335,13 +335,11 @@ input[type=file]{display:none}
         <div style="font-size:9px;color:#aaa;margin-top:6px;font-family:monospace">Fotografíe la placa de datos y el marcado Ex</div>
       </div>
       <div id="m-prev" style="display:none;padding:8px 10px;background:#eceae3;border-radius:4px;font-size:11px;color:#6b7280;font-family:monospace"></div>
-
-      <!-- COMPONENTES SECTION inside main modal -->
       <div style="font-size:10px;font-weight:600;color:#7c3aed;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">
         Componentes del equipo
       </div>
       <div id="m-comp-list" style="display:flex;flex-direction:column;gap:4px"></div>
-      <div class="comp-add" id="m-comp-add" onclick="openSubModal('new', curEq)">
+      <div class="comp-add" id="m-comp-add" onclick="openSubModal('new',curEq)">
         ＋ Agregar componente (motor, sensor, detector…)
       </div>
     </div>
@@ -352,7 +350,7 @@ input[type=file]{display:none}
   </div>
 </div>
 
-<!-- SUB MODAL -->
+<!-- SUB MODAL COMPONENTE -->
 <div id="smodal-bg" onclick="closeSMBg(event)" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;padding:16px;overflow-y:auto;align-items:flex-start;justify-content:center">
   <div class="modal" style="border-top-color:#7c3aed">
     <div class="modal-head" style="background:#1e1030">
@@ -436,95 +434,132 @@ input[type=file]{display:none}
 
 <script>
 // ═══════════════════════════════════════════════════════════
-//  CONFIG — edita estas dos líneas con tus credenciales
+//  CONFIG
 // ═══════════════════════════════════════════════════════════
 const SUPA_URL = 'https://nyqqaaqxjdmedggpkxbj.supabase.co';
 const SUPA_KEY = 'sb_publishable_mtcCcCdVScjQQHtIQxUpYQ_awU9gt_j';
-
-// ═══════════════════════════════════════════════════════════
-//  SUPABASE INIT
-// ═══════════════════════════════════════════════════════════
 const sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
 
 // ═══════════════════════════════════════════════════════════
-//  CATÁLOGO DE EQUIPOS
+//  CATÁLOGO DE EQUIPOS — 80 equipos · Manual TEM-ELA-MAN 006
 // ═══════════════════════════════════════════════════════════
 const EQ = [
-  {id:'e001',n:'Redlers descarga de malta (SEEGER)',p:'1sub',g:'Transporte',z:'21'},
-  {id:'e001b',n:'Elevador de capachos recepción arroz',p:'1sub',g:'Transporte',z:'21'},
-  {id:'e001f',n:'Sistema neumático transporte arroz entero — silo exterior→silos internos',p:'1sub',g:'Transporte neumático',z:'21'},
-  {id:'e001c',n:'Elevador de capachos preparación malta — silos→molinos (SEEGER)',p:'1sub',g:'Transporte',z:'21'},
-  {id:'e001d',n:'Elevador de capachos malta procesada N°1 (BÜHLER)',p:'1',g:'Transporte',z:'21'},
-  {id:'e001e',n:'Elevador de capachos malta procesada N°2 (BÜHLER)',p:'1',g:'Transporte',z:'21'},
-  {id:'e002',n:'Cono salida silos de malta',p:'1',g:'Almacenamiento',z:''},
-  {id:'e003',n:'Cono salida silos de arroz',p:'1',g:'Almacenamiento',z:''},
-  {id:'e004',n:'Compuertas de silos de malta',p:'1',g:'Válvulas',z:''},
-  {id:'e005',n:'Compuertas silos malta y arroz',p:'1',g:'Válvulas',z:''},
-  {id:'e006',n:'Transporte preparación de carga e intersilos',p:'1',g:'Transporte',z:'21'},
-  {id:'e007',n:'Succión polvos descarga de malta (x2)',p:'1',g:'Aspiración',z:'21'},
-  {id:'e008',n:'Redler transporte descarga de malta',p:'1',g:'Transporte',z:'21'},
-  {id:'e009',n:'Agua proceso al premacerador',p:'1',g:'Servicios',z:'NG'},
-  {id:'e010',n:'Compresor tolva polvo recepción malta',p:'2',g:'Compresor',z:'22'},
-  {id:'e011',n:'Tolva de polvo (parte inferior)',p:'2',g:'Contenedor polvo',z:'20'},
-  {id:'e012',n:'Ciclón filtro manga recepción arroz',p:'2',g:'Filtración polvo',z:'21'},
-  {id:'e013',n:'Tolva harina de malta (parte inferior)',p:'2',g:'Contenedor polvo',z:'20'},
-  {id:'e014',n:'Tolva harina de arroz (parte inferior)',p:'2',g:'Contenedor polvo',z:'20'},
-  {id:'e015',n:'Elevador de capachos (despedradora→acondicionador)',p:'2',g:'Transporte',z:'21'},
-  {id:'e016',n:'Filtro separador mangas descarga arroz',p:'2',g:'Filtración polvo',z:'22'},
-  {id:'e017',n:'Tolva polvos malta a silos de orujo',p:'2',g:'Contenedor polvo',z:'20'},
-  {id:'e018',n:'Compresor polvo sistema recepción arroz',p:'3',g:'Compresor',z:'22'},
-  {id:'e019',n:'Tolva de polvo / Tolva de malta (inf.)',p:'3',g:'Contenedor polvo',z:'20'},
-  {id:'e020',n:'Molino parte inferior — descarga a redler',p:'3',g:'Molienda',z:'21'},
-  {id:'e021',n:'Despedradora de malta',p:'3',g:'Limpieza grano',z:'21'},
-  {id:'e022',n:'Tolva de arroz',p:'3',g:'Almacenamiento',z:'21'},
-  {id:'e023',n:'Compuerta silo batch',p:'3',g:'Válvulas',z:''},
-  {id:'e024',n:'Tolva de harina de malta',p:'3',g:'Contenedor polvo',z:'20'},
-  {id:'e025',n:'Molino de malta (6 cilindros — 11 t/h)',p:'4',g:'Molienda',z:'21'},
-  {id:'e026',n:'Silo batch malta (parte inferior — 11,5 t)',p:'4',g:'Contenedor polvo',z:'20'},
-  {id:'e027',n:'Molino de arroz (2 cilindros — 5 t/h)',p:'4',g:'Molienda',z:'21'},
-  {id:'e028',n:'Succión polvos molino de malta',p:'4',g:'Aspiración',z:'21'},
-  {id:'e029',n:'Succión polvos malta a humectación',p:'4',g:'Aspiración',z:'21'},
-  {id:'e030',n:'Filtro manga tolva recepción (parte inf.)',p:'5',g:'Filtración polvo',z:'22'},
-  {id:'e031',n:'Tornillo acondicionador / humectador (11 t/h)',p:'5',g:'Acondicionamiento',z:'22'},
-  {id:'e032',n:'Silo Batch malta (parte superior)',p:'5',g:'Contenedor polvo',z:'20'},
-  {id:'e033',n:'Filtro manga polvo equipos malta (inf.)',p:'5',g:'Filtración polvo',z:'22'},
-  {id:'e034',n:'Filtro manga polvo equipos arroz (inf.)',p:'5',g:'Filtración polvo',z:'22'},
-  {id:'e035',n:'Despedradora de arroz (8 t/h)',p:'5',g:'Limpieza grano',z:'21'},
-  {id:'e036',n:'Filtro manga arroz a molienda (inf.) + desvíos',p:'5',g:'Filtración polvo',z:'22'},
-  {id:'e037',n:'Succión polvos despedradora de arroz',p:'5',g:'Aspiración',z:'21'},
-  {id:'e038',n:'Filtro manga polvo tolva recepción (sup.)',p:'6',g:'Filtración polvo',z:'22'},
-  {id:'e039',n:'Redlers alimentación criba circular malta',p:'6',g:'Transporte',z:'21'},
-  {id:'e040',n:'Criba circular de malta / limpiadora (20 t/h)',p:'6',g:'Limpieza grano',z:'21'},
-  {id:'e041',n:'Filtro manga polvo equipos malta (sup.)',p:'6',g:'Filtración polvo',z:'22'},
-  {id:'e042',n:'Filtro manga polvo equipos arroz (sup.)',p:'6',g:'Filtración polvo',z:'22'},
-  {id:'e043',n:'Compresor neumático arroz a molienda + ciclón',p:'6',g:'Compresor',z:'22'},
-  {id:'e044',n:'Elevador alimentación criba circular arroz',p:'6',g:'Transporte',z:'21'},
-  {id:'e045',n:'Criba circular arroz (20 t/h)',p:'6',g:'Limpieza grano',z:'21'},
-  {id:'e046',n:'Ventilador filtro manga polvo malta',p:'6',g:'Ventilación',z:'22'},
-  {id:'e047',n:'Ventilador filtro manga polvo arroz',p:'6',g:'Ventilación',z:'22'},
-  {id:'e048',n:'Filtro separador mangas ambiente arroz y malta',p:'6',g:'Filtración polvo',z:'22'},
-  {id:'e049',n:'Terminación elevador de malta',p:'7',g:'Transporte',z:'21'},
-  {id:'e050',n:'Terminación elevador de arroz',p:'7',g:'Transporte',z:'21'},
-  {id:'e051',n:'Balanza en línea malta (50 t/h)',p:'7',g:'Pesaje',z:'21'},
-  {id:'e052',n:'Balanza en línea arroz',p:'7',g:'Pesaje',z:'21'},
-  {id:'e053',n:'Silos de malta (6 silos — 600 t total)',p:'7',g:'Almacenamiento',z:'20'},
-  {id:'e054',n:'Sistema extracción polvo tolva recepción',p:'7',g:'Aspiración',z:'21'},
-  {id:'e055',n:'Succión polvos distribuidor malta a silos',p:'7',g:'Aspiración',z:'21'},
-  {id:'e056',n:'Succión polvos arroz a intersilos',p:'7',g:'Aspiración',z:'21'},
-  {id:'e057',n:'Tolva de recepción malta (6 m³ — 2.300 kg)',p:'hangar',g:'Contenedor polvo',z:'21'},
-  {id:'e058',n:'Pre-limpiadora malta',p:'hangar',g:'Limpieza grano',z:'21'},
-  {id:'e059',n:'Transportadores cadena recepción malta (50 t/h)',p:'hangar',g:'Transporte',z:'21'},
-  {id:'e060',n:'Elevador capachos recepción malta (50 t/h)',p:'hangar',g:'Transporte',z:'21'},
-  {id:'e061',n:'Sistema neumático aspiración arroz (30 t/h)',p:'hangar',g:'Transporte',z:'21'},
-  {id:'e062',n:'Silos de arroz / intersilos (325 t)',p:'hangar',g:'Almacenamiento',z:'20'},
+  // ── PISO SUBTERRÁNEO ──────────────────────────────────────
+  {id:'e001',  n:'Redler pavo a elevadores (malta)',                           p:'1sub', g:'Transporte',           z:'21'},
+
+  // ── PRIMER PISO ───────────────────────────────────────────
+  {id:'e002',  n:'Redler descarga de silos de malta (cabezal x2)',             p:'1',    g:'Transporte',           z:'21'},
+  {id:'e003',  n:'Elevador de capachos recepción malta (50 t/h)',              p:'1',    g:'Transporte',           z:'21'},
+  {id:'e004',  n:'Elevador de capachos recepción arroz',                       p:'1',    g:'Transporte',           z:'21'},
+  {id:'e005',  n:'Elevador de capachos preparación de carga malta',            p:'1',    g:'Transporte',           z:'21'},
+  {id:'e006',  n:'Cono salida silos de malta',                                 p:'1',    g:'Almacenamiento',       z:'21'},
+  {id:'e007',  n:'Cono salida silos de arroz',                                 p:'1',    g:'Almacenamiento',       z:'21'},
+  {id:'e008',  n:'Compuertas de silos de malta (válvula de aire)',             p:'1',    g:'Válvulas',             z:'21'},
+  {id:'e009',  n:'Compuertas silos malta y arroz (cadena regulable)',          p:'1',    g:'Válvulas',             z:'21'},
+  {id:'e010',  n:'Transportador preparación de carga e intersilos',           p:'1',    g:'Transporte',           z:'21'},
+  {id:'e011',  n:'Succión polvos descarga de malta — línea 1',                p:'1',    g:'Aspiración',           z:'21'},
+  {id:'e012',  n:'Succión polvos descarga de malta — línea 2',                p:'1',    g:'Aspiración',           z:'21'},
+  {id:'e013',  n:'Pre-limpiadora de malta',                                    p:'1',    g:'Limpieza grano',       z:'21'},
+  {id:'e014',  n:'Agua proceso al premacerador (válvula)',                     p:'1',    g:'Servicios',            z:'NG'},
+
+  // ── SEGUNDO PISO ──────────────────────────────────────────
+  {id:'e015',  n:'Compresor tolva polvo recepción malta (→ silos orujo)',      p:'2',    g:'Compresor',            z:'22'},
+  {id:'e016',  n:'Tolva de polvo (parte inferior)',                            p:'2',    g:'Contenedor polvo',     z:'20'},
+  {id:'e017',  n:'Ciclón filtro manga recepción arroz',                        p:'2',    g:'Filtración polvo',     z:'21'},
+  {id:'e018',  n:'Tolva harina de malta (parte inferior)',                     p:'2',    g:'Contenedor polvo',     z:'20'},
+  {id:'e019',  n:'Tolva harina de arroz (parte inferior)',                     p:'2',    g:'Contenedor polvo',     z:'20'},
+  {id:'e020',  n:'Elevador de capachos malta (despedradora → acondicionador)', p:'2',    g:'Transporte',           z:'21'},
+  {id:'e021',  n:'Filtro separador mangas descarga arroz',                     p:'2',    g:'Filtración polvo',     z:'22'},
+  {id:'e022',  n:'Tolva polvos malta a silos de orujo',                       p:'2',    g:'Contenedor polvo',     z:'20'},
+
+  // ── TERCER PISO ───────────────────────────────────────────
+  {id:'e023',  n:'Compresor polvo sistema recepción arroz',                    p:'3',    g:'Compresor',            z:'22'},
+  {id:'e024',  n:'Tolva de polvo / Tolva de malta (parte superior)',           p:'3',    g:'Contenedor polvo',     z:'20'},
+  {id:'e025',  n:'Despedradora de malta (8 t/h)',                              p:'3',    g:'Limpieza grano',       z:'21'},
+  {id:'e026',  n:'Tolva de arroz (parte superior)',                            p:'3',    g:'Almacenamiento',       z:'21'},
+  {id:'e027',  n:'Compuerta silo batch (cadena regulable)',                    p:'3',    g:'Válvulas',             z:'21'},
+  {id:'e028',  n:'Tolva harina de malta (parte superior)',                     p:'3',    g:'Contenedor polvo',     z:'20'},
+  {id:'e029',  n:'Redler de pajilla a tolva de malta',                         p:'3',    g:'Transporte',           z:'21'},
+  {id:'e030',  n:'Succión polvos despedradora de malta',                       p:'3',    g:'Aspiración',           z:'21'},
+  {id:'e031',  n:'Molino parte inferior — descarga a redler tolva arroz',      p:'3',    g:'Molienda',             z:'21'},
+
+  // ── CUARTO PISO ───────────────────────────────────────────
+  {id:'e032',  n:'Molino de malta (6 cilindros — 11 t/h)',                    p:'4',    g:'Molienda',             z:'21'},
+  {id:'e033',  n:'Silo batch malta (parte inferior — 11,5 t)',                p:'4',    g:'Contenedor polvo',     z:'20'},
+  {id:'e034',  n:'Molino de arroz (2 cilindros — 5 t/h)',                     p:'4',    g:'Molienda',             z:'21'},
+  {id:'e035',  n:'Succión polvos molino de malta',                             p:'4',    g:'Aspiración',           z:'21'},
+  {id:'e036',  n:'Succión polvos malta a humectación',                         p:'4',    g:'Aspiración',           z:'21'},
+
+  // ── QUINTO PISO ───────────────────────────────────────────
+  {id:'e037',  n:'Filtro manga tolva recepción (parte inferior)',              p:'5',    g:'Filtración polvo',     z:'22'},
+  {id:'e038',  n:'Tornillo acondicionador / humectador (11 t/h)',              p:'5',    g:'Acondicionamiento',    z:'22'},
+  {id:'e039',  n:'Silo batch malta (parte superior)',                          p:'5',    g:'Contenedor polvo',     z:'20'},
+  {id:'e040',  n:'Filtro manga polvo equipos malta (parte inferior)',          p:'5',    g:'Filtración polvo',     z:'22'},
+  {id:'e041',  n:'Filtro manga polvo equipos arroz (parte inferior)',          p:'5',    g:'Filtración polvo',     z:'22'},
+  {id:'e042',  n:'Despedradora de arroz (8 t/h)',                              p:'5',    g:'Limpieza grano',       z:'21'},
+  {id:'e043',  n:'Filtro manga arroz a molienda (inf.) + desvíos tolva harina',p:'5',   g:'Filtración polvo',     z:'22'},
+  {id:'e044',  n:'Succión polvos despedradora de arroz',                       p:'5',    g:'Aspiración',           z:'21'},
+  {id:'e045',  n:'Elevador de capacho arroz (→ criba circular arroz)',         p:'5',    g:'Transporte',           z:'21'},
+
+  // ── SEXTO PISO ────────────────────────────────────────────
+  {id:'e046',  n:'Filtro manga polvo tolva recepción (parte superior)',        p:'6',    g:'Filtración polvo',     z:'22'},
+  {id:'e047',  n:'Redlers alimentación criba circular malta',                  p:'6',    g:'Transporte',           z:'21'},
+  {id:'e048',  n:'Criba circular de malta / limpiadora (20 t/h)',              p:'6',    g:'Limpieza grano',       z:'21'},
+  {id:'e049',  n:'Filtro manga polvo equipos malta (parte superior)',          p:'6',    g:'Filtración polvo',     z:'22'},
+  {id:'e050',  n:'Filtro manga polvo equipos arroz (parte superior)',          p:'6',    g:'Filtración polvo',     z:'22'},
+  {id:'e051',  n:'Compresor neumático arroz a molienda + filtro ciclón',       p:'6',    g:'Compresor',            z:'22'},
+  {id:'e052',  n:'Elevador alimentación criba circular arroz',                 p:'6',    g:'Transporte',           z:'21'},
+  {id:'e053',  n:'Criba circular arroz (20 t/h)',                              p:'6',    g:'Limpieza grano',       z:'21'},
+  {id:'e054',  n:'Ventilador filtro manga polvo equipos malta',                p:'6',    g:'Ventilación',          z:'22'},
+  {id:'e055',  n:'Ventilador filtro manga polvo equipos arroz',                p:'6',    g:'Ventilación',          z:'22'},
+  {id:'e056',  n:'Filtro separador mangas ambiente arroz y malta',             p:'6',    g:'Filtración polvo',     z:'22'},
+  {id:'e057',  n:'Succión polvos procesos de arroz',                           p:'6',    g:'Aspiración',           z:'21'},
+  {id:'e058',  n:'Succión polvos elevador a criba de arroz',                   p:'6',    g:'Aspiración',           z:'21'},
+  {id:'e059',  n:'Succión polvos criba de malta',                              p:'6',    g:'Aspiración',           z:'21'},
+  {id:'e060',  n:'Succión polvos preparación de carga malta',                  p:'6',    g:'Aspiración',           z:'21'},
+  {id:'e061',  n:'Succión polvos descarga de malta a silos',                   p:'6',    g:'Aspiración',           z:'21'},
+  {id:'e062',  n:'Succión polvos descarga de arroz a silos',                   p:'6',    g:'Aspiración',           z:'21'},
+
+  // ── SÉPTIMO PISO ──────────────────────────────────────────
+  {id:'e063',  n:'Terminación elevador de malta',                              p:'7',    g:'Transporte',           z:'21'},
+  {id:'e064',  n:'Terminación elevador de arroz',                              p:'7',    g:'Transporte',           z:'21'},
+  {id:'e065',  n:'Balanza en línea malta (50 t/h)',                            p:'7',    g:'Pesaje',               z:'21'},
+  {id:'e066',  n:'Balanza en línea arroz',                                     p:'7',    g:'Pesaje',               z:'21'},
+  {id:'e067',  n:'Silos de malta (6 silos — 600 t total)',                    p:'7',    g:'Almacenamiento',       z:'20'},
+  {id:'e068',  n:'Sistema extracción polvo tolva recepción (terminación)',     p:'7',    g:'Aspiración',           z:'21'},
+  {id:'e069',  n:'Succión polvos distribuidor malta a silos',                  p:'7',    g:'Aspiración',           z:'21'},
+  {id:'e070',  n:'Succión polvos arroz a intersilos',                          p:'7',    g:'Aspiración',           z:'21'},
+  {id:'e071',  n:'Succión de aire al ambiente (descarga 50% cerrada)',         p:'7',    g:'Ventilación',          z:'21'},
+
+  // ── HANGAR / PATIO RECEPCIÓN ──────────────────────────────
+  {id:'e072',  n:'Pavo de recepción de malta',                                 p:'hangar',g:'Contenedor polvo',    z:'21'},
+  {id:'e073',  n:'Tolva de recepción malta (6 m³ — 2.300 kg)',                p:'hangar',g:'Contenedor polvo',    z:'21'},
+  {id:'e074',  n:'Pre-limpiadora malta (hangar)',                              p:'hangar',g:'Limpieza grano',      z:'21'},
+  {id:'e075',  n:'Transportadores cadena recepción malta (50 t/h)',            p:'hangar',g:'Transporte',          z:'21'},
+  {id:'e076',  n:'Balanza en línea recepción malta (50 t/h)',                  p:'hangar',g:'Pesaje',              z:'21'},
+  {id:'e077',  n:'Sistema neumático aspiración arroz (30 t/h)',                p:'hangar',g:'Transporte neumático', z:'21'},
+  {id:'e078',  n:'Toberas recepción arroz',                                    p:'hangar',g:'Transporte neumático', z:'21'},
+  {id:'e079',  n:'Silos de arroz / intersilos (325 t)',                        p:'hangar',g:'Almacenamiento',      z:'20'},
+  {id:'e080',  n:'Silo exterior de malta (150 t)',                             p:'hangar',g:'Almacenamiento',      z:'20'},
 ];
-const FL = {'1sub':'Primer piso — Subterráneo','1':'Primer piso','2':'Segundo piso','3':'Tercer piso','4':'Cuarto piso','5':'Quinto piso','6':'Sexto piso','7':'Séptimo piso','hangar':'Hangar / Patio'};
+
+const FL = {
+  '1sub':'Piso Subterráneo',
+  '1':   'Primer piso',
+  '2':   'Segundo piso',
+  '3':   'Tercer piso',
+  '4':   'Cuarto piso',
+  '5':   'Quinto piso',
+  '6':   'Sexto piso',
+  '7':   'Séptimo piso',
+  'hangar':'Hangar / Patio de recepción'
+};
 
 // ═══════════════════════════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════════════════════════
-let session, profile, recs={}, subRecs={}, curEq=null, curComp=null, curConf='', pendFiles=[], exPaths=[], floorF='all', allRaw=[], allSubRaw=[];
-let modalMode='main'; // 'main' | 'sub'
+let session, profile, recs={}, subRecs={}, curEq=null, curConf='', pendFiles=[], exPaths=[], floorF='all', allRaw=[], allSubRaw=[];
+let curParentEq=null, curCompId=null, subConf='', subPendFiles=[], subExPaths=[];
 
 // ═══════════════════════════════════════════════════════════
 //  BOOT
@@ -538,10 +573,8 @@ let modalMode='main'; // 'main' | 'sub'
 
 async function loadApp(){
   loader(1);
-  // Show app immediately
   document.getElementById('login').style.display='none';
   document.getElementById('app').style.display='flex';
-  // Load profile
   try {
     const {data} = await sb.from('profiles').select('*').eq('id',session.user.id).single();
     profile=data;
@@ -550,12 +583,10 @@ async function loadApp(){
   document.getElementById('user-lbl').textContent=name;
   document.getElementById('i-insp').value=name;
   document.getElementById('i-fecha').value=new Date().toISOString().slice(0,10);
-  // Load records
   try {
     const {data} = await sb.from('registros').select('*, profiles(full_name)').order('updated_at',{ascending:false});
     if(data){ data.forEach(r=>{ recs[r.equipo_id]=r; }); allRaw=data; }
   } catch(e){ toast('Ejecuta el schema.sql en Supabase para activar la base de datos','err'); }
-  // Load subcomponents
   try {
     const {data:sd}=await sb.from('componentes').select('*, profiles(full_name)').order('created_at',{ascending:true});
     if(sd){ allSubRaw=sd; subRecs={}; sd.forEach(c=>{ if(!subRecs[c.equipo_id]) subRecs[c.equipo_id]=[]; subRecs[c.equipo_id].push(c); }); }
@@ -629,10 +660,13 @@ function worstConf(eqId){
   const comps=(subRecs[eqId]||[]);
   const order=['NC','OBS','C','NA',''];
   let worst='';
-  for(const c of comps){ if(order.indexOf(c.conformidad)<order.indexOf(worst)||worst==='') worst=c.conformidad||''; }
+  for(const c of comps){
+    const ci=order.indexOf(c.conformidad||'');
+    const wi=order.indexOf(worst);
+    if(worst===''||( ci!==-1 && (wi===-1||ci<wi) )) worst=c.conformidad||'';
+  }
   return worst;
 }
-
 function eqConf(eqId){
   const main=(recs[eqId]||{}).conformidad||'';
   const sub=worstConf(eqId);
@@ -657,28 +691,24 @@ function renderEq(){
       const z=r.zona||eq.z||'';
       const conf=eqConf(eq.id);
       const comps=subRecs[eq.id]||[];
-      const compCount=comps.length;
+      const cc=comps.length;
       h+=`<div class="eq-card${z?' z'+z:''} ${r.conformidad?'done':''}" id="card-${eq.id}">
-        <div class="eq-name" onclick="openModal('${eq.id}')" style="cursor:pointer">${eq.n}</div>
+        <div class="eq-name" onclick="openModal('${eq.id}')">${eq.n}</div>
         <div class="eq-meta">
           ${zpillHtml(z)}
           <span style="font-family:monospace;font-size:9px;color:#bbb">${eq.g}</span>
           <span class="dot d${conf||'-'}"></span>
-          <span class="eq-toggle" onclick="toggleExpand('${eq.id}',this)">
-            ${compCount?compCount+' comp ▾':'componentes ▾'}
-          </span>
+          <span class="eq-toggle" onclick="toggleExpand('${eq.id}',this)">${cc?cc+' comp ▾':'+ comp'}</span>
         </div>
         ${r.marca?`<div style="font-family:monospace;font-size:9px;color:#aaa;margin-top:4px">${r.marca}${r.modelo?' · '+r.modelo:''}</div>`:''}
         <div class="eq-expand" id="exp-${eq.id}">
           ${comps.map(c=>`
             <div class="comp-row" onclick="openSubModal(null,'${eq.id}','${c.id}')">
               <span class="comp-type">${c.tipo||'—'}</span>
-              <span class="comp-name">${c.nombre_comp||c.equipo_nombre}</span>
+              <span class="comp-name">${c.nombre_comp||c.tipo}</span>
               <span class="dot d${c.conformidad||'-'}"></span>
             </div>`).join('')}
-          <div class="comp-add" onclick="openSubModal('new','${eq.id}')">
-            ＋ Agregar componente
-          </div>
+          <div class="comp-add" onclick="openSubModal('new','${eq.id}')">＋ Agregar componente</div>
         </div>
       </div>`;
     }
@@ -687,15 +717,15 @@ function renderEq(){
   list.innerHTML=h||'<div style="padding:40px;text-align:center;color:#6b7280">Sin equipos</div>';
 }
 
-function toggleExpand(eqId, btn){
+function toggleExpand(eqId,btn){
   const exp=document.getElementById('exp-'+eqId);
   const card=document.getElementById('card-'+eqId);
   if(!exp) return;
   const open=exp.style.display==='block';
   exp.style.display=open?'none':'block';
   card.classList.toggle('expanded',!open);
-  const comps=subRecs[eqId]||[];
-  btn.textContent=open?(comps.length?comps.length+' comp ▾':'componentes ▾'):(comps.length?comps.length+' comp ▴':'componentes ▴');
+  const cc=(subRecs[eqId]||[]).length;
+  btn.textContent=open?(cc?cc+' comp ▾':'+ comp'):(cc?cc+' comp ▴':'▴');
 }
 function setFloor(fl,el){
   floorF=fl;
@@ -705,7 +735,7 @@ function setFloor(fl,el){
 }
 
 // ═══════════════════════════════════════════════════════════
-//  MODAL
+//  MODAL EQUIPO
 // ═══════════════════════════════════════════════════════════
 async function openModal(id){
   curEq=id; curConf=''; pendFiles=[]; exPaths=[];
@@ -717,7 +747,7 @@ async function openModal(id){
   const pill=document.getElementById('m-zpill');
   pill.textContent=z?'Zona '+z:'Sin clasificar';
   pill.className='zpill '+({20:'z20p',21:'z21p',22:'z22p',NG:'zdp','':'zdp'}[z]||'zdp');
-  const fv=(id,v)=>{document.getElementById(id).value=v||'';};
+  const fv=(fid,v)=>{document.getElementById(fid).value=v||'';};
   fv('f-marca',r.marca); fv('f-modelo',r.modelo); fv('f-serie',r.serie);
   fv('f-pot',r.potencia); fv('f-mex',r.marcado_ex); fv('f-epl',r.epl);
   fv('f-zona',r.zona||eq.z); fv('f-temp',r.temp_max);
@@ -733,7 +763,6 @@ async function openModal(id){
   document.getElementById('modal-bg').classList.add('on');
   document.body.style.overflow='hidden';
 }
-
 function renderModalComps(eqId){
   const comps=subRecs[eqId]||[];
   const el=document.getElementById('m-comp-list');
@@ -753,7 +782,7 @@ function renderModalComps(eqId){
 function closeModal(){ document.getElementById('modal-bg').classList.remove('on'); document.body.style.overflow=''; curEq=null; }
 function closeMBg(e){ if(e.target===document.getElementById('modal-bg')) closeModal(); }
 function setConf(v){ curConf=v; renderRadios(); }
-function renderRadios(){ document.querySelectorAll('.ropt').forEach(b=>{ b.className='ropt'; if(b.dataset.v===curConf) b.classList.add('s'+curConf); }); }
+function renderRadios(){ document.querySelectorAll('#rgrp .ropt').forEach(b=>{ b.className='ropt'; if(b.dataset.v===curConf) b.classList.add('s'+curConf); }); }
 function addPhotos(e){ pendFiles.push(...e.target.files); e.target.value=''; renderPhotos(); }
 async function renderPhotos(){
   const g=document.getElementById('pgrid'); let h='';
@@ -769,7 +798,7 @@ async function renderPhotos(){
   g.innerHTML=h;
 }
 async function saveEq(){
-  if(!curEq)return;
+  if(!curEq) return;
   const btn=document.getElementById('btn-sv');
   btn.disabled=1; btn.textContent='Guardando…';
   try {
@@ -800,12 +829,12 @@ async function saveEq(){
     const {data:ex}=await sb.from('registros').select('id').eq('equipo_id',curEq).eq('inspector_id',session.user.id).maybeSingle();
     let saved;
     if(ex){ const {data}=await sb.from('registros').update(payload).eq('id',ex.id).select().single(); saved=data; }
-    else { const {data}=await sb.from('registros').insert(payload).select().single(); saved=data; }
+    else   { const {data}=await sb.from('registros').insert(payload).select().single(); saved=data; }
     recs[curEq]={...saved,profiles:{full_name:profile?.full_name}};
     toast('Equipo guardado ✓','ok');
     closeModal(); renderEq();
   } catch(err){ toast('Error: '+err.message,'err'); }
-  btn.disabled=0; btn.textContent='GUARDAR';
+  btn.disabled=0; btn.textContent='GUARDAR EQUIPO';
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -816,8 +845,10 @@ async function renderResumen(){
   try {
     const {data}=await sb.from('registros').select('*, profiles(full_name)');
     allRaw=data||[];
-    const total=allRaw.length, C=allRaw.filter(r=>r.conformidad==='C').length,
-          NC=allRaw.filter(r=>r.conformidad==='NC').length, OBS=allRaw.filter(r=>r.conformidad==='OBS').length;
+    const total=allRaw.length,
+          C=allRaw.filter(r=>r.conformidad==='C').length,
+          NC=allRaw.filter(r=>r.conformidad==='NC').length,
+          OBS=allRaw.filter(r=>r.conformidad==='OBS').length;
     const pct=Math.round(total/EQ.length*100);
     document.getElementById('pct').textContent=pct+'%';
     document.getElementById('prog').style.width=pct+'%';
@@ -832,12 +863,13 @@ async function renderResumen(){
 function renderGapRows(){
   const rows=document.getElementById('gap-rows');
   if(!allRaw.length){ rows.innerHTML='<div style="padding:28px;text-align:center;color:#6b7280">Sin registros</div>'; return; }
-  rows.innerHTML=allRaw.map(r=>`<div class="dt-row" style="grid-template-columns:2.5fr 0.8fr 0.7fr 2.5fr">
-    <div><div style="font-weight:500;font-size:12px">${r.equipo_nombre}</div><div style="font-family:monospace;font-size:9px;color:#aaa">${FL[r.piso]||r.piso}</div></div>
-    <div>${zpillHtml(r.zona||'')}</div>
-    <div><span class="cbadge b${r.conformidad}">${r.conformidad}</span></div>
-    <div style="font-size:11px;color:#6b7280">${r.hallazgo||'—'}</div>
-  </div>`).join('');
+  rows.innerHTML=allRaw.map(r=>`
+    <div class="dt-row" style="grid-template-columns:2.5fr 0.8fr 0.7fr 2.5fr">
+      <div><div style="font-weight:500;font-size:12px">${r.equipo_nombre}</div><div style="font-family:monospace;font-size:9px;color:#aaa">${FL[r.piso]||r.piso}</div></div>
+      <div>${zpillHtml(r.zona||'')}</div>
+      <div><span class="cbadge b${r.conformidad}">${r.conformidad}</span></div>
+      <div style="font-size:11px;color:#6b7280">${r.hallazgo||'—'}</div>
+    </div>`).join('');
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -846,27 +878,34 @@ function renderGapRows(){
 function renderFindings(){
   const nc=allRaw.filter(r=>r.conformidad==='NC');
   const el=document.getElementById('nc-sum');
-  if(!nc.length){ el.innerHTML='<div style="padding:10px 14px;background:#d1fae5;color:#065f46;border-left:3px solid #059669;border-radius:4px;font-size:13px">✓ Sin no conformidades.</div>'; }
-  else { el.innerHTML=`<div style="padding:10px 14px;background:#fee2e2;color:#991b1b;border-left:3px solid #dc2626;border-radius:4px;font-size:13px;margin-bottom:10px">⚠ ${nc.length} no conformidad${nc.length>1?'es':''}</div>`
-    +nc.map(r=>`<div style="padding:10px 14px;background:#fff;border:1px solid #ddd9d0;border-left:3px solid #dc2626;border-radius:4px;margin-bottom:8px">
-      <div style="font-weight:500;font-size:13px">${r.equipo_nombre}</div>
-      <div style="font-size:10px;color:#aaa;font-family:monospace;margin-bottom:5px">${FL[r.piso]||r.piso}</div>
-      <div style="font-size:12px;margin-bottom:3px"><strong>Hallazgo:</strong> ${r.hallazgo||'—'}</div>
-      <div style="font-size:12px;color:#6b7280"><strong>Acción:</strong> ${r.accion||'—'}</div>
-    </div>`).join(''); }
-  document.getElementById('findings').innerHTML=allRaw.map(r=>`<div class="dt-row" style="grid-template-columns:2fr 0.7fr 0.7fr 2.5fr 2fr">
-    <div><div style="font-weight:500;font-size:12px">${r.equipo_nombre}</div><div style="font-family:monospace;font-size:9px;color:#aaa">${FL[r.piso]||r.piso}</div></div>
-    <div>${zpillHtml(r.zona||'')}</div>
-    <div><span class="cbadge b${r.conformidad}">${r.conformidad}</span></div>
-    <div style="font-size:11px">${r.hallazgo||'—'}</div>
-    <div style="font-size:11px;color:#6b7280">${r.accion||'—'}</div>
-  </div>`).join('');
+  if(!nc.length){
+    el.innerHTML='<div style="padding:10px 14px;background:#d1fae5;color:#065f46;border-left:3px solid #059669;border-radius:4px;font-size:13px">✓ Sin no conformidades.</div>';
+  } else {
+    el.innerHTML=`<div style="padding:10px 14px;background:#fee2e2;color:#991b1b;border-left:3px solid #dc2626;border-radius:4px;font-size:13px;margin-bottom:10px">⚠ ${nc.length} no conformidad${nc.length>1?'es':''}</div>`
+      +nc.map(r=>`<div style="padding:10px 14px;background:#fff;border:1px solid #ddd9d0;border-left:3px solid #dc2626;border-radius:4px;margin-bottom:8px">
+        <div style="font-weight:500;font-size:13px">${r.equipo_nombre}</div>
+        <div style="font-size:10px;color:#aaa;font-family:monospace;margin-bottom:5px">${FL[r.piso]||r.piso}</div>
+        <div style="font-size:12px;margin-bottom:3px"><strong>Hallazgo:</strong> ${r.hallazgo||'—'}</div>
+        <div style="font-size:12px;color:#6b7280"><strong>Acción:</strong> ${r.accion||'—'}</div>
+      </div>`).join('');
+  }
+  document.getElementById('findings').innerHTML=allRaw.map(r=>`
+    <div class="dt-row" style="grid-template-columns:2fr 0.7fr 0.7fr 2.5fr 2fr">
+      <div><div style="font-weight:500;font-size:12px">${r.equipo_nombre}</div><div style="font-family:monospace;font-size:9px;color:#aaa">${FL[r.piso]||r.piso}</div></div>
+      <div>${zpillHtml(r.zona||'')}</div>
+      <div><span class="cbadge b${r.conformidad}">${r.conformidad}</span></div>
+      <div style="font-size:11px">${r.hallazgo||'—'}</div>
+      <div style="font-size:11px;color:#6b7280">${r.accion||'—'}</div>
+    </div>`).join('');
 }
 function exportCSV(){
   const rows=[['Equipo','Piso','Zona','Conformidad','Hallazgo','Acción','Inspector'],
-    ...allRaw.map(r=>[`"${r.equipo_nombre}"`,r.piso,r.zona||'',r.conformidad||'',`"${(r.hallazgo||'').replace(/"/g,"'")}"`,`"${(r.accion||'').replace(/"/g,"'")}"`,`"${r.inspector_nombre||''}"`])];
+    ...allRaw.map(r=>[`"${r.equipo_nombre}"`,r.piso,r.zona||'',r.conformidad||'',
+      `"${(r.hallazgo||'').replace(/"/g,"'")}"`,`"${(r.accion||'').replace(/"/g,"'")}"`,
+      `"${r.inspector_nombre||''}"`])];
   const blob=new Blob(['\ufeff'+rows.map(r=>r.join(',')).join('\n')],{type:'text/csv;charset=utf-8'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`ATEX_CCU_${new Date().toISOString().slice(0,10)}.csv`; a.click();
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download=`ATEX_CCU_${new Date().toISOString().slice(0,10)}.csv`; a.click();
   toast('CSV descargado ✓','ok');
 }
 function copyMD(){
@@ -879,20 +918,13 @@ function copyMD(){
 // ═══════════════════════════════════════════════════════════
 //  SUBCOMPONENT MODAL
 // ═══════════════════════════════════════════════════════════
-let curParentEq=null, curCompId=null, subConf='', subPendFiles=[], subExPaths=[];
-
 async function openSubModal(mode, parentEqId, compId){
   curParentEq=parentEqId; curCompId=compId||null; subConf=''; subPendFiles=[]; subExPaths=[];
   const eq=EQ.find(e=>e.id===parentEqId);
   document.getElementById('sm-parent-name').textContent=eq?eq.n:'';
-
   let comp={};
-  if(compId){
-    comp=(subRecs[parentEqId]||[]).find(c=>c.id===compId)||{};
-  }
-
-  // Fill fields
-  const sv=(id,v)=>{document.getElementById(id).value=v||'';};
+  if(compId){ comp=(subRecs[parentEqId]||[]).find(c=>c.id===compId)||{}; }
+  const sv=(fid,v)=>{document.getElementById(fid).value=v||'';};
   sv('sm-tipo',comp.tipo); sv('sm-nombre',comp.nombre_comp);
   sv('sm-marca',comp.marca); sv('sm-modelo',comp.modelo);
   sv('sm-serie',comp.serie); sv('sm-pot',comp.potencia);
@@ -901,27 +933,22 @@ async function openSubModal(mode, parentEqId, compId){
   sv('sm-hall',comp.hallazgo); sv('sm-acc',comp.accion);
   subConf=comp.conformidad||''; renderSubRadios();
   subExPaths=comp.fotos||[]; await renderSubPhotos();
-
   const prev=document.getElementById('sm-prev');
   if(comp.inspector_nombre&&comp.updated_at){
     prev.style.display='block';
     prev.textContent='Actualizado: '+comp.inspector_nombre+' · '+new Date(comp.updated_at).toLocaleString('es-CL');
   } else { prev.style.display='none'; }
-
   document.getElementById('sm-del-wrap').style.display=compId?'block':'none';
-
   const bg=document.getElementById('smodal-bg');
   bg.style.display='flex'; bg.style.alignItems='flex-start'; bg.style.justifyContent='center';
   document.body.style.overflow='hidden';
 }
-
 function closeSubModal(){
   document.getElementById('smodal-bg').style.display='none';
   document.body.style.overflow='';
   curParentEq=null; curCompId=null;
 }
 function closeSMBg(e){ if(e.target===document.getElementById('smodal-bg')) closeSubModal(); }
-
 function setSubConf(v){ subConf=v; renderSubRadios(); }
 function renderSubRadios(){
   document.querySelectorAll('#sm-rgrp .ropt').forEach(b=>{
@@ -942,7 +969,6 @@ async function renderSubPhotos(){
   }
   g.innerHTML=h;
 }
-
 async function saveComp(){
   if(!curParentEq) return;
   const tipo=document.getElementById('sm-tipo').value.trim();
@@ -951,7 +977,6 @@ async function saveComp(){
   const btn=document.getElementById('sm-sv');
   btn.disabled=1; btn.textContent='Guardando…';
   try {
-    // Upload photos
     const newPaths=[];
     for(const f of subPendFiles){
       const ext=f.name.split('.').pop();
@@ -960,23 +985,21 @@ async function saveComp(){
       newPaths.push(path);
     }
     const payload={
-      equipo_id:      curParentEq,
-      tipo:           tipo,
-      nombre_comp:    nombre||tipo,
-      marca:          document.getElementById('sm-marca').value.trim(),
-      modelo:         document.getElementById('sm-modelo').value.trim(),
-      serie:          document.getElementById('sm-serie').value.trim(),
-      potencia:       document.getElementById('sm-pot').value.trim(),
-      marcado_ex:     document.getElementById('sm-mex').value.trim(),
-      epl:            document.getElementById('sm-epl').value,
-      zona:           document.getElementById('sm-zona').value,
-      temp_max:       document.getElementById('sm-temp').value.trim(),
-      conformidad:    subConf,
-      hallazgo:       document.getElementById('sm-hall').value.trim(),
-      accion:         document.getElementById('sm-acc').value.trim(),
-      fotos:          [...subExPaths,...newPaths],
-      inspector_id:   session.user.id,
-      inspector_nombre: profile?.full_name||session.user.email,
+      equipo_id:curParentEq, tipo, nombre_comp:nombre||tipo,
+      marca:document.getElementById('sm-marca').value.trim(),
+      modelo:document.getElementById('sm-modelo').value.trim(),
+      serie:document.getElementById('sm-serie').value.trim(),
+      potencia:document.getElementById('sm-pot').value.trim(),
+      marcado_ex:document.getElementById('sm-mex').value.trim(),
+      epl:document.getElementById('sm-epl').value,
+      zona:document.getElementById('sm-zona').value,
+      temp_max:document.getElementById('sm-temp').value.trim(),
+      conformidad:subConf,
+      hallazgo:document.getElementById('sm-hall').value.trim(),
+      accion:document.getElementById('sm-acc').value.trim(),
+      fotos:[...subExPaths,...newPaths],
+      inspector_id:session.user.id,
+      inspector_nombre:profile?.full_name||session.user.email,
     };
     let saved;
     if(curCompId){
@@ -986,19 +1009,16 @@ async function saveComp(){
       const {data,error}=await sb.from('componentes').insert(payload).select().single();
       if(error)throw error; saved=data;
     }
-    // Update local state
     if(!subRecs[curParentEq]) subRecs[curParentEq]=[];
     const idx=subRecs[curParentEq].findIndex(c=>c.id===saved.id);
-    if(idx>=0) subRecs[curParentEq][idx]={...saved,profiles:{full_name:profile?.full_name}};
-    else subRecs[curParentEq].push({...saved,profiles:{full_name:profile?.full_name}});
+    if(idx>=0) subRecs[curParentEq][idx]={...saved};
+    else subRecs[curParentEq].push({...saved});
     toast('Componente guardado ✓','ok');
-    closeSubModal();
-    renderEq();
+    closeSubModal(); renderEq();
     if(curEq) renderModalComps(curEq);
   } catch(err){ toast('Error: '+err.message,'err'); }
   btn.disabled=0; btn.textContent='GUARDAR COMPONENTE';
 }
-
 async function deleteComp(){
   if(!curCompId||!confirm('¿Eliminar este componente?')) return;
   try {
