@@ -250,7 +250,7 @@ input[type=file]{display:none}
       <div class="sec-hd">Tabla completa</div>
       <div class="dt" style="overflow-x:auto">
         <div class="dt-head" style="grid-template-columns:2fr 0.7fr 0.6fr 0.7fr 2fr 2fr;min-width:700px">
-          <div>EQUIPO</div><div>ZONA</div><div>FABRICACIÓN</div><div>ESTADO</div><div>HALLAZGO</div><div>ACCIÓN</div>
+          <div>EQUIPO / COMPONENTE</div><div>ZONA</div><div>FABRICACIÓN</div><div>ESTADO</div><div>HALLAZGO</div><div>ACCIÓN</div>
         </div>
         <div id="findings" style="min-width:700px"><div style="padding:28px;text-align:center;color:#6b7280">Sin datos</div></div>
       </div>
@@ -899,30 +899,84 @@ function renderFindings(){
         <div style="font-size:12px;color:#6b7280"><strong>Acción:</strong> ${r.accion||'—'}</div>
       </div>`).join('');
   }
-  document.getElementById('findings').innerHTML=allRaw.map(r=>`
-    <div class="dt-row" style="grid-template-columns:2fr 0.7fr 0.6fr 0.7fr 2fr 2fr">
-      <div><div style="font-weight:500;font-size:12px">${r.equipo_nombre}</div><div style="font-family:monospace;font-size:9px;color:#aaa">${FL[r.piso]||r.piso}</div></div>
-      <div>${zpillHtml(r.zona||'')}</div>
-      <div style="font-family:monospace;font-size:10px;color:#6b7280">${r.fecha_fab||'—'}</div>
-      <div><span class="cbadge b${r.conformidad}">${r.conformidad}</span></div>
-      <div style="font-size:11px">${r.hallazgo||'—'}</div>
-      <div style="font-size:11px;color:#6b7280">${r.accion||'—'}</div>
-    </div>`).join('');
+  // Tabla completa: equipo principal + sus componentes agrupados
+  let findHtml = '';
+  if(!allRaw.length){
+    findHtml = '<div style="padding:28px;text-align:center;color:#6b7280">Sin datos</div>';
+  } else {
+    for(const r of allRaw){
+      const comps = allSubRaw.filter(c=>c.equipo_id===r.equipo_id);
+      // Fila equipo principal
+      findHtml += `<div class="dt-row" style="grid-template-columns:2fr 0.7fr 0.6fr 0.7fr 2fr 2fr;background:#f0ece4">
+        <div>
+          <div style="font-weight:600;font-size:12px">▸ ${r.equipo_nombre}</div>
+          <div style="font-family:monospace;font-size:9px;color:#aaa">${FL[r.piso]||r.piso}</div>
+        </div>
+        <div>${zpillHtml(r.zona||'')}</div>
+        <div style="font-family:monospace;font-size:10px;color:#6b7280">${r.fecha_fab||'—'}</div>
+        <div><span class="cbadge b${r.conformidad||''}">${r.conformidad||'—'}</span></div>
+        <div style="font-size:11px">${r.hallazgo||'—'}</div>
+        <div style="font-size:11px;color:#6b7280">${r.accion||'—'}</div>
+      </div>`;
+      // Filas componentes
+      for(const c of comps){
+        findHtml += `<div class="dt-row" style="grid-template-columns:2fr 0.7fr 0.6fr 0.7fr 2fr 2fr">
+          <div style="padding-left:16px">
+            <div style="font-size:11px;color:#5b21b6">↳ ${c.nombre_comp||c.tipo}</div>
+            <div style="font-family:monospace;font-size:9px;color:#aaa">${c.tipo||'—'} · ${c.marca||''} ${c.modelo||''}</div>
+          </div>
+          <div>${zpillHtml(c.zona||'')}</div>
+          <div style="font-family:monospace;font-size:10px;color:#6b7280">${c.fecha_fab||'—'}</div>
+          <div><span class="cbadge b${c.conformidad||''}">${c.conformidad||'—'}</span></div>
+          <div style="font-size:11px">${c.hallazgo||'—'}</div>
+          <div style="font-size:11px;color:#6b7280">${c.accion||'—'}</div>
+        </div>`;
+      }
+    }
+  }
+  document.getElementById('findings').innerHTML = findHtml;
 }
+
 function exportCSV(){
-  const rows=[['Equipo','Piso','Zona','Fabricación','Conformidad','Hallazgo','Acción','Inspector'],
-    ...allRaw.map(r=>[`"${r.equipo_nombre}"`,r.piso,r.zona||'',r.fecha_fab||'',r.conformidad||'',
-      `"${(r.hallazgo||'').replace(/"/g,"'")}"`,`"${(r.accion||'').replace(/"/g,"'")}"`,
-      `"${r.inspector_nombre||''}"`])];
+  const rows=[['Tipo','Equipo / Componente','Equipo principal','Piso','Zona','Fabricación','Conformidad','Hallazgo','Acción','Inspector']];
+  for(const r of allRaw){
+    rows.push([
+      'Equipo',
+      `"${r.equipo_nombre}"`, '',
+      r.piso, r.zona||'', r.fecha_fab||'', r.conformidad||'',
+      `"${(r.hallazgo||'').replace(/"/g,"'")}"`,
+      `"${(r.accion||'').replace(/"/g,"'")}"`,
+      `"${r.inspector_nombre||''}"`
+    ]);
+    const comps = allSubRaw.filter(c=>c.equipo_id===r.equipo_id);
+    for(const c of comps){
+      rows.push([
+        'Componente',
+        `"${c.nombre_comp||c.tipo}"`,
+        `"${r.equipo_nombre}"`,
+        r.piso, c.zona||'', c.fecha_fab||'', c.conformidad||'',
+        `"${(c.hallazgo||'').replace(/"/g,"'")}"`,
+        `"${(c.accion||'').replace(/"/g,"'")}"`,
+        `"${c.inspector_nombre||''}"`
+      ]);
+    }
+  }
   const blob=new Blob(['\ufeff'+rows.map(r=>r.join(',')).join('\n')],{type:'text/csv;charset=utf-8'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
   a.download=`ATEX_CCU_${new Date().toISOString().slice(0,10)}.csv`; a.click();
   toast('CSV descargado ✓','ok');
 }
+
 function copyMD(){
   let md=`# Informe ATEX — CCU Chile · Planta Temuco\n\n**Inspector:** ${document.getElementById('i-insp').value||'—'}  \n**Fecha:** ${document.getElementById('i-fecha').value||'—'}  \n**Norma:** UNE-EN 60079-10-2:2010\n\n`;
-  md+=`| Equipo | Piso | Zona | Fabricación | Estado | Hallazgo |\n|---|---|---|---|---|---|\n`;
-  allRaw.forEach(r=>{ md+=`| ${r.equipo_nombre} | ${FL[r.piso]||r.piso} | ${r.zona?'Z'+r.zona:'—'} | ${r.fecha_fab||'—'} | ${r.conformidad} | ${r.hallazgo||'—'} |\n`; });
+  md+=`| Tipo | Equipo / Componente | Piso | Zona | Fabricación | Estado | Hallazgo |\n|---|---|---|---|---|---|---|\n`;
+  for(const r of allRaw){
+    md+=`| **Equipo** | **${r.equipo_nombre}** | ${FL[r.piso]||r.piso} | ${r.zona?'Z'+r.zona:'—'} | ${r.fecha_fab||'—'} | ${r.conformidad||'—'} | ${r.hallazgo||'—'} |\n`;
+    const comps = allSubRaw.filter(c=>c.equipo_id===r.equipo_id);
+    for(const c of comps){
+      md+=`| ↳ Comp. | ${c.nombre_comp||c.tipo} | ${FL[r.piso]||r.piso} | ${c.zona?'Z'+c.zona:'—'} | ${c.fecha_fab||'—'} | ${c.conformidad||'—'} | ${c.hallazgo||'—'} |\n`;
+    }
+  }
   navigator.clipboard.writeText(md).then(()=>toast('Markdown copiado ✓','ok')).catch(()=>toast('Error al copiar','err'));
 }
 
