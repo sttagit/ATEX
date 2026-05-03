@@ -106,6 +106,13 @@ input{width:100%;padding:8px 10px;border:1px solid #ddd9d0;border-radius:4px;fon
 #toasts{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:8px;z-index:400}
 .toast{background:#0f1117;color:#fff;border-radius:4px;padding:10px 16px;font-size:13px;box-shadow:0 4px 16px rgba(0,0,0,.2);border-left:3px solid #d4500a;max-width:280px}
 .toast.ok{border-left-color:#059669}.toast.err{border-left-color:#dc2626}
+/* ── FOTOS INFORME ── */
+.inf-foto-btn{font-family:monospace;font-size:10px;color:#d4500a;background:none;border:1px solid #ddd9d0;border-radius:3px;padding:2px 7px;cursor:pointer;white-space:nowrap;margin-top:4px;display:inline-block}
+.inf-foto-btn:hover{background:#fff3ed;border-color:#d4500a}
+.inf-foto-panel{display:none;margin-top:8px;padding:8px;background:#fafaf8;border-radius:4px;border:1px solid #f0ece4}
+.inf-foto-panel.on{display:flex;flex-wrap:wrap;gap:6px}
+.inf-foto-panel img{width:64px;height:64px;object-fit:cover;border-radius:3px;border:1px solid #ddd9d0;cursor:pointer}
+.inf-foto-panel .inf-spin{font-family:monospace;font-size:10px;color:#aaa}
 input[type=file]{display:none}
 /* ── SUBCOMPONENTS ── */
 .eq-expand{display:none;border-top:1px solid #f0ece4;margin-top:8px;padding-top:8px}
@@ -456,7 +463,7 @@ const EQ = [
   {id:'e001',  n:'Redler pavo a elevadores (malta)',                           p:'1sub', g:'Transporte',           z:'21'},
 
   // ── PRIMER PISO ───────────────────────────────────────────
-  {id:'e002',  n:'Redler descarga de silos de malta (cabezal x2)',             p:'1',    g:'Transporte',           z:'21'},
+  {id:'e002',  n:'Redler descarga silos de malta',                              p:'1',    g:'Transporte',           z:'21'},
   {id:'e003',  n:'Elevador de capachos recepción malta (50 t/h)',              p:'1',    g:'Transporte',           z:'21'},
   {id:'e004',  n:'Elevador de capachos recepción arroz',                       p:'1',    g:'Transporte',           z:'21'},
   {id:'e005',  n:'Elevador de capachos preparación de carga malta',            p:'1',    g:'Transporte',           z:'21'},
@@ -894,6 +901,29 @@ function renderGapRows(){
 // ═══════════════════════════════════════════════════════════
 //  INFORME
 // ═══════════════════════════════════════════════════════════
+function fotosBtnHtml(fotos, rowId){
+  if(!fotos||!fotos.length) return '';
+  return `<button class="inf-foto-btn" onclick="toggleInfFotos('${rowId}',${JSON.stringify(fotos).replace(/"/g,'&quot;')})">📷 ${fotos.length} foto${fotos.length>1?'s':''}</button>
+<div class="inf-foto-panel" id="ifp-${rowId}"><span class="inf-spin">Cargando…</span></div>`;
+}
+
+async function toggleInfFotos(rowId, fotos){
+  const panel = document.getElementById('ifp-'+rowId);
+  if(!panel) return;
+  if(panel.classList.contains('on')){ panel.classList.remove('on'); return; }
+  panel.classList.add('on');
+  if(panel.dataset.loaded) return; // ya cargadas
+  panel.dataset.loaded = '1';
+  let h = '';
+  for(const path of fotos){
+    try {
+      const {data} = await sb.storage.from('atex-fotos').createSignedUrl(path, 3600);
+      h += `<img src="${data.signedUrl}" onclick="openLb('${data.signedUrl}')" title="${path}">`;
+    } catch(e){ h += `<div style="width:64px;height:64px;background:#eee;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;color:#aaa">Error</div>`; }
+  }
+  panel.innerHTML = h || '<span class="inf-spin">Sin fotos</span>';
+}
+
 function renderFindings(){
   const nc=allRaw.filter(r=>r.conformidad==='NC');
   const el=document.getElementById('nc-sum');
@@ -906,8 +936,10 @@ function renderFindings(){
         <div style="font-size:10px;color:#aaa;font-family:monospace;margin-bottom:5px">${FL[r.piso]||r.piso}</div>
         <div style="font-size:12px;margin-bottom:3px"><strong>Hallazgo:</strong> ${r.hallazgo||'—'}</div>
         <div style="font-size:12px;color:#6b7280"><strong>Acción:</strong> ${r.accion||'—'}</div>
+        ${fotosBtnHtml(r.fotos,'nc-'+r.equipo_id)}
       </div>`).join('');
   }
+
   // Tabla completa: equipo principal + sus componentes agrupados
   let findHtml = '';
   if(!allRaw.length){
@@ -915,11 +947,13 @@ function renderFindings(){
   } else {
     for(const r of allRaw){
       const comps = allSubRaw.filter(c=>c.equipo_id===r.equipo_id);
+      const rId = 'eq-'+r.equipo_id;
       // Fila equipo principal
       findHtml += `<div class="dt-row" style="grid-template-columns:2fr 0.7fr 0.6fr 0.7fr 2fr 2fr;background:#f0ece4">
         <div>
           <div style="font-weight:600;font-size:12px">▸ ${r.equipo_nombre}</div>
           <div style="font-family:monospace;font-size:9px;color:#aaa">${FL[r.piso]||r.piso}</div>
+          ${fotosBtnHtml(r.fotos, rId)}
         </div>
         <div>${zpillHtml(r.zona||'')}</div>
         <div style="font-family:monospace;font-size:10px;color:#6b7280">${r.fecha_fab||'—'}</div>
@@ -929,10 +963,12 @@ function renderFindings(){
       </div>`;
       // Filas componentes
       for(const c of comps){
+        const cId = 'comp-'+c.id;
         findHtml += `<div class="dt-row" style="grid-template-columns:2fr 0.7fr 0.6fr 0.7fr 2fr 2fr">
           <div style="padding-left:16px">
             <div style="font-size:11px;color:#5b21b6">↳ ${c.nombre_comp||c.tipo}</div>
-            <div style="font-family:monospace;font-size:9px;color:#aaa">${c.tipo||'—'} · ${c.marca||''} ${c.modelo||''}</div>
+            <div style="font-family:monospace;font-size:9px;color:#aaa">${c.tipo||'—'}${c.marca?' · '+c.marca:''}${c.modelo?' '+c.modelo:''}</div>
+            ${fotosBtnHtml(c.fotos, cId)}
           </div>
           <div>${zpillHtml(c.zona||'')}</div>
           <div style="font-family:monospace;font-size:10px;color:#6b7280">${c.fecha_fab||'—'}</div>
