@@ -106,6 +106,16 @@ input{width:100%;padding:8px 10px;border:1px solid #ddd9d0;border-radius:4px;fon
 #toasts{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:8px;z-index:400}
 .toast{background:#0f1117;color:#fff;border-radius:4px;padding:10px 16px;font-size:13px;box-shadow:0 4px 16px rgba(0,0,0,.2);border-left:3px solid #d4500a;max-width:280px}
 .toast.ok{border-left-color:#059669}.toast.err{border-left-color:#dc2626}
+/* ── EDICIÓN NOMBRE EQUIPO ── */
+.eq-edit-btn{background:none;border:none;cursor:pointer;font-size:11px;color:#ccc;padding:0 3px;line-height:1;vertical-align:middle;display:none}
+.eq-card:hover .eq-edit-btn{display:inline}
+.eq-name-wrap{display:flex;align-items:flex-start;gap:4px;margin-bottom:5px}
+.eq-name-input{font-size:13px;font-weight:500;line-height:1.35;border:1.5px solid #d4500a;border-radius:3px;padding:2px 6px;width:100%;background:#fff;display:none}
+.eq-name-input.on{display:block}
+.eq-name-actions{display:none;gap:4px;margin-top:4px}
+.eq-name-actions.on{display:flex}
+.eq-name-ok{background:#d4500a;color:#fff;border:none;border-radius:3px;padding:3px 10px;font-size:10px;font-family:monospace;cursor:pointer}
+.eq-name-cancel{background:none;border:1px solid #ddd9d0;border-radius:3px;padding:3px 10px;font-size:10px;font-family:monospace;cursor:pointer}
 /* ── FOTOS INFORME ── */
 .inf-foto-btn{font-family:monospace;font-size:10px;color:#d4500a;background:none;border:1px solid #ddd9d0;border-radius:3px;padding:2px 7px;cursor:pointer;white-space:nowrap;margin-top:4px;display:inline-block}
 .inf-foto-btn:hover{background:#fff3ed;border-color:#d4500a}
@@ -491,7 +501,7 @@ const EQ = [
   {id:'e023',  n:'Compresor polvo sistema recepción arroz',                    p:'3',    g:'Compresor',            z:'22'},
   {id:'e024',  n:'Tolva de polvo / Tolva de malta (parte superior)',           p:'3',    g:'Contenedor polvo',     z:'20'},
   {id:'e025',  n:'Despedradora de malta (8 t/h)',                              p:'3',    g:'Limpieza grano',       z:'21'},
-  {id:'e026',  n:'Tolva de arroz (parte superior)',                            p:'3',    g:'Almacenamiento',       z:'21'},
+  {id:'e026',  n:'Ciclón tolva de arroz (parte superior)',                     p:'3',    g:'Almacenamiento',       z:'21'},
   {id:'e027',  n:'Compuerta silo batch (cadena regulable)',                    p:'3',    g:'Válvulas',             z:'21'},
   {id:'e028',  n:'Tolva harina de malta (parte superior)',                     p:'3',    g:'Contenedor polvo',     z:'20'},
   {id:'e029',  n:'Redler de pajilla a tolva de malta',                         p:'3',    g:'Transporte',           z:'21'},
@@ -561,6 +571,7 @@ const EQ = [
   {id:'e081',  n:'Elevador de capachos pajillas a sacos',                      p:'1',    g:'Transporte',           z:'21'},
   {id:'e082',  n:'Soplador preparación de arroz',                              p:'1',    g:'Transporte neumático',  z:'21'},
   {id:'e083',  n:'Aspiradora móvil sistema de limpieza',                       p:'1',    g:'Limpieza',              z:'21'},
+  {id:'e086',  n:'Válvula rotatoria descarga arroz a elevador (ciclón P3 → elevador capachos)',p:'1', g:'Válvulas', z:'21'},
 
   // ── SEGUNDO PISO (continuación) ───────────────────────────
   {id:'e084',  n:'Elevador de capachos malta procesada N°1 → P6 (BÜHLER)',    p:'2',    g:'Transporte',           z:'21'},
@@ -584,6 +595,7 @@ const FL = {
 // ═══════════════════════════════════════════════════════════
 let session, profile, recs={}, subRecs={}, curEq=null, curConf='', pendFiles=[], exPaths=[], floorF='all', allRaw=[], allSubRaw=[];
 let curParentEq=null, curCompId=null, subConf='', subPendFiles=[], subExPaths=[];
+let customNames={}; // { eqId: nombrePersonalizado }
 
 // ═══════════════════════════════════════════════════════════
 //  BOOT
@@ -615,6 +627,11 @@ async function loadApp(){
     const {data:sd}=await sb.from('componentes').select('*, profiles(full_name)').order('created_at',{ascending:true});
     if(sd){ allSubRaw=sd; subRecs={}; sd.forEach(c=>{ if(!subRecs[c.equipo_id]) subRecs[c.equipo_id]=[]; subRecs[c.equipo_id].push(c); }); }
   } catch(e){ console.warn('componentes table not found'); }
+  // Cargar nombres personalizados
+  try {
+    const {data:cn}=await sb.from('equipos_custom').select('id,nombre');
+    if(cn){ cn.forEach(r=>{ customNames[r.id]=r.nombre; }); }
+  } catch(e){ console.warn('equipos_custom table not found — ejecuta el SQL indicado'); }
   renderEq();
   loader(0);
 }
@@ -702,6 +719,11 @@ function eqConf(eqId){
   return mi<=si?main:sub;
 }
 
+// Devuelve el nombre vigente de un equipo (custom o catálogo)
+function eqName(eqId){
+  return customNames[eqId] || (EQ.find(e=>e.id===eqId)||{}).n || eqId;
+}
+
 function renderEq(){
   const list=document.getElementById('eq-list');
   const items=floorF==='all'?EQ:EQ.filter(e=>e.p===floorF);
@@ -716,8 +738,24 @@ function renderEq(){
       const conf=eqConf(eq.id);
       const comps=subRecs[eq.id]||[];
       const cc=comps.length;
+      const nombre=eqName(eq.id);
+      const isCustom=!!customNames[eq.id];
       h+=`<div class="eq-card${z?' z'+z:''} ${r.conformidad?'done':''}" id="card-${eq.id}">
-        <div class="eq-name" onclick="openModal('${eq.id}')">${eq.n}</div>
+        <div class="eq-name-wrap">
+          <div style="flex:1">
+            <span class="eq-name" id="eqn-${eq.id}" onclick="openModal('${eq.id}')">${nombre}</span>
+            ${isCustom?'<span style="font-family:monospace;font-size:8px;color:#d4500a;margin-left:4px" title="Nombre editado">✎</span>':''}
+          </div>
+          <button class="eq-edit-btn" onclick="startEditName('${eq.id}')" title="Editar nombre">✎</button>
+        </div>
+        <div class="eq-name-input-wrap" id="enw-${eq.id}" style="display:none;margin-bottom:5px">
+          <input class="eq-name-input on" id="eni-${eq.id}" value="${nombre.replace(/"/g,'&quot;')}" onkeydown="if(event.key==='Enter')saveEqName('${eq.id}');if(event.key==='Escape')cancelEditName('${eq.id}')">
+          <div class="eq-name-actions on" style="margin-top:4px">
+            <button class="eq-name-ok" onclick="saveEqName('${eq.id}')">✓ Guardar</button>
+            <button class="eq-name-cancel" onclick="cancelEditName('${eq.id}')">✕ Cancelar</button>
+            ${isCustom?`<button class="eq-name-cancel" onclick="resetEqName('${eq.id}')" style="color:#d4500a;border-color:#d4500a">↺ Original</button>`:''}
+          </div>
+        </div>
         <div class="eq-meta">
           ${zpillHtml(z)}
           <span style="font-family:monospace;font-size:9px;color:#bbb">${eq.g}</span>
@@ -739,6 +777,53 @@ function renderEq(){
     h+='</div>';
   }
   list.innerHTML=h||'<div style="padding:40px;text-align:center;color:#6b7280">Sin equipos</div>';
+}
+
+// ── EDICIÓN NOMBRE EQUIPO ─────────────────────────────────
+function startEditName(eqId){
+  const nameEl=document.getElementById('eqn-'+eqId);
+  const wrapEl=document.getElementById('enw-'+eqId);
+  if(!nameEl||!wrapEl) return;
+  nameEl.style.display='none';
+  wrapEl.style.display='block';
+  const inp=document.getElementById('eni-'+eqId);
+  if(inp){ inp.focus(); inp.select(); }
+}
+function cancelEditName(eqId){
+  const nameEl=document.getElementById('eqn-'+eqId);
+  const wrapEl=document.getElementById('enw-'+eqId);
+  if(nameEl) nameEl.style.display='';
+  if(wrapEl) wrapEl.style.display='none';
+}
+async function saveEqName(eqId){
+  const inp=document.getElementById('eni-'+eqId);
+  if(!inp) return;
+  const nuevoNombre=inp.value.trim();
+  if(!nuevoNombre){ toast('El nombre no puede estar vacío','err'); return; }
+  try {
+    const payload={
+      id:eqId,
+      nombre:nuevoNombre,
+      updated_at:new Date().toISOString(),
+      updated_by:profile?.full_name||session.user.email
+    };
+    const {error}=await sb.from('equipos_custom')
+      .upsert(payload,{onConflict:'id'});
+    if(error) throw error;
+    customNames[eqId]=nuevoNombre;
+    toast('Nombre guardado ✓','ok');
+    renderEq();
+  } catch(e){ toast('Error al guardar: '+e.message,'err'); }
+}
+async function resetEqName(eqId){
+  if(!confirm('¿Restaurar el nombre original del catálogo?')) return;
+  try {
+    const {error}=await sb.from('equipos_custom').delete().eq('id',eqId);
+    if(error) throw error;
+    delete customNames[eqId];
+    toast('Nombre restaurado ✓','ok');
+    renderEq();
+  } catch(e){ toast('Error: '+e.message,'err'); }
 }
 
 function toggleExpand(eqId,btn){
@@ -764,7 +849,7 @@ function setFloor(fl,el){
 async function openModal(id){
   curEq=id; curConf=''; pendFiles=[]; exPaths=[];
   const eq=EQ.find(e=>e.id===id), r=recs[id]||{};
-  document.getElementById('m-name').textContent=eq.n;
+  document.getElementById('m-name').textContent=eqName(id);
   document.getElementById('m-floor').textContent=FL[eq.p]||eq.p;
   document.getElementById('m-grp').textContent=eq.g;
   const z=r.zona||eq.z||'';
