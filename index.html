@@ -286,7 +286,7 @@ input[type=file]{display:none}
 </div>
 
 <!-- MODAL EQUIPO -->
-<div id="modal-bg" onclick="closeMBg(event)">
+<div id="modal-bg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;padding:16px;overflow-y:auto;align-items:flex-start;justify-content:center">
   <div class="modal">
     <div class="modal-head">
       <div style="flex:1">
@@ -310,7 +310,7 @@ input[type=file]{display:none}
         <div><div class="field-lbl">Potencia / Tensión</div><input class="field-input" id="f-pot" placeholder="11 kW / 380V"></div>
       </div>
       <div class="two-col">
-        <div><div class="field-lbl">Fecha de fabricación</div><input class="field-input" id="f-fab" type="month" placeholder="AAAA-MM"></div>
+        <div><div class="field-lbl">Año de fabricación</div><input class="field-input" id="f-fab" type="number" min="1950" max="2099" placeholder="Ej: 1998"></div>
         <div></div>
       </div>
       <div style="font-size:10px;font-weight:600;color:#d4500a;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">Clasificación ATEX</div>
@@ -390,7 +390,7 @@ input[type=file]{display:none}
 </div>
 
 <!-- SUB MODAL COMPONENTE -->
-<div id="smodal-bg" onclick="closeSMBg(event)" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;padding:16px;overflow-y:auto;align-items:flex-start;justify-content:center">
+<div id="smodal-bg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;padding:16px;overflow-y:auto;align-items:flex-start;justify-content:center">
   <div class="modal" style="border-top-color:#7c3aed">
     <div class="modal-head" style="background:#1e1030">
       <div style="flex:1">
@@ -412,7 +412,7 @@ input[type=file]{display:none}
         <div><div class="field-lbl">Potencia / Tensión</div><input class="field-input" id="sm-pot" placeholder="11 kW / 380V"></div>
       </div>
       <div class="two-col">
-        <div><div class="field-lbl">Fecha de fabricación</div><input class="field-input" id="sm-fab" type="month" placeholder="AAAA-MM"></div>
+        <div><div class="field-lbl">Año de fabricación</div><input class="field-input" id="sm-fab" type="number" min="1950" max="2099" placeholder="Ej: 1998"></div>
         <div></div>
       </div>
       <div style="font-size:10px;font-weight:600;color:#7c3aed;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">Clasificación ATEX</div>
@@ -900,7 +900,8 @@ async function openModal(id){
   // Mostrar sección eliminación solo si hay datos guardados
   const delSec=document.getElementById('m-del-section');
   if(delSec) delSec.style.display='none';
-  document.getElementById('modal-bg').classList.add('on');
+  const mbg=document.getElementById('modal-bg');
+  mbg.style.display='flex';
   document.body.style.overflow='hidden';
 }
 function renderModalComps(eqId){
@@ -946,7 +947,8 @@ async function deleteEqData(){
     delete recs[curEq];
     allRaw=allRaw.filter(r=>r.equipo_id!==curEq);
     toast('Datos de inspección eliminados ✓','ok');
-    closeModal(); renderEq();
+    closeModal();
+    await reloadData();
   } catch(e){ toast('Error: '+e.message,'err'); }
 }
 
@@ -963,12 +965,21 @@ async function hideEq(){
     if(error) throw error;
     hiddenEqs.add(curEq);
     toast(`"${nombre}" ocultado del listado ✓`,'ok');
-    closeModal(); renderEq();
+    closeModal();
+    await reloadData();
   } catch(e){ toast('Error: '+e.message,'err'); }
 }
 
-function closeModal(){ document.getElementById('modal-bg').classList.remove('on'); document.body.style.overflow=''; curEq=null; }
-function closeMBg(e){ if(e.target===document.getElementById('modal-bg')) closeModal(); }
+function closeModal(){
+  document.getElementById('modal-bg').style.display='none';
+  document.body.style.overflow='';
+  curEq=null;
+}
+function closeSubModal(){
+  document.getElementById('smodal-bg').style.display='none';
+  document.body.style.overflow='';
+  curParentEq=null; curCompId=null;
+}
 function setConf(v){ curConf=v; renderRadios(); }
 function renderRadios(){ document.querySelectorAll('#rgrp .ropt').forEach(b=>{ b.className='ropt'; if(b.dataset.v===curConf) b.classList.add('s'+curConf); }); }
 function addPhotos(e){ pendFiles.push(...e.target.files); e.target.value=''; renderPhotos(); }
@@ -1021,9 +1032,23 @@ async function saveEq(){
     else   { const {data}=await sb.from('registros').insert(payload).select().single(); saved=data; }
     recs[curEq]={...saved,profiles:{full_name:profile?.full_name}};
     toast('Equipo guardado ✓','ok');
-    closeModal(); renderEq();
+    closeModal();
+    await reloadData();
   } catch(err){ toast('Error: '+err.message,'err'); }
   btn.disabled=0; btn.textContent='GUARDAR EQUIPO';
+}
+
+// ── RELOAD DATA ───────────────────────────────────────────
+async function reloadData(){
+  try {
+    const {data}=await sb.from('registros').select('*, profiles(full_name)').order('updated_at',{ascending:false});
+    if(data){ allRaw=data; recs={}; data.forEach(r=>{ recs[r.equipo_id]=r; }); }
+  } catch(e){ console.warn(e); }
+  try {
+    const {data:sd}=await sb.from('componentes').select('*, profiles(full_name)').order('created_at',{ascending:true});
+    if(sd){ allSubRaw=sd; subRecs={}; sd.forEach(c=>{ if(!subRecs[c.equipo_id]) subRecs[c.equipo_id]=[]; subRecs[c.equipo_id].push(c); }); }
+  } catch(e){ console.warn(e); }
+  renderEq();
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -1222,7 +1247,6 @@ function closeSubModal(){
   document.body.style.overflow='';
   curParentEq=null; curCompId=null;
 }
-function closeSMBg(e){ if(e.target===document.getElementById('smodal-bg')) closeSubModal(); }
 function setSubConf(v){ subConf=v; renderSubRadios(); }
 function renderSubRadios(){
   document.querySelectorAll('#sm-rgrp .ropt').forEach(b=>{
@@ -1289,7 +1313,8 @@ async function saveComp(){
     if(idx>=0) subRecs[curParentEq][idx]={...saved};
     else subRecs[curParentEq].push({...saved});
     toast('Componente guardado ✓','ok');
-    closeSubModal(); renderEq();
+    closeSubModal();
+    await reloadData();
     if(curEq) renderModalComps(curEq);
   } catch(err){ toast('Error: '+err.message,'err'); }
   btn.disabled=0; btn.textContent='GUARDAR COMPONENTE';
@@ -1301,7 +1326,8 @@ async function deleteComp(){
     if(error)throw error;
     subRecs[curParentEq]=(subRecs[curParentEq]||[]).filter(c=>c.id!==curCompId);
     toast('Componente eliminado','ok');
-    closeSubModal(); renderEq();
+    closeSubModal();
+    await reloadData();
     if(curEq) renderModalComps(curEq);
   } catch(e){ toast('Error: '+e.message,'err'); }
 }
