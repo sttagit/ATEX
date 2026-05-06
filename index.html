@@ -779,8 +779,13 @@ function renderEq(){
   const floors=[...new Set(items.map(e=>e.p))];
   let h='';
   for(const fl of floors){
+    const flItems=items.filter(e=>e.p===fl).sort((a,b)=>{
+      const na=eqName(a.id).toLowerCase();
+      const nb=eqName(b.id).toLowerCase();
+      return na.localeCompare(nb,'es');
+    });
     h+=`<div class="sec-hd">${FL[fl]||fl}</div><div class="eq-grid">`;
-    for(const eq of items.filter(e=>e.p===fl)){
+    for(const eq of flItems){
       const r=recs[eq.id]||{};
       const z=r.zona||eq.z||'';
       const conf=eqConf(eq.id);
