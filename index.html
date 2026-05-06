@@ -383,6 +383,7 @@ input[type=file]{display:none}
     </div>
     <div class="modal-foot">
       <button class="btn-out" onclick="toggleDelSection()" id="btn-del-toggle" style="color:#dc2626;border-color:#fca5a5">⚠ Eliminar</button>
+      <button class="btn-out" onclick="duplicateEq()" style="color:#059669;border-color:#6ee7b7">⧉ Duplicar</button>
       <button class="btn-out" onclick="closeModal()">Cancelar</button>
       <button class="btn-save" onclick="saveEq()" id="btn-sv">GUARDAR EQUIPO</button>
     </div>
@@ -619,6 +620,7 @@ let session, profile, recs={}, subRecs={}, curEq=null, curConf='', pendFiles=[],
 let curParentEq=null, curCompId=null, subConf='', subPendFiles=[], subExPaths=[];
 let customNames={}; // { eqId: nombrePersonalizado }
 let hiddenEqs=new Set(); // ids ocultos
+let equiposExtra=[]; // equipos duplicados guardados en Supabase
 
 // ═══════════════════════════════════════════════════════════
 //  BOOT
@@ -660,6 +662,11 @@ async function loadApp(){
     const {data:ho}=await sb.from('equipos_ocultos').select('id');
     if(ho){ ho.forEach(r=>hiddenEqs.add(r.id)); }
   } catch(e){ console.warn('equipos_ocultos table not found — ejecuta el SQL indicado'); }
+  // Cargar equipos extra (duplicados)
+  try {
+    const {data:ee}=await sb.from('equipos_extra').select('*').order('created_at',{ascending:true});
+    if(ee){ equiposExtra=ee; }
+  } catch(e){ console.warn('equipos_extra table not found — ejecuta el SQL indicado'); }
   renderEq();
   loader(0);
 }
@@ -749,12 +756,25 @@ function eqConf(eqId){
 
 // Devuelve el nombre vigente de un equipo (custom o catálogo)
 function eqName(eqId){
-  return customNames[eqId] || (EQ.find(e=>e.id===eqId)||{}).n || eqId;
+  return customNames[eqId]
+    || (EQ.find(e=>e.id===eqId)||{}).n
+    || (equiposExtra.find(e=>e.id===eqId)||{}).nombre
+    || eqId;
+}
+
+// Devuelve lista combinada EQ + equiposExtra filtrada por piso y ocultos
+function allEqs(floorFilter){
+  const base = EQ.filter(e=>!hiddenEqs.has(e.id));
+  const extra = equiposExtra.filter(e=>!hiddenEqs.has(e.id)).map(e=>({
+    id:e.id, n:e.nombre, p:e.piso, g:e.grupo||'', z:e.zona||'', _extra:true
+  }));
+  const combined = [...base, ...extra];
+  return floorFilter==='all' ? combined : combined.filter(e=>e.p===floorFilter);
 }
 
 function renderEq(){
   const list=document.getElementById('eq-list');
-  const items=(floorF==='all'?EQ:EQ.filter(e=>e.p===floorF)).filter(e=>!hiddenEqs.has(e.id));
+  const items=allEqs(floorF);
   document.getElementById('eq-cnt').textContent=items.length+' equipos';
   const floors=[...new Set(items.map(e=>e.p))];
   let h='';
@@ -768,11 +788,13 @@ function renderEq(){
       const cc=comps.length;
       const nombre=eqName(eq.id);
       const isCustom=!!customNames[eq.id];
+      const isExtra=!!eq._extra;
       h+=`<div class="eq-card${z?' z'+z:''} ${r.conformidad?'done':''}" id="card-${eq.id}">
         <div class="eq-name-wrap">
           <div style="flex:1">
             <span class="eq-name" id="eqn-${eq.id}" onclick="openModal('${eq.id}')">${nombre}</span>
             ${isCustom?'<span style="font-family:monospace;font-size:8px;color:#d4500a;margin-left:4px" title="Nombre editado">✎</span>':''}
+            ${isExtra?'<span style="font-family:monospace;font-size:8px;color:#059669;margin-left:4px;background:#d1fae5;padding:1px 4px;border-radius:2px" title="Equipo duplicado">copia</span>':''}
           </div>
           <button class="eq-edit-btn" onclick="startEditName('${eq.id}')" title="Editar nombre">✎</button>
         </div>
@@ -921,6 +943,89 @@ function renderModalComps(eqId){
       <span class="dot d${c.conformidad||'-'}" style="margin-left:auto;flex-shrink:0"></span>
     </div>`).join('');
 }
+// ── DUPLICAR EQUIPO ───────────────────────────────────────
+async function duplicateEq(){
+  if(!curEq) return;
+  const copias = parseInt(prompt('¿Cuántas copias quieres crear? (1 o 2)', '1'));
+  if(!copias||copias<1||copias>2){ toast('Ingresa 1 o 2 copias','err'); return; }
+  const eq = EQ.find(e=>e.id===curEq) || equiposExtra.find(e=>e.id===curEq);
+  const r = recs[curEq]||{};
+  const comps = subRecs[curEq]||[];
+  const nombreBase = eqName(curEq);
+  loader(1);
+  try {
+    for(let i=1;i<=copias;i++){
+      // Generar ID único
+      const newId = 'ex_'+Date.now()+'_'+i;
+      const sufijo = copias>1 ? ` (copia ${i})` : ' (copia)';
+      // Guardar equipo en equipos_extra
+      const eqPayload = {
+        id: newId,
+        nombre: nombreBase+sufijo,
+        piso: eq.p||eq.piso,
+        grupo: eq.g||eq.grupo||'',
+        zona: r.zona||eq.z||eq.zona||'',
+        marca: r.marca||'',
+        modelo: r.modelo||'',
+        serie: r.serie||'',
+        potencia: r.potencia||'',
+        fecha_fab: r.fecha_fab||null,
+        marcado_ex: r.marcado_ex||'',
+        epl: r.epl||'',
+        temp_max: r.temp_max||'',
+        conformidad: r.conformidad||'',
+        hallazgo: r.hallazgo||'',
+        accion: r.accion||'',
+        fotos: r.fotos||[],
+        inspector_id: session.user.id,
+        inspector_nombre: profile?.full_name||session.user.email,
+        origen_id: curEq,
+      };
+      const {error:eErr}=await sb.from('equipos_extra').insert(eqPayload);
+      if(eErr) throw eErr;
+      // Guardar registro de inspección para el nuevo equipo
+      const regPayload={
+        equipo_id:newId, equipo_nombre:nombreBase+sufijo,
+        piso:eq.p||eq.piso, grupo:eq.g||eq.grupo||'',
+        marca:r.marca||'', modelo:r.modelo||'',
+        serie:r.serie||'', potencia:r.potencia||'',
+        fecha_fab:r.fecha_fab||null,
+        marcado_ex:r.marcado_ex||'', epl:r.epl||'',
+        zona:r.zona||eq.z||eq.zona||'', temp_max:r.temp_max||'',
+        conformidad:r.conformidad||'',
+        hallazgo:r.hallazgo||'', accion:r.accion||'',
+        fotos:r.fotos||[],
+        inspector_id:session.user.id,
+        inspector_nombre:profile?.full_name||session.user.email,
+      };
+      if(Object.keys(r).length>0){
+        await sb.from('registros').insert(regPayload);
+      }
+      // Duplicar componentes
+      for(const c of comps){
+        const cPayload={
+          equipo_id:newId, tipo:c.tipo, nombre_comp:c.nombre_comp,
+          marca:c.marca||'', modelo:c.modelo||'',
+          serie:c.serie||'', potencia:c.potencia||'',
+          fecha_fab:c.fecha_fab||null,
+          marcado_ex:c.marcado_ex||'', epl:c.epl||'',
+          zona:c.zona||'', temp_max:c.temp_max||'',
+          conformidad:c.conformidad||'',
+          hallazgo:c.hallazgo||'', accion:c.accion||'',
+          fotos:c.fotos||[],
+          inspector_id:session.user.id,
+          inspector_nombre:profile?.full_name||session.user.email,
+        };
+        await sb.from('componentes').insert(cPayload);
+      }
+    }
+    toast(`${copias} copia${copias>1?'s':''} creada${copias>1?'s':''} ✓`,'ok');
+    closeModal();
+    await reloadData();
+  } catch(e){ toast('Error al duplicar: '+e.message,'err'); }
+  loader(0);
+}
+
 // ── ELIMINACIÓN EQUIPO ────────────────────────────────────
 function toggleDelSection(){
   const sec=document.getElementById('m-del-section');
@@ -937,14 +1042,21 @@ async function deleteEqData(){
   if(!curEq) return;
   if(!confirm('¿Borrar todos los datos de inspección de este equipo?\n\nEsto elimina marca, modelo, fotos, conformidad y hallazgos.\nEl equipo seguirá visible en el listado.')) return;
   try {
-    // Eliminar fotos del storage
     const r=recs[curEq]||{};
     if(r.fotos&&r.fotos.length){
       await sb.storage.from('atex-fotos').remove(r.fotos);
     }
-    // Eliminar registro
     const {error}=await sb.from('registros').delete().eq('equipo_id',curEq);
     if(error) throw error;
+    // Si es equipo extra limpiar sus datos también
+    const isExtra=!!equiposExtra.find(e=>e.id===curEq);
+    if(isExtra){
+      await sb.from('equipos_extra').update({
+        marca:'',modelo:'',serie:'',potencia:'',fecha_fab:null,
+        marcado_ex:'',epl:'',temp_max:'',conformidad:'',
+        hallazgo:'',accion:'',fotos:[]
+      }).eq('id',curEq);
+    }
     delete recs[curEq];
     allRaw=allRaw.filter(r=>r.equipo_id!==curEq);
     toast('Datos de inspección eliminados ✓','ok');
@@ -956,16 +1068,25 @@ async function deleteEqData(){
 async function hideEq(){
   if(!curEq) return;
   const nombre=eqName(curEq);
-  if(!confirm(`¿Ocultar "${nombre}" del listado?\n\nPodrás restaurarlo desde Supabase eliminando la fila en la tabla equipos_ocultos.`)) return;
+  if(!confirm(`¿Ocultar "${nombre}" del listado?\n\nPodrás restaurarlo desde Supabase eliminando la fila en equipos_ocultos.`)) return;
   try {
-    const {error}=await sb.from('equipos_ocultos').upsert({
-      id:curEq,
-      hidden_at:new Date().toISOString(),
-      hidden_by:profile?.full_name||session.user.email
-    },{onConflict:'id'});
-    if(error) throw error;
-    hiddenEqs.add(curEq);
-    toast(`"${nombre}" ocultado del listado ✓`,'ok');
+    // Si es equipo extra lo borramos directamente de la tabla
+    const isExtra=!!equiposExtra.find(e=>e.id===curEq);
+    if(isExtra){
+      await sb.from('equipos_extra').delete().eq('id',curEq);
+      await sb.from('registros').delete().eq('equipo_id',curEq);
+      await sb.from('componentes').delete().eq('equipo_id',curEq);
+      toast(`"${nombre}" eliminado ✓`,'ok');
+    } else {
+      const {error}=await sb.from('equipos_ocultos').upsert({
+        id:curEq,
+        hidden_at:new Date().toISOString(),
+        hidden_by:profile?.full_name||session.user.email
+      },{onConflict:'id'});
+      if(error) throw error;
+      hiddenEqs.add(curEq);
+      toast(`"${nombre}" ocultado del listado ✓`,'ok');
+    }
     closeModal();
     await reloadData();
   } catch(e){ toast('Error: '+e.message,'err'); }
@@ -1048,6 +1169,10 @@ async function reloadData(){
   try {
     const {data:sd}=await sb.from('componentes').select('*, profiles(full_name)').order('created_at',{ascending:true});
     if(sd){ allSubRaw=sd; subRecs={}; sd.forEach(c=>{ if(!subRecs[c.equipo_id]) subRecs[c.equipo_id]=[]; subRecs[c.equipo_id].push(c); }); }
+  } catch(e){ console.warn(e); }
+  try {
+    const {data:ee}=await sb.from('equipos_extra').select('*').order('created_at',{ascending:true});
+    if(ee){ equiposExtra=ee; }
   } catch(e){ console.warn(e); }
   renderEq();
 }
