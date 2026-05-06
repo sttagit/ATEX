@@ -272,10 +272,10 @@ input[type=file]{display:none}
       <div id="nc-sum" style="margin-bottom:20px"></div>
       <div class="sec-hd">Tabla completa</div>
       <div class="dt" style="overflow-x:auto">
-        <div class="dt-head" style="grid-template-columns:2fr 0.7fr 0.6fr 0.7fr 2fr 2fr;min-width:700px">
-          <div>EQUIPO / COMPONENTE</div><div>ZONA</div><div>FABRICACIÓN</div><div>ESTADO</div><div>HALLAZGO</div><div>ACCIÓN</div>
+        <div class="dt-head" style="grid-template-columns:2fr 0.7fr 0.6fr 1.2fr 0.7fr 2fr 2fr;min-width:800px">
+          <div>EQUIPO / COMPONENTE</div><div>ZONA</div><div>FABRICACIÓN</div><div>MARCADO Ex</div><div>ESTADO</div><div>HALLAZGO</div><div>ACCIÓN</div>
         </div>
-        <div id="findings" style="min-width:700px"><div style="padding:28px;text-align:center;color:#6b7280">Sin datos</div></div>
+        <div id="findings" style="min-width:800px"><div style="padding:28px;text-align:center;color:#6b7280">Sin datos</div></div>
       </div>
       <div style="display:flex;gap:10px;margin-top:22px;flex-wrap:wrap">
         <button class="btn-dark btn-lg" onclick="exportCSV()">⬇ CSV</button>
@@ -1268,7 +1268,7 @@ function renderFindings(){
       const comps = allSubRaw.filter(c=>c.equipo_id===r.equipo_id);
       const rId = 'eq-'+r.equipo_id;
       // Fila equipo principal
-      findHtml += `<div class="dt-row" style="grid-template-columns:2fr 0.7fr 0.6fr 0.7fr 2fr 2fr;background:#f0ece4">
+      findHtml += `<div class="dt-row" style="grid-template-columns:2fr 0.7fr 0.6fr 1.2fr 0.7fr 2fr 2fr;background:#f0ece4">
         <div>
           <div style="font-weight:600;font-size:12px">▸ ${r.equipo_nombre}</div>
           <div style="font-family:monospace;font-size:9px;color:#aaa">${FL[r.piso]||r.piso}</div>
@@ -1276,6 +1276,7 @@ function renderFindings(){
         </div>
         <div>${zpillHtml(r.zona||'')}</div>
         <div style="font-family:monospace;font-size:10px;color:#6b7280">${r.fecha_fab||'—'}</div>
+        <div style="font-family:monospace;font-size:10px;color:#0f1117">${r.marcado_ex||'—'}</div>
         <div><span class="cbadge b${r.conformidad||''}">${r.conformidad||'—'}</span></div>
         <div style="font-size:11px">${r.hallazgo||'—'}</div>
         <div style="font-size:11px;color:#6b7280">${r.accion||'—'}</div>
@@ -1283,7 +1284,7 @@ function renderFindings(){
       // Filas componentes
       for(const c of comps){
         const cId = 'comp-'+c.id;
-        findHtml += `<div class="dt-row" style="grid-template-columns:2fr 0.7fr 0.6fr 0.7fr 2fr 2fr">
+        findHtml += `<div class="dt-row" style="grid-template-columns:2fr 0.7fr 0.6fr 1.2fr 0.7fr 2fr 2fr">
           <div style="padding-left:16px">
             <div style="font-size:11px;color:#5b21b6">↳ ${c.nombre_comp||c.tipo}</div>
             <div style="font-family:monospace;font-size:9px;color:#aaa">${c.tipo||'—'}${c.marca?' · '+c.marca:''}${c.modelo?' '+c.modelo:''}</div>
@@ -1291,6 +1292,7 @@ function renderFindings(){
           </div>
           <div>${zpillHtml(c.zona||'')}</div>
           <div style="font-family:monospace;font-size:10px;color:#6b7280">${c.fecha_fab||'—'}</div>
+          <div style="font-family:monospace;font-size:10px;color:#0f1117">${c.marcado_ex||'—'}</div>
           <div><span class="cbadge b${c.conformidad||''}">${c.conformidad||'—'}</span></div>
           <div style="font-size:11px">${c.hallazgo||'—'}</div>
           <div style="font-size:11px;color:#6b7280">${c.accion||'—'}</div>
@@ -1302,23 +1304,20 @@ function renderFindings(){
 }
 
 function exportCSV(){
-  const rows=[['Tipo','Equipo / Componente','Equipo principal','Piso','Zona','Fabricación','Conformidad','Hallazgo','Acción','Inspector']];
+  const rows=[['Tipo','Equipo / Componente','Equipo principal','Piso','Zona','Fabricación','Marcado Ex','Conformidad','Hallazgo','Acción','Inspector']];
   for(const r of allRaw){
     rows.push([
-      'Equipo',
-      `"${r.equipo_nombre}"`, '',
-      r.piso, r.zona||'', r.fecha_fab||'', r.conformidad||'',
+      'Equipo',`"${r.equipo_nombre}"`, '',
+      r.piso, r.zona||'', r.fecha_fab||'', r.marcado_ex||'', r.conformidad||'',
       `"${(r.hallazgo||'').replace(/"/g,"'")}"`,
       `"${(r.accion||'').replace(/"/g,"'")}"`,
       `"${r.inspector_nombre||''}"`
     ]);
-    const comps = allSubRaw.filter(c=>c.equipo_id===r.equipo_id);
+    const comps=allSubRaw.filter(c=>c.equipo_id===r.equipo_id);
     for(const c of comps){
       rows.push([
-        'Componente',
-        `"${c.nombre_comp||c.tipo}"`,
-        `"${r.equipo_nombre}"`,
-        r.piso, c.zona||'', c.fecha_fab||'', c.conformidad||'',
+        'Componente',`"${c.nombre_comp||c.tipo}"`,`"${r.equipo_nombre}"`,
+        r.piso, c.zona||'', c.fecha_fab||'', c.marcado_ex||'', c.conformidad||'',
         `"${(c.hallazgo||'').replace(/"/g,"'")}"`,
         `"${(c.accion||'').replace(/"/g,"'")}"`,
         `"${c.inspector_nombre||''}"`
@@ -1333,12 +1332,12 @@ function exportCSV(){
 
 function copyMD(){
   let md=`# Informe ATEX — CCU Chile · Planta Temuco\n\n**Inspector:** ${document.getElementById('i-insp').value||'—'}  \n**Fecha:** ${document.getElementById('i-fecha').value||'—'}  \n**Norma:** UNE-EN 60079-10-2:2010\n\n`;
-  md+=`| Tipo | Equipo / Componente | Piso | Zona | Fabricación | Estado | Hallazgo |\n|---|---|---|---|---|---|---|\n`;
+  md+=`| Tipo | Equipo / Componente | Piso | Zona | Fabricación | Marcado Ex | Estado | Hallazgo |\n|---|---|---|---|---|---|---|---|\n`;
   for(const r of allRaw){
-    md+=`| **Equipo** | **${r.equipo_nombre}** | ${FL[r.piso]||r.piso} | ${r.zona?'Z'+r.zona:'—'} | ${r.fecha_fab||'—'} | ${r.conformidad||'—'} | ${r.hallazgo||'—'} |\n`;
-    const comps = allSubRaw.filter(c=>c.equipo_id===r.equipo_id);
+    md+=`| **Equipo** | **${r.equipo_nombre}** | ${FL[r.piso]||r.piso} | ${r.zona?'Z'+r.zona:'—'} | ${r.fecha_fab||'—'} | ${r.marcado_ex||'—'} | ${r.conformidad||'—'} | ${r.hallazgo||'—'} |\n`;
+    const comps=allSubRaw.filter(c=>c.equipo_id===r.equipo_id);
     for(const c of comps){
-      md+=`| ↳ Comp. | ${c.nombre_comp||c.tipo} | ${FL[r.piso]||r.piso} | ${c.zona?'Z'+c.zona:'—'} | ${c.fecha_fab||'—'} | ${c.conformidad||'—'} | ${c.hallazgo||'—'} |\n`;
+      md+=`| ↳ Comp. | ${c.nombre_comp||c.tipo} | ${FL[r.piso]||r.piso} | ${c.zona?'Z'+c.zona:'—'} | ${c.fecha_fab||'—'} | ${c.marcado_ex||'—'} | ${c.conformidad||'—'} | ${c.hallazgo||'—'} |\n`;
     }
   }
   navigator.clipboard.writeText(md).then(()=>toast('Markdown copiado ✓','ok')).catch(()=>toast('Error al copiar','err'));
