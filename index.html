@@ -1167,7 +1167,7 @@ async function saveEq(){
       inspector_id:session.user.id,
       inspector_nombre:profile?.full_name||session.user.email,
     };
-    const {data:ex}=await sb.from('registros').select('id').eq('equipo_id',curEq).eq('inspector_id',session.user.id).maybeSingle();
+    const {data:ex}=await sb.from('registros').select('id').eq('equipo_id',curEq).maybeSingle();
     let saved;
     if(ex){ const {data}=await sb.from('registros').update(payload).eq('id',ex.id).select().single(); saved=data; }
     else   { const {data}=await sb.from('registros').insert(payload).select().single(); saved=data; }
