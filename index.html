@@ -906,7 +906,15 @@ function setFloor(fl,el){
 // ═══════════════════════════════════════════════════════════
 async function openModal(id){
   curEq=id; curConf=''; pendFiles=[]; exPaths=[];
-  const eq=EQ.find(e=>e.id===id), r=recs[id]||{};
+  // Buscar en catálogo fijo o en equipos extra
+  const eqBase = EQ.find(e=>e.id===id);
+  const eqExtra = equiposExtra.find(e=>e.id===id);
+  const eq = eqBase || (eqExtra ? {
+    id:eqExtra.id, n:eqExtra.nombre, p:eqExtra.piso,
+    g:eqExtra.grupo||'', z:eqExtra.zona||''
+  } : null);
+  if(!eq){ toast('Equipo no encontrado','err'); return; }
+  const r=recs[id]||{};
   document.getElementById('m-name').textContent=eqName(id);
   document.getElementById('m-floor').textContent=FL[eq.p]||eq.p;
   document.getElementById('m-grp').textContent=eq.g;
@@ -1137,7 +1145,10 @@ async function saveEq(){
       await sb.storage.from('atex-fotos').upload(path,f,{contentType:f.type});
       newPaths.push(path);
     }
-    const eq=EQ.find(e=>e.id===curEq);
+    const eqBase=EQ.find(e=>e.id===curEq);
+    const eqExtra=equiposExtra.find(e=>e.id===curEq);
+    const eq=eqBase||(eqExtra?{id:eqExtra.id,n:eqExtra.nombre,p:eqExtra.piso,g:eqExtra.grupo||''}:null);
+    if(!eq){ toast('Equipo no encontrado','err'); return; }
     const payload={
       equipo_id:curEq, equipo_nombre:eq.n, piso:eq.p, grupo:eq.g,
       marca:document.getElementById('f-marca').value.trim(),
