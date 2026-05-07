@@ -1265,7 +1265,7 @@ function renderFindings(){
   } else {
     el.innerHTML=`<div style="padding:10px 14px;background:#fee2e2;color:#991b1b;border-left:3px solid #dc2626;border-radius:4px;font-size:13px;margin-bottom:10px">⚠ ${nc.length} no conformidad${nc.length>1?'es':''}</div>`
       +nc.map(r=>`<div style="padding:10px 14px;background:#fff;border:1px solid #ddd9d0;border-left:3px solid #dc2626;border-radius:4px;margin-bottom:8px">
-        <div style="font-weight:500;font-size:13px">${r.equipo_nombre}</div>
+        <div style="font-weight:500;font-size:13px;cursor:pointer;color:#d4500a" onclick="openFromInforme('${r.equipo_id}')">${r.equipo_nombre} ↗</div>
         <div style="font-size:10px;color:#aaa;font-family:monospace;margin-bottom:5px">${FL[r.piso]||r.piso}</div>
         <div style="font-size:12px;margin-bottom:3px"><strong>Hallazgo:</strong> ${r.hallazgo||'—'}</div>
         <div style="font-size:12px;color:#6b7280"><strong>Acción:</strong> ${r.accion||'—'}</div>
@@ -1273,18 +1273,36 @@ function renderFindings(){
       </div>`).join('');
   }
 
-  // Tabla completa: equipo principal + sus componentes agrupados
-  let findHtml = '';
-  if(!allRaw.length){
-    findHtml = '<div style="padding:28px;text-align:center;color:#6b7280">Sin datos</div>';
+  // Ordenar allRaw por piso según orden FL
+  const pisoOrder=Object.keys(FL); // ['1sub','1','2','3','4','5','6','7','hangar']
+  const sorted=[...allRaw].sort((a,b)=>{
+    const ai=pisoOrder.indexOf(a.piso), bi=pisoOrder.indexOf(b.piso);
+    if(ai!==bi) return ai-bi;
+    // mismo piso → orden alfabético por nombre
+    return (a.equipo_nombre||'').localeCompare(b.equipo_nombre||'','es');
+  });
+
+  // Tabla completa agrupada por piso con links
+  let findHtml='';
+  if(!sorted.length){
+    findHtml='<div style="padding:28px;text-align:center;color:#6b7280">Sin datos</div>';
   } else {
-    for(const r of allRaw){
-      const comps = allSubRaw.filter(c=>c.equipo_id===r.equipo_id);
-      const rId = 'eq-'+r.equipo_id;
-      // Fila equipo principal
-      findHtml += `<div class="dt-row" style="grid-template-columns:2fr 0.7fr 0.6fr 1.2fr 0.7fr 2fr 2fr;background:#f0ece4">
+    let lastPiso='';
+    for(const r of sorted){
+      // Encabezado de piso
+      if(r.piso!==lastPiso){
+        lastPiso=r.piso;
+        findHtml+=`<div style="grid-column:1/-1;background:#1e2230;color:#e8820a;font-family:monospace;font-size:10px;font-weight:600;letter-spacing:1.5px;padding:7px 14px;text-transform:uppercase">${FL[r.piso]||r.piso}</div>`;
+      }
+      const comps=allSubRaw.filter(c=>c.equipo_id===r.equipo_id);
+      const rId='eq-'+r.equipo_id;
+      // Fila equipo principal — clickeable
+      findHtml+=`<div class="dt-row" style="grid-template-columns:2fr 0.7fr 0.6fr 1.2fr 0.7fr 2fr 2fr;background:#f0ece4">
         <div>
-          <div style="font-weight:600;font-size:12px">▸ ${r.equipo_nombre}</div>
+          <div style="font-weight:600;font-size:12px;cursor:pointer;color:#0f1117" onclick="openFromInforme('${r.equipo_id}')"
+            onmouseover="this.style.color='#d4500a'" onmouseout="this.style.color='#0f1117'">
+            ▸ ${r.equipo_nombre} <span style="font-size:9px;color:#d4500a">↗</span>
+          </div>
           <div style="font-family:monospace;font-size:9px;color:#aaa">${FL[r.piso]||r.piso}</div>
           ${fotosBtnHtml(r.fotos, rId)}
         </div>
@@ -1295,12 +1313,17 @@ function renderFindings(){
         <div style="font-size:11px">${r.hallazgo||'—'}</div>
         <div style="font-size:11px;color:#6b7280">${r.accion||'—'}</div>
       </div>`;
-      // Filas componentes
+      // Filas componentes — clickeables
       for(const c of comps){
-        const cId = 'comp-'+c.id;
-        findHtml += `<div class="dt-row" style="grid-template-columns:2fr 0.7fr 0.6fr 1.2fr 0.7fr 2fr 2fr">
+        const cId='comp-'+c.id;
+        findHtml+=`<div class="dt-row" style="grid-template-columns:2fr 0.7fr 0.6fr 1.2fr 0.7fr 2fr 2fr">
           <div style="padding-left:16px">
-            <div style="font-size:11px;color:#5b21b6">↳ ${c.nombre_comp||c.tipo}</div>
+            <div style="font-size:11px;color:#5b21b6;cursor:pointer"
+              onclick="openSubModal(null,'${r.equipo_id}','${c.id}')"
+              onmouseover="this.style.color='#7c3aed';this.style.textDecoration='underline'"
+              onmouseout="this.style.color='#5b21b6';this.style.textDecoration='none'">
+              ↳ ${c.nombre_comp||c.tipo} <span style="font-size:9px">↗</span>
+            </div>
             <div style="font-family:monospace;font-size:9px;color:#aaa">${c.tipo||'—'}${c.marca?' · '+c.marca:''}${c.modelo?' '+c.modelo:''}</div>
             ${fotosBtnHtml(c.fotos, cId)}
           </div>
@@ -1314,7 +1337,23 @@ function renderFindings(){
       }
     }
   }
-  document.getElementById('findings').innerHTML = findHtml;
+  document.getElementById('findings').innerHTML=findHtml;
+}
+
+// Abre modal desde informe y vuelve al tab equipo
+async function openFromInforme(eqId){
+  // Cambiar a tab equipos
+  const navBtns=document.querySelectorAll('.nav-btn');
+  navBtns.forEach(b=>b.classList.remove('on'));
+  navBtns[0].classList.add('on');
+  ['eq','rs','inf'].forEach(t=>{
+    document.getElementById('tab-'+t).style.display=t==='eq'?'block':'none';
+  });
+  // Desplazar al piso del equipo
+  const r=recs[eqId];
+  if(r){ setFloor(r.piso, document.querySelector(`.chip[onclick="setFloor('${r.piso}',this)"]`)||document.querySelector('.chip.on')); }
+  // Abrir modal
+  await openModal(eqId);
 }
 
 function exportCSV(){
