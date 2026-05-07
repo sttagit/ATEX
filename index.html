@@ -489,7 +489,7 @@ const SUPA_KEY = 'sb_publishable_mtcCcCdVScjQQHtIQxUpYQ_awU9gt_j';
 const sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
 
 // ═══════════════════════════════════════════════════════════
-//  CATÁLOGO DE EQUIPOS — 80 equipos · Manual TEM-ELA-MAN 006
+//  CATÁLOGO DE EQUIPOS — Manual TEM-ELA-MAN 006
 // ═══════════════════════════════════════════════════════════
 const EQ = [
   // ── PISO SUBTERRÁNEO ──────────────────────────────────────
@@ -528,10 +528,17 @@ const EQ = [
   {id:'e025',  n:'Despedradora de malta (8 t/h)',                              p:'3',    g:'Limpieza grano',       z:'21'},
   {id:'e026',  n:'Ciclón tolva de arroz (parte superior)',                     p:'3',    g:'Almacenamiento',       z:'21'},
   {id:'e027',  n:'Compuerta silo batch (cadena regulable)',                    p:'3',    g:'Válvulas',             z:'21'},
-  {id:'e028',  n:'Tolva harina de malta (parte superior)',                     p:'3',    g:'Contenedor polvo',     z:'20'},
-  {id:'e029',  n:'Redler de pajilla a tolva de malta',                         p:'3',    g:'Transporte',           z:'21'},
-  {id:'e030',  n:'Succión polvos despedradora de malta',                       p:'3',    g:'Aspiración',           z:'21'},
   {id:'e031',  n:'Molino parte inferior — descarga a redler tolva arroz',      p:'3',    g:'Molienda',             z:'21'},
+  // ── NUEVOS EQUIPOS TERCER PISO ────────────────────────────
+  {id:'e090',  n:'Salida Silo Bash Malta a Despedradora BÜHLER',              p:'3',    g:'Transporte',           z:'21'},
+  {id:'e091',  n:'Salida Silo Bash Malta a Despedradora SEEGER',              p:'3',    g:'Transporte',           z:'21'},
+  {id:'e092',  n:'Sobre Silo - Tolva Harina Malta BÜHLER',                    p:'3',    g:'Contenedor polvo',     z:'20'},
+  {id:'e093',  n:'Sobre Silo - Tolva Harina Malta SEEGER',                    p:'3',    g:'Contenedor polvo',     z:'20'},
+  {id:'e094',  n:'Elevador capachos BÜHLER 1',                                p:'3',    g:'Transporte',           z:'21'},
+  {id:'e095',  n:'Elevador capachos BÜHLER 2',                                p:'3',    g:'Transporte',           z:'21'},
+  {id:'e096',  n:'Salida Molino Malta BÜHLER - descarga redler',              p:'3',    g:'Molienda',             z:'21'},
+  {id:'e097',  n:'Salida Molino Malta SEEGER - descarga redler',              p:'3',    g:'Molienda',             z:'21'},
+  {id:'e098',  n:'Redler Harina Arroz sobre Silos arroz',                     p:'3',    g:'Transporte',           z:'21'},
 
   // ── CUARTO PISO ───────────────────────────────────────────
   {id:'e032',  n:'Molino de malta (6 cilindros — 11 t/h)',                    p:'4',    g:'Molienda',             z:'21'},
@@ -1056,7 +1063,7 @@ function toggleDelSection(){
 
 async function deleteEqData(){
   if(!curEq) return;
-  if(!confirm('¿Borrar todos los datos de inspección de este equipo?\n\nEsto elimina marca, modelo, fotos, conformidad y hallazgos.\nEl equipo seguirá visible en el listado.')) return;
+  if(!confirm('¿Borrar todos los datos de inspección de este equipo?\n\nEsto elimina marca, fotos y conformidad.\nEl equipo seguirá visible en el listado.')) return;
   try {
     const r=recs[curEq]||{};
     if(r.fotos&&r.fotos.length){
@@ -1274,11 +1281,10 @@ function renderFindings(){
   }
 
   // Ordenar allRaw por piso según orden FL
-  const pisoOrder=Object.keys(FL); // ['1sub','1','2','3','4','5','6','7','hangar']
+  const pisoOrder=Object.keys(FL);
   const sorted=[...allRaw].sort((a,b)=>{
     const ai=pisoOrder.indexOf(a.piso), bi=pisoOrder.indexOf(b.piso);
     if(ai!==bi) return ai-bi;
-    // mismo piso → orden alfabético por nombre
     return (a.equipo_nombre||'').localeCompare(b.equipo_nombre||'','es');
   });
 
