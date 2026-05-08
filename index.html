@@ -147,6 +147,33 @@ input[type=file]{display:none}
 #lb img{max-width:90vw;max-height:90vh;border-radius:4px}
 #lb-close{position:fixed;top:16px;right:16px;background:none;border:none;color:#fff;font-size:28px;cursor:pointer}
 @media(max-width:640px){.two-col{grid-template-columns:1fr}.kpi-grid{grid-template-columns:1fr 1fr}.eq-grid{grid-template-columns:1fr}}
+/* ── DRAG & DROP COMPONENTES ── */
+.comp-row[draggable]{cursor:grab}
+.comp-row[draggable]:active{cursor:grabbing}
+.comp-row.dragging{opacity:.35;background:#ede9fe!important;border-color:#7c3aed!important;transform:scale(.97)}
+.eq-expand.drag-over{background:#ede9fe!important;border:2px dashed #7c3aed!important;border-radius:6px;padding:4px!important}
+.eq-expand.drag-over .comp-add{border-color:#7c3aed;color:#7c3aed}
+.drag-ghost{position:fixed;top:-100px;left:-100px;background:#1e1030;color:#a78bfa;border-radius:4px;padding:5px 12px;font-size:11px;font-family:monospace;pointer-events:none;z-index:9999;white-space:nowrap;border:1px solid #7c3aed}
+/* ── INFORME ÁRBOL ── */
+.inf-tree-wrap{border:1px solid #ddd9d0;border-radius:6px;overflow:hidden;background:#fff}
+.inf-piso-hd{background:#1e2230;color:#e8820a;padding:9px 14px;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;font-family:monospace;font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;border-top:1px solid #2a2f40}
+.inf-piso-hd:first-child{border-top:none}
+.inf-piso-hd:hover{background:#252b3d}
+.inf-piso-arrow{font-size:9px;transition:transform .2s;display:inline-block;flex-shrink:0}
+.inf-col-hd-bar{display:grid;grid-template-columns:22px 2.2fr 0.7fr 0.55fr 1.2fr 0.65fr 1.8fr 1.8fr;gap:6px;padding:6px 14px;background:#0f1117;font-family:monospace;font-size:9px;font-weight:600;color:#666;letter-spacing:.5px;text-transform:uppercase;position:sticky;top:0;z-index:5}
+.inf-eq-row{display:grid;grid-template-columns:22px 2.2fr 0.7fr 0.55fr 1.2fr 0.65fr 1.8fr 1.8fr;gap:6px;padding:8px 14px;align-items:start;background:#f8f6f2;cursor:pointer;transition:background .1s;border-top:1px solid #eceae3}
+.inf-eq-row:hover{background:#f0ece4}
+.inf-eq-toggle{font-size:10px;color:#aaa;transition:transform .18s;display:inline-block;line-height:1.5;flex-shrink:0}
+.inf-comp-rows{display:none}
+.inf-comp-row{display:grid;grid-template-columns:22px 2.2fr 0.7fr 0.55fr 1.2fr 0.65fr 1.8fr 1.8fr;gap:6px;padding:6px 14px 6px 38px;align-items:start;border-top:1px solid #f0ece4;background:#fdfcfb;cursor:pointer;transition:background .1s}
+.inf-comp-row:hover{background:#f5f3ee}
+/* ── ZONA USO CHECKBOXES ── */
+.zona-uso-wrap{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.zona-uso-opt{display:flex;align-items:center;gap:5px;padding:5px 11px;border:1.5px solid #ddd9d0;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600;font-family:monospace;user-select:none;transition:all .1s}
+.zona-uso-opt input[type=checkbox]{width:14px;height:14px;padding:0;margin:0;accent-color:#7c3aed;cursor:pointer;flex-shrink:0}
+.zona-uso-opt.sel-20{border-color:#7c3aed;background:#ede9fe;color:#5b21b6}
+.zona-uso-opt.sel-21{border-color:#d97706;background:#fef3c7;color:#92400e}
+.zona-uso-opt.sel-22{border-color:#059669;background:#d1fae5;color:#065f46}
 </style>
 </head>
 <body>
@@ -271,12 +298,7 @@ input[type=file]{display:none}
       <div class="sec-hd">No conformidades</div>
       <div id="nc-sum" style="margin-bottom:20px"></div>
       <div class="sec-hd">Tabla completa</div>
-      <div class="dt" style="overflow-x:auto">
-        <div class="dt-head" style="grid-template-columns:2fr 0.7fr 0.6fr 1.2fr 0.7fr 2fr 2fr;min-width:800px">
-          <div>EQUIPO / COMPONENTE</div><div>ZONA</div><div>FABRICACIÓN</div><div>MARCADO Ex</div><div>ESTADO</div><div>HALLAZGO</div><div>ACCIÓN</div>
-        </div>
-        <div id="findings" style="min-width:800px"><div style="padding:28px;text-align:center;color:#6b7280">Sin datos</div></div>
-      </div>
+      <div id="findings" style="overflow-x:auto"><div style="padding:28px;text-align:center;color:#6b7280">Sin datos</div></div>
       <div style="display:flex;gap:10px;margin-top:22px;flex-wrap:wrap">
         <button class="btn-dark btn-lg" onclick="exportCSV()">⬇ CSV</button>
         <button class="btn-dark btn-lg" onclick="copyMD()">📋 Markdown</button>
@@ -432,16 +454,25 @@ input[type=file]{display:none}
         </div>
       </div>
       <div class="two-col">
-        <div><div class="field-lbl">Zona asignada</div>
+        <div><div class="field-lbl">Zona ubicada equipo</div>
           <select class="field-sel" id="sm-zona">
             <option value="">— clasificar —</option>
             <option value="20">Zona 20</option>
+            <option value="20/21">Zona 20/21</option>
             <option value="21">Zona 21</option>
             <option value="22">Zona 22</option>
             <option value="NG">No peligroso</option>
           </select>
         </div>
         <div><div class="field-lbl">Temp. superficial máx.</div><input class="field-input" id="sm-temp" placeholder="T3 (200°C)"></div>
+      </div>
+      <div>
+        <div class="field-lbl">Zona uso equipo</div>
+        <div class="zona-uso-wrap">
+          <label class="zona-uso-opt" id="zuo-20"><input type="checkbox" value="20" onchange="updateZonaUso(this,'20')"> Z20</label>
+          <label class="zona-uso-opt" id="zuo-21"><input type="checkbox" value="21" onchange="updateZonaUso(this,'21')"> Z21</label>
+          <label class="zona-uso-opt" id="zuo-22"><input type="checkbox" value="22" onchange="updateZonaUso(this,'22')"> Z22</label>
+        </div>
       </div>
       <div style="font-size:10px;font-weight:600;color:#7c3aed;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">Conformidad</div>
       <div class="radio-grp" id="sm-rgrp">
@@ -732,7 +763,34 @@ function goTab(name,el){
   el.classList.add('on');
   ['eq','rs','inf'].forEach(t=>{ document.getElementById('tab-'+t).style.display=t===name?'block':'none'; });
   if(name==='rs') renderResumen();
-  if(name==='inf'){ renderResumen(); renderFindings(); }
+  if(name==='inf') loadAndRenderInforme();
+}
+
+async function loadAndRenderInforme(){
+  loader(1);
+  try {
+    const [r1, r2] = await Promise.all([
+      sb.from('registros').select('*, profiles(full_name)').order('updated_at',{ascending:false}),
+      sb.from('componentes').select('*, profiles(full_name)').order('created_at',{ascending:true})
+    ]);
+    if(r1.data){ allRaw=r1.data; recs={}; r1.data.forEach(r=>{ recs[r.equipo_id]=r; }); }
+    if(r2.data){ allSubRaw=r2.data; subRecs={}; r2.data.forEach(c=>{ if(!subRecs[c.equipo_id]) subRecs[c.equipo_id]=[]; subRecs[c.equipo_id].push(c); }); }
+  } catch(e){ toast('Error cargando informe','err'); }
+  // Update KPIs
+  const total=allRaw.length,
+        C=allRaw.filter(r=>r.conformidad==='C').length,
+        NC=allRaw.filter(r=>r.conformidad==='NC').length,
+        OBS=allRaw.filter(r=>r.conformidad==='OBS').length;
+  const pct=Math.round(total/EQ.length*100);
+  document.getElementById('pct').textContent=pct+'%';
+  document.getElementById('prog').style.width=pct+'%';
+  document.getElementById('kTotal').textContent=total;
+  document.getElementById('kC').textContent=C;
+  document.getElementById('kNC').textContent=NC;
+  document.getElementById('kOBS').textContent=OBS;
+  renderGapRows();
+  renderFindings();
+  loader(0);
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -828,9 +886,15 @@ function renderEq(){
           <span class="eq-toggle" onclick="toggleExpand('${eq.id}',this)">${cc?cc+' comp ▾':'+ comp'}</span>
         </div>
         ${r.marca?`<div style="font-family:monospace;font-size:9px;color:#aaa;margin-top:4px">${r.marca}${r.modelo?' · '+r.modelo:''}${r.fecha_fab?' · '+r.fecha_fab:''}</div>`:''}
-        <div class="eq-expand" id="exp-${eq.id}">
+        <div class="eq-expand" id="exp-${eq.id}"
+          ondragover="onExpandDragOver(event,'${eq.id}')"
+          ondragleave="onExpandDragLeave(event,'${eq.id}')"
+          ondrop="onExpandDrop(event,'${eq.id}')">
           ${comps.map(c=>`
-            <div class="comp-row" onclick="openSubModal(null,'${eq.id}','${c.id}')">
+            <div class="comp-row" draggable="true"
+              ondragstart="onCompDragStart(event,'${c.id}','${eq.id}')"
+              ondragend="onCompDragEnd(event)"
+              onclick="openSubModal(null,'${eq.id}','${c.id}')">
               <span class="comp-type">${c.tipo||'—'}</span>
               <span class="comp-name">${c.nombre_comp||c.tipo}</span>
               <span class="dot d${c.conformidad||'-'}"></span>
@@ -1265,6 +1329,7 @@ async function toggleInfFotos(rowId, fotos){
 }
 
 function renderFindings(){
+  // ── NC Summary ──────────────────────────────────────────
   const nc=allRaw.filter(r=>r.conformidad==='NC');
   const el=document.getElementById('nc-sum');
   if(!nc.length){
@@ -1280,70 +1345,149 @@ function renderFindings(){
       </div>`).join('');
   }
 
-  // Ordenar allRaw por piso según orden FL
+  // ── Árbol Piso → Equipo → Componente ──────────────────
+  const findEl=document.getElementById('findings');
   const pisoOrder=Object.keys(FL);
-  const sorted=[...allRaw].sort((a,b)=>{
-    const ai=pisoOrder.indexOf(a.piso), bi=pisoOrder.indexOf(b.piso);
-    if(ai!==bi) return ai-bi;
-    return (a.equipo_nombre||'').localeCompare(b.equipo_nombre||'','es');
-  });
 
-  // Tabla completa agrupada por piso con links
-  let findHtml='';
-  if(!sorted.length){
-    findHtml='<div style="padding:28px;text-align:center;color:#6b7280">Sin datos</div>';
-  } else {
-    let lastPiso='';
-    for(const r of sorted){
-      // Encabezado de piso
-      if(r.piso!==lastPiso){
-        lastPiso=r.piso;
-        findHtml+=`<div style="grid-column:1/-1;background:#1e2230;color:#e8820a;font-family:monospace;font-size:10px;font-weight:600;letter-spacing:1.5px;padding:7px 14px;text-transform:uppercase">${FL[r.piso]||r.piso}</div>`;
-      }
-      const comps=allSubRaw.filter(c=>c.equipo_id===r.equipo_id);
-      const rId='eq-'+r.equipo_id;
-      // Fila equipo principal — clickeable
-      findHtml+=`<div class="dt-row" style="grid-template-columns:2fr 0.7fr 0.6fr 1.2fr 0.7fr 2fr 2fr;background:#f0ece4">
-        <div>
-          <div style="font-weight:600;font-size:12px;cursor:pointer;color:#0f1117" onclick="openFromInforme('${r.equipo_id}')"
-            onmouseover="this.style.color='#d4500a'" onmouseout="this.style.color='#0f1117'">
-            ▸ ${r.equipo_nombre} <span style="font-size:9px;color:#d4500a">↗</span>
-          </div>
-          <div style="font-family:monospace;font-size:9px;color:#aaa">${FL[r.piso]||r.piso}</div>
-          ${fotosBtnHtml(r.fotos, rId)}
-        </div>
-        <div>${zpillHtml(r.zona||'')}</div>
-        <div style="font-family:monospace;font-size:10px;color:#6b7280">${r.fecha_fab||'—'}</div>
-        <div style="font-family:monospace;font-size:10px;color:#0f1117">${r.marcado_ex||'—'}</div>
-        <div><span class="cbadge b${r.conformidad||''}">${r.conformidad||'—'}</span></div>
-        <div style="font-size:11px">${r.hallazgo||'—'}</div>
-        <div style="font-size:11px;color:#6b7280">${r.accion||'—'}</div>
-      </div>`;
-      // Filas componentes — clickeables
-      for(const c of comps){
-        const cId='comp-'+c.id;
-        findHtml+=`<div class="dt-row" style="grid-template-columns:2fr 0.7fr 0.6fr 1.2fr 0.7fr 2fr 2fr">
-          <div style="padding-left:16px">
-            <div style="font-size:11px;color:#5b21b6;cursor:pointer"
-              onclick="openSubModal(null,'${r.equipo_id}','${c.id}')"
-              onmouseover="this.style.color='#7c3aed';this.style.textDecoration='underline'"
-              onmouseout="this.style.color='#5b21b6';this.style.textDecoration='none'">
-              ↳ ${c.nombre_comp||c.tipo} <span style="font-size:9px">↗</span>
-            </div>
-            <div style="font-family:monospace;font-size:9px;color:#aaa">${c.tipo||'—'}${c.marca?' · '+c.marca:''}${c.modelo?' '+c.modelo:''}</div>
-            ${fotosBtnHtml(c.fotos, cId)}
-          </div>
-          <div>${zpillHtml(c.zona||'')}</div>
-          <div style="font-family:monospace;font-size:10px;color:#6b7280">${c.fecha_fab||'—'}</div>
-          <div style="font-family:monospace;font-size:10px;color:#0f1117">${c.marcado_ex||'—'}</div>
-          <div><span class="cbadge b${c.conformidad||''}">${c.conformidad||'—'}</span></div>
-          <div style="font-size:11px">${c.hallazgo||'—'}</div>
-          <div style="font-size:11px;color:#6b7280">${c.accion||'—'}</div>
-        </div>`;
-      }
-    }
+  // Equipos con datos (registro o componentes)
+  const eqIdsWithData=new Set([
+    ...allRaw.map(r=>r.equipo_id),
+    ...allSubRaw.map(c=>c.equipo_id)
+  ]);
+  const allEquip=allEqs('all');
+  const equipWithData=allEquip.filter(e=>eqIdsWithData.has(e.id));
+
+  // Agrupar por piso
+  const byFloor={};
+  for(const e of equipWithData){
+    if(!byFloor[e.p]) byFloor[e.p]=[];
+    byFloor[e.p].push(e);
   }
-  document.getElementById('findings').innerHTML=findHtml;
+
+  if(!eqIdsWithData.size){
+    findEl.innerHTML='<div style="padding:28px;text-align:center;color:#6b7280">Sin datos registrados</div>';
+    return;
+  }
+
+  let h=`<div class="inf-tree-wrap">`;
+
+  // Barra de controles globales
+  h+=`<div style="padding:7px 14px;background:#2a2f40;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <span style="font-family:monospace;font-size:9px;color:#888">ÁRBOL</span>
+    <button onclick="toggleAllPisos(true)" style="background:none;border:1px solid #444;color:#aaa;border-radius:3px;padding:2px 8px;font-size:10px;font-family:monospace;cursor:pointer">▼ Expandir todo</button>
+    <button onclick="toggleAllPisos(false)" style="background:none;border:1px solid #444;color:#aaa;border-radius:3px;padding:2px 8px;font-size:10px;font-family:monospace;cursor:pointer">▶ Contraer todo</button>
+    <span style="margin-left:auto;font-family:monospace;font-size:9px;color:#666">${eqIdsWithData.size} equipos · ${allSubRaw.length} componentes</span>
+  </div>`;
+
+  // Cabecera columnas
+  h+=`<div class="inf-col-hd-bar">
+    <div></div>
+    <div>EQUIPO / COMPONENTE</div>
+    <div>ZONA</div>
+    <div>FAB.</div>
+    <div>MARCADO Ex</div>
+    <div>ESTADO</div>
+    <div>HALLAZGO</div>
+    <div>ACCIÓN</div>
+  </div>`;
+
+  for(const piso of pisoOrder){
+    const eqs=(byFloor[piso]||[]).sort((a,b)=>eqName(a.id).localeCompare(eqName(b.id),'es'));
+    if(!eqs.length) continue;
+    const compCount=eqs.reduce((s,e)=>s+(allSubRaw.filter(c=>c.equipo_id===e.id).length),0);
+
+    h+=`<div class="inf-piso-hd" onclick="togglePiso('${piso}')">
+      <span class="inf-piso-arrow" id="ipa-${piso}">▼</span>
+      ${FL[piso]||piso}
+      <span style="margin-left:auto;font-size:9px;color:#888;font-weight:400;text-transform:none;letter-spacing:0">${eqs.length} equipo${eqs.length!==1?'s':''} · ${compCount} comp.</span>
+    </div>
+    <div id="ipb-${piso}">`;
+
+    for(const eq of eqs){
+      const r=recs[eq.id]||{};
+      const comps=allSubRaw.filter(c=>c.equipo_id===eq.id);
+      const hasComps=comps.length>0;
+      const nombre=eqName(eq.id);
+      const z=r.zona||eq.z||'';
+
+      h+=`<div id="iew-${eq.id}">
+        <div class="inf-eq-row" onclick="toggleInfEq('${eq.id}')">
+          <div class="inf-eq-toggle" id="iet-${eq.id}" style="${!hasComps?'color:#ddd':''}">${hasComps?'▶':'·'}</div>
+          <div>
+            <div style="font-weight:600;font-size:12px;color:#0f1117"
+              onclick="event.stopPropagation();openFromInforme('${eq.id}')"
+              onmouseover="this.style.color='#d4500a';this.style.cursor='pointer'" onmouseout="this.style.color='#0f1117'">
+              ${nombre} <span style="font-size:9px;color:#d4500a">↗</span>
+            </div>
+            ${r.marca?`<div style="font-family:monospace;font-size:9px;color:#aaa">${r.marca}${r.modelo?' · '+r.modelo:''}</div>`:''}
+            ${fotosBtnHtml(r.fotos||[],'eq-'+eq.id)}
+          </div>
+          <div>${zpillHtml(z)}</div>
+          <div style="font-family:monospace;font-size:10px;color:#6b7280">${r.fecha_fab||'—'}</div>
+          <div style="font-family:monospace;font-size:10px">${r.marcado_ex||'—'}</div>
+          <div><span class="cbadge b${r.conformidad||''}">${r.conformidad||'—'}</span></div>
+          <div style="font-size:11px">${r.hallazgo||'—'}</div>
+          <div style="font-size:11px;color:#6b7280">${r.accion||'—'}</div>
+        </div>`;
+
+      if(hasComps){
+        h+=`<div class="inf-comp-rows" id="iec-${eq.id}">`;
+        for(const c of comps){
+          h+=`<div class="inf-comp-row" onclick="openSubModal(null,'${eq.id}','${c.id}')">
+            <div></div>
+            <div>
+              <div style="font-size:11px;color:#5b21b6">↳ ${c.nombre_comp||c.tipo}</div>
+              <div style="font-family:monospace;font-size:9px;color:#aaa">${c.tipo||''}${c.marca?' · '+c.marca:''}${c.modelo?' '+c.modelo:''}</div>
+              ${fotosBtnHtml(c.fotos||[],'comp-'+c.id)}
+            </div>
+            <div>${zpillHtml(c.zona||'')}</div>
+            <div style="font-family:monospace;font-size:10px;color:#6b7280">${c.fecha_fab||'—'}</div>
+            <div style="font-family:monospace;font-size:10px">${c.marcado_ex||'—'}</div>
+            <div><span class="cbadge b${c.conformidad||''}">${c.conformidad||'—'}</span></div>
+            <div style="font-size:11px">${c.hallazgo||'—'}</div>
+            <div style="font-size:11px;color:#6b7280">${c.accion||'—'}</div>
+          </div>`;
+        }
+        h+=`</div>`;
+      }
+      h+=`</div>`; // iew
+    }
+    h+=`</div>`; // ipb
+  }
+  h+=`</div>`; // inf-tree-wrap
+  findEl.innerHTML=h;
+}
+
+// ── Árbol expand/collapse ─────────────────────────────────
+function togglePiso(piso){
+  const body=document.getElementById('ipb-'+piso);
+  const arrow=document.getElementById('ipa-'+piso);
+  if(!body) return;
+  const open=body.style.display!=='none';
+  body.style.display=open?'none':'';
+  if(arrow) arrow.style.transform=open?'rotate(-90deg)':'rotate(0deg)';
+}
+function toggleInfEq(eqId){
+  const comps=document.getElementById('iec-'+eqId);
+  const tog=document.getElementById('iet-'+eqId);
+  if(!comps) return;
+  const open=comps.style.display==='block'||comps.classList.contains('inf-comp-rows-open');
+  if(open){
+    comps.style.display='none';
+    if(tog) tog.style.transform='rotate(0deg)';
+  } else {
+    comps.style.display='block';
+    if(tog) tog.style.transform='rotate(90deg)';
+  }
+}
+function toggleAllPisos(expand){
+  Object.keys(FL).forEach(piso=>{
+    const body=document.getElementById('ipb-'+piso);
+    const arrow=document.getElementById('ipa-'+piso);
+    if(!body) return;
+    body.style.display=expand?'':'none';
+    if(arrow) arrow.style.transform=expand?'rotate(0deg)':'rotate(-90deg)';
+  });
 }
 
 // Abre modal desde informe y vuelve al tab equipo
@@ -1419,6 +1563,13 @@ async function openSubModal(mode, parentEqId, compId){
   sv('sm-mex',comp.marcado_ex); sv('sm-epl',comp.epl);
   sv('sm-zona',comp.zona); sv('sm-temp',comp.temp_max);
   sv('sm-hall',comp.hallazgo); sv('sm-acc',comp.accion);
+  // Zona uso checkboxes
+  const zonaUso=comp.zona_uso||[];
+  ['20','21','22'].forEach(z=>{
+    const cb=document.querySelector(`#zuo-${z} input`);
+    const opt=document.getElementById(`zuo-${z}`);
+    if(cb){ cb.checked=zonaUso.includes(z); if(opt) opt.classList.toggle(`sel-${z}`,cb.checked); }
+  });
   subConf=comp.conformidad||''; renderSubRadios();
   subExPaths=comp.fotos||[]; await renderSubPhotos();
   const prev=document.getElementById('sm-prev');
@@ -1471,6 +1622,10 @@ async function saveComp(){
       await sb.storage.from('atex-fotos').upload(path,f,{contentType:f.type});
       newPaths.push(path);
     }
+    const zonaUso=['20','21','22'].filter(z=>{
+      const cb=document.querySelector(`#zuo-${z} input`);
+      return cb&&cb.checked;
+    });
     const payload={
       equipo_id:curParentEq, tipo, nombre_comp:nombre||tipo,
       marca:document.getElementById('sm-marca').value.trim(),
@@ -1481,6 +1636,7 @@ async function saveComp(){
       marcado_ex:document.getElementById('sm-mex').value.trim(),
       epl:document.getElementById('sm-epl').value,
       zona:document.getElementById('sm-zona').value,
+      zona_uso:zonaUso,
       temp_max:document.getElementById('sm-temp').value.trim(),
       conformidad:subConf,
       hallazgo:document.getElementById('sm-hall').value.trim(),
@@ -1519,6 +1675,76 @@ async function deleteComp(){
     await reloadData();
     if(curEq) renderModalComps(curEq);
   } catch(e){ toast('Error: '+e.message,'err'); }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  DRAG & DROP COMPONENTES
+// ═══════════════════════════════════════════════════════════
+let dragCompId=null, dragFromEqId=null, _dragGhost=null;
+
+function onCompDragStart(e, compId, fromEqId){
+  dragCompId=compId; dragFromEqId=fromEqId;
+  e.dataTransfer.effectAllowed='move';
+  e.currentTarget.classList.add('dragging');
+  // Custom ghost
+  _dragGhost=document.createElement('div');
+  _dragGhost.className='drag-ghost';
+  const name=e.currentTarget.querySelector('.comp-name')?.textContent||'componente';
+  _dragGhost.textContent='⠿ '+name;
+  document.body.appendChild(_dragGhost);
+  try{ e.dataTransfer.setDragImage(_dragGhost,-10,-10); }catch(ex){}
+}
+
+function onCompDragEnd(e){
+  e.currentTarget.classList.remove('dragging');
+  document.querySelectorAll('.eq-expand.drag-over').forEach(z=>z.classList.remove('drag-over'));
+  if(_dragGhost){ _dragGhost.remove(); _dragGhost=null; }
+}
+
+function onExpandDragOver(e, eqId){
+  if(!dragCompId) return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect='move';
+  document.querySelectorAll('.eq-expand.drag-over').forEach(z=>{ if(z.id!=='exp-'+eqId) z.classList.remove('drag-over'); });
+  const zone=document.getElementById('exp-'+eqId);
+  if(zone) zone.classList.add('drag-over');
+}
+
+function onExpandDragLeave(e, eqId){
+  if(e.currentTarget&&!e.currentTarget.contains(e.relatedTarget)){
+    document.getElementById('exp-'+eqId)?.classList.remove('drag-over');
+  }
+}
+
+async function onExpandDrop(e, toEqId){
+  e.preventDefault();
+  document.getElementById('exp-'+toEqId)?.classList.remove('drag-over');
+  if(!dragCompId||!dragFromEqId) return;
+  if(toEqId===dragFromEqId){ dragCompId=null; dragFromEqId=null; return; }
+  const fromId=dragFromEqId, cId=dragCompId;
+  dragCompId=null; dragFromEqId=null;
+  try {
+    const {error}=await sb.from('componentes').update({equipo_id:toEqId}).eq('id',cId);
+    if(error) throw error;
+    // Update local state
+    const comp=(subRecs[fromId]||[]).find(c=>c.id===cId);
+    if(comp){
+      subRecs[fromId]=(subRecs[fromId]||[]).filter(c=>c.id!==cId);
+      comp.equipo_id=toEqId;
+      if(!subRecs[toEqId]) subRecs[toEqId]=[];
+      subRecs[toEqId].push(comp);
+      allSubRaw=allSubRaw.map(c=>c.id===cId?{...c,equipo_id:toEqId}:c);
+    }
+    const fromName=eqName(fromId), toName=eqName(toEqId);
+    toast(`Movido a "${toName}" ✓`,'ok');
+    renderEq();
+  } catch(err){ toast('Error al mover: '+err.message,'err'); }
+}
+
+// ── ZONA USO EQUIPO checkboxes ────────────────────────────
+function updateZonaUso(cb, z){
+  const opt=document.getElementById('zuo-'+z);
+  if(opt) opt.classList.toggle('sel-'+z, cb.checked);
 }
 
 // ═══════════════════════════════════════════════════════════
