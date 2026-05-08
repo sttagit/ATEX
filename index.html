@@ -275,7 +275,7 @@ input[type=file]{display:none}
       <div class="sec-hd">Hallazgos</div>
       <div class="dt">
         <div class="dt-head" style="grid-template-columns:2.5fr 0.8fr 0.7fr 2.5fr">
-          <div>EQUIPO</div><div>ZONA</div><div>ESTADO</div><div>HALLAZGO</div>
+          <div>EQUIPO</div><div>ZONA</div><div>ESTADO</div><div>BRECHAS / OBS.</div>
         </div>
         <div id="gap-rows"><div style="padding:28px;text-align:center;color:#6b7280">Sin registros</div></div>
       </div>
@@ -370,7 +370,7 @@ input[type=file]{display:none}
         <span class="ropt" data-v="NA" onclick="setConf('NA',this)">NA — No aplica</span>
       </div>
       <div style="font-size:10px;font-weight:600;color:#d4500a;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">Hallazgos</div>
-      <div><div class="field-lbl">Brechas detectadas</div><textarea class="field-ta" id="f-hall" placeholder="Marcado faltante, EPL inadecuado…"></textarea></div>
+      <div><div class="field-lbl">Brechas detectadas / Observaciones</div><textarea class="field-ta" id="f-hall" placeholder="Marcado faltante, EPL inadecuado…"></textarea></div>
       <div><div class="field-lbl">Acción correctiva</div><textarea class="field-ta" id="f-acc" placeholder="Reemplazo, re-certificación…"></textarea></div>
       <div style="font-size:10px;font-weight:600;color:#d4500a;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">Fotografías</div>
       <div class="photo-zone">
@@ -482,7 +482,7 @@ input[type=file]{display:none}
         <span class="ropt" data-v="NA" onclick="setSubConf('NA',this)">NA — No aplica</span>
       </div>
       <div style="font-size:10px;font-weight:600;color:#7c3aed;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">Hallazgos</div>
-      <div><div class="field-lbl">Brechas detectadas</div><textarea class="field-ta" id="sm-hall" placeholder="Marcado faltante, EPL inadecuado…"></textarea></div>
+      <div><div class="field-lbl">Brechas detectadas / Observaciones</div><textarea class="field-ta" id="sm-hall" placeholder="Marcado faltante, EPL inadecuado…"></textarea></div>
       <div><div class="field-lbl">Acción correctiva</div><textarea class="field-ta" id="sm-acc" placeholder="Reemplazo, re-certificación…"></textarea></div>
       <div style="font-size:10px;font-weight:600;color:#7c3aed;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">Fotografías</div>
       <div class="photo-zone">
@@ -1339,7 +1339,7 @@ function renderFindings(){
       +nc.map(r=>`<div style="padding:10px 14px;background:#fff;border:1px solid #ddd9d0;border-left:3px solid #dc2626;border-radius:4px;margin-bottom:8px">
         <div style="font-weight:500;font-size:13px;cursor:pointer;color:#d4500a" onclick="openFromInforme('${r.equipo_id}')">${r.equipo_nombre} ↗</div>
         <div style="font-size:10px;color:#aaa;font-family:monospace;margin-bottom:5px">${FL[r.piso]||r.piso}</div>
-        <div style="font-size:12px;margin-bottom:3px"><strong>Hallazgo:</strong> ${r.hallazgo||'—'}</div>
+        <div style="font-size:12px;margin-bottom:3px"><strong>Brechas / Obs.:</strong> ${r.hallazgo||'—'}</div>
         <div style="font-size:12px;color:#6b7280"><strong>Acción:</strong> ${r.accion||'—'}</div>
         ${fotosBtnHtml(r.fotos,'nc-'+r.equipo_id)}
       </div>`).join('');
@@ -1387,7 +1387,7 @@ function renderFindings(){
     <div>FAB.</div>
     <div>MARCADO Ex</div>
     <div>ESTADO</div>
-    <div>HALLAZGO</div>
+    <div>BRECHAS / OBS.</div>
     <div>ACCIÓN</div>
   </div>`;
 
