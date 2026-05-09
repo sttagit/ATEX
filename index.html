@@ -328,12 +328,12 @@ input[type=file]{display:none}
         <div><div class="field-lbl">Modelo</div><input class="field-input" id="f-modelo" placeholder="Referencia"></div>
       </div>
       <div class="two-col">
-        <div><div class="field-lbl">N° Serie / Tag</div><input class="field-input" id="f-serie" placeholder="Tag planta"></div>
-        <div><div class="field-lbl">Potencia / Tensión</div><input class="field-input" id="f-pot" placeholder="11 kW / 380V"></div>
+        <div><div class="field-lbl">N° Serie Equipo</div><input class="field-input" id="f-serie" placeholder="Número de serie fabricante"></div>
+        <div><div class="field-lbl">TAG Planta</div><input class="field-input" id="f-tag" placeholder="Tag interno planta"></div>
       </div>
       <div class="two-col">
+        <div><div class="field-lbl">Potencia / Tensión</div><input class="field-input" id="f-pot" placeholder="11 kW / 380V"></div>
         <div><div class="field-lbl">Año de fabricación</div><input class="field-input" id="f-fab" type="number" min="1950" max="2099" placeholder="Ej: 1998"></div>
-        <div></div>
       </div>
       <div style="font-size:10px;font-weight:600;color:#d4500a;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">Clasificación ATEX</div>
       <div class="two-col">
@@ -431,12 +431,12 @@ input[type=file]{display:none}
         <div><div class="field-lbl">Modelo</div><input class="field-input" id="sm-modelo" placeholder="Referencia"></div>
       </div>
       <div class="two-col">
-        <div><div class="field-lbl">N° Serie / Tag</div><input class="field-input" id="sm-serie" placeholder="Tag planta"></div>
-        <div><div class="field-lbl">Potencia / Tensión</div><input class="field-input" id="sm-pot" placeholder="11 kW / 380V"></div>
+        <div><div class="field-lbl">N° Serie Equipo</div><input class="field-input" id="sm-serie" placeholder="Número de serie fabricante"></div>
+        <div><div class="field-lbl">TAG Planta</div><input class="field-input" id="sm-tag" placeholder="Tag interno planta"></div>
       </div>
       <div class="two-col">
+        <div><div class="field-lbl">Potencia / Tensión</div><input class="field-input" id="sm-pot" placeholder="11 kW / 380V"></div>
         <div><div class="field-lbl">Año de fabricación</div><input class="field-input" id="sm-fab" type="number" min="1950" max="2099" placeholder="Ej: 1998"></div>
-        <div></div>
       </div>
       <div style="font-size:10px;font-weight:600;color:#7c3aed;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">Clasificación ATEX</div>
       <div class="two-col">
@@ -885,7 +885,7 @@ function renderEq(){
           <span class="dot d${conf||'-'}"></span>
           <span class="eq-toggle" onclick="toggleExpand('${eq.id}',this)">${cc?cc+' comp ▾':'+ comp'}</span>
         </div>
-        ${r.marca?`<div style="font-family:monospace;font-size:9px;color:#aaa;margin-top:4px">${r.marca}${r.modelo?' · '+r.modelo:''}${r.fecha_fab?' · '+r.fecha_fab:''}</div>`:''}
+        ${r.marca?`<div style="font-family:monospace;font-size:9px;color:#aaa;margin-top:4px">${r.marca}${r.modelo?' · '+r.modelo:''}${r.tag_planta?' · TAG: '+r.tag_planta:r.serie?' · S/N: '+r.serie:''}${r.fecha_fab?' · '+r.fecha_fab:''}</div>`:''}
         <div class="eq-expand" id="exp-${eq.id}"
           ondragover="onExpandDragOver(event,'${eq.id}')"
           ondragleave="onExpandDragLeave(event,'${eq.id}')"
@@ -994,7 +994,7 @@ async function openModal(id){
   pill.textContent=z?'Zona '+z:'Sin clasificar';
   pill.className='zpill '+({20:'z20p',21:'z21p',22:'z22p',NG:'zdp','':'zdp'}[z]||'zdp');
   const fv=(fid,v)=>{document.getElementById(fid).value=v||'';};
-  fv('f-marca',r.marca); fv('f-modelo',r.modelo); fv('f-serie',r.serie);
+  fv('f-marca',r.marca); fv('f-modelo',r.modelo); fv('f-serie',r.serie); fv('f-tag',r.tag_planta);
   fv('f-pot',r.potencia); fv('f-fab',r.fecha_fab);
   fv('f-mex',r.marcado_ex); fv('f-epl',r.epl);
   fv('f-zona',r.zona||eq.z); fv('f-temp',r.temp_max);
@@ -1026,7 +1026,7 @@ function renderModalComps(eqId){
     <div class="comp-row" onclick="openSubModal(null,'${eqId}','${c.id}')">
       <span class="comp-type">${c.tipo||'—'}</span>
       <span class="comp-name">${c.nombre_comp||c.tipo}</span>
-      ${c.marca?`<span style="font-family:monospace;font-size:9px;color:#aaa">${c.marca}</span>`:''}
+      ${c.marca?`<span style="font-family:monospace;font-size:9px;color:#aaa">${c.marca}${c.tag_planta?' · TAG: '+c.tag_planta:c.serie?' · S/N: '+c.serie:''}</span>`:''}
       <span class="dot d${c.conformidad||'-'}" style="margin-left:auto;flex-shrink:0"></span>
     </div>`).join('');
 }
@@ -1055,6 +1055,7 @@ async function duplicateEq(){
         marca: r.marca||'',
         modelo: r.modelo||'',
         serie: r.serie||'',
+        tag_planta: r.tag_planta||'',
         potencia: r.potencia||'',
         fecha_fab: r.fecha_fab||null,
         marcado_ex: r.marcado_ex||'',
@@ -1075,7 +1076,7 @@ async function duplicateEq(){
         equipo_id:newId, equipo_nombre:nombreBase+sufijo,
         piso:eq.p||eq.piso, grupo:eq.g||eq.grupo||'',
         marca:r.marca||'', modelo:r.modelo||'',
-        serie:r.serie||'', potencia:r.potencia||'',
+        serie:r.serie||'', tag_planta:r.tag_planta||'', potencia:r.potencia||'',
         fecha_fab:r.fecha_fab||null,
         marcado_ex:r.marcado_ex||'', epl:r.epl||'',
         zona:r.zona||eq.z||eq.zona||'', temp_max:r.temp_max||'',
@@ -1093,7 +1094,7 @@ async function duplicateEq(){
         const cPayload={
           equipo_id:newId, tipo:c.tipo, nombre_comp:c.nombre_comp,
           marca:c.marca||'', modelo:c.modelo||'',
-          serie:c.serie||'', potencia:c.potencia||'',
+          serie:c.serie||'', tag_planta:c.tag_planta||'', potencia:c.potencia||'',
           fecha_fab:c.fecha_fab||null,
           marcado_ex:c.marcado_ex||'', epl:c.epl||'',
           zona:c.zona||'', temp_max:c.temp_max||'',
@@ -1139,7 +1140,7 @@ async function deleteEqData(){
     const isExtra=!!equiposExtra.find(e=>e.id===curEq);
     if(isExtra){
       await sb.from('equipos_extra').update({
-        marca:'',modelo:'',serie:'',potencia:'',fecha_fab:null,
+        marca:'',modelo:'',serie:'',tag_planta:'',potencia:'',fecha_fab:null,
         marcado_ex:'',epl:'',temp_max:'',conformidad:'',
         hallazgo:'',accion:'',fotos:[]
       }).eq('id',curEq);
@@ -1225,6 +1226,7 @@ async function saveEq(){
       marca:document.getElementById('f-marca').value.trim(),
       modelo:document.getElementById('f-modelo').value.trim(),
       serie:document.getElementById('f-serie').value.trim(),
+      tag_planta:document.getElementById('f-tag').value.trim(),
       potencia:document.getElementById('f-pot').value.trim(),
       fecha_fab:document.getElementById('f-fab').value||null,
       marcado_ex:document.getElementById('f-mex').value.trim(),
@@ -1558,7 +1560,7 @@ async function openSubModal(mode, parentEqId, compId){
   const sv=(fid,v)=>{document.getElementById(fid).value=v||'';};
   sv('sm-tipo',comp.tipo); sv('sm-nombre',comp.nombre_comp);
   sv('sm-marca',comp.marca); sv('sm-modelo',comp.modelo);
-  sv('sm-serie',comp.serie); sv('sm-pot',comp.potencia);
+  sv('sm-serie',comp.serie); sv('sm-tag',comp.tag_planta); sv('sm-pot',comp.potencia);
   sv('sm-fab',comp.fecha_fab);
   sv('sm-mex',comp.marcado_ex); sv('sm-epl',comp.epl);
   sv('sm-zona',comp.zona); sv('sm-temp',comp.temp_max);
@@ -1631,6 +1633,7 @@ async function saveComp(){
       marca:document.getElementById('sm-marca').value.trim(),
       modelo:document.getElementById('sm-modelo').value.trim(),
       serie:document.getElementById('sm-serie').value.trim(),
+      tag_planta:document.getElementById('sm-tag').value.trim(),
       potencia:document.getElementById('sm-pot').value.trim(),
       fecha_fab:document.getElementById('sm-fab').value||null,
       marcado_ex:document.getElementById('sm-mex').value.trim(),
