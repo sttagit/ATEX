@@ -3,20 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ATEX — CCU Temuco</title>
+<title>SUSTENTA Ex — Levantamiento ATEX</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:sans-serif;background:#f5f3ee;color:#0f1117;min-height:100vh}
 /* ── LOGIN ── */
 #login{position:fixed;inset:0;background:#0f1117;display:flex;align-items:center;justify-content:center;z-index:100}
-.login-box{background:#f5f3ee;border-radius:10px;border-top:3px solid #d4500a;width:100%;max-width:400px;margin:16px;overflow:hidden}
+.login-box{background:#f5f3ee;border-radius:10px;border-top:3px solid #F7C600;width:100%;max-width:400px;margin:16px;overflow:hidden}
 .login-head{background:#1e2230;padding:28px;text-align:center;color:#f5f3ee}
 .login-body{padding:28px;display:flex;flex-direction:column;gap:14px}
-.lbl{font-size:10px;font-weight:600;color:#d4500a;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.lbl{font-size:10px;font-weight:600;color:#F7C600;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
 input{width:100%;padding:8px 10px;border:1px solid #ddd9d0;border-radius:4px;font-size:13px}
-.btn-orange{background:#d4500a;color:#fff;border:none;border-radius:4px;padding:11px;width:100%;font-size:13px;font-weight:600;cursor:pointer}
-.btn-orange:hover{background:#b8400a}
+.btn-orange{background:#F7C600;color:#111;border:none;border-radius:4px;padding:11px;width:100%;font-size:13px;font-weight:600;cursor:pointer}
+.btn-orange:hover{background:#C9A200}
 .msg{padding:10px 14px;border-radius:4px;font-size:13px;display:none}
 .msg.err{background:#fee2e2;color:#991b1b;border-left:3px solid #dc2626}
 .msg.ok{background:#d1fae5;color:#065f46;border-left:3px solid #059669}
@@ -25,18 +25,18 @@ input{width:100%;padding:8px 10px;border:1px solid #ddd9d0;border-radius:4px;fon
 .tab.on{background:#0f1117;color:#fff}
 /* ── APP ── */
 #app{display:none;flex-direction:column;min-height:100vh}
-.topbar{background:#0f1117;border-bottom:2px solid #d4500a;padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
-.logo{background:#d4500a;color:#fff;font-size:11px;font-weight:600;padding:3px 9px;border-radius:2px;letter-spacing:1px}
+.topbar{background:#0f1117;border-bottom:2px solid #F7C600;padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.logo{background:#F7C600;color:#fff;font-size:11px;font-weight:600;padding:3px 9px;border-radius:2px;letter-spacing:1px}
 .topbar-title{color:#f5f3ee;font-size:13px;font-weight:500;margin-left:10px}
 .nav{display:flex;background:#1e2230;border-bottom:1px solid #2a2f40;overflow-x:auto}
 .nav-btn{padding:11px 18px;font-size:11px;font-weight:600;color:#666;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;font-family:monospace;letter-spacing:.5px}
-.nav-btn.on{color:#e8820a;border-bottom-color:#e8820a}
+.nav-btn.on{color:#F7C600;border-bottom-color:#F7C600}
 .page-wrap{max-width:960px;margin:0 auto;padding:18px 16px 60px;width:100%}
 /* ── EQUIPOS ── */
 .filter-bar{display:flex;gap:6px;flex-wrap:wrap;padding:10px 14px;background:#fff;border:1px solid #ddd9d0;border-radius:4px;margin-bottom:14px;align-items:center}
 .chip{padding:4px 10px;border:1px solid #ddd9d0;border-radius:20px;font-size:11px;cursor:pointer;color:#6b7280}
 .chip.on{background:#0f1117;color:#fff;border-color:#0f1117}
-.sec-hd{font-size:10px;font-weight:600;color:#d4500a;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin:20px 0 12px}
+.sec-hd{font-size:10px;font-weight:600;color:#F7C600;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin:20px 0 12px}
 .sec-hd:first-child{margin-top:0}
 .eq-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;margin-bottom:8px}
 .eq-card{background:#fff;border:1px solid #ddd9d0;border-left:3px solid #ccc8be;border-radius:4px;padding:10px 13px;cursor:pointer;transition:box-shadow .12s}
@@ -57,11 +57,11 @@ input{width:100%;padding:8px 10px;border:1px solid #ddd9d0;border-radius:4px;fon
 /* ── MODAL ── */
 #modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;padding:16px;overflow-y:auto}
 #modal-bg.on{display:flex;align-items:flex-start;justify-content:center}
-.modal{background:#f5f3ee;border-radius:8px;width:100%;max-width:660px;margin:auto;border-top:3px solid #d4500a;overflow:hidden}
+.modal{background:#f5f3ee;border-radius:8px;width:100%;max-width:660px;margin:auto;border-top:3px solid #F7C600;overflow:hidden}
 .modal-head{background:#0f1117;color:#f5f3ee;padding:14px 20px;display:flex;align-items:flex-start;justify-content:space-between}
 .modal-body{padding:20px;display:flex;flex-direction:column;gap:12px}
 .modal-foot{padding:14px 20px;border-top:1px solid #ddd9d0;background:#eceae3;display:flex;gap:8px;justify-content:flex-end}
-.field-lbl{font-size:10px;font-weight:600;color:#d4500a;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.field-lbl{font-size:10px;font-weight:600;color:#F7C600;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
 .field-input,.field-sel,.field-ta{width:100%;padding:7px 10px;border:1px solid #ddd9d0;border-radius:4px;font-size:13px;background:#fff}
 .field-ta{min-height:68px;resize:vertical}
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -77,16 +77,16 @@ input{width:100%;padding:8px 10px;border:1px solid #ddd9d0;border-radius:4px;fon
 .photo-wrap img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:4px;border:1px solid #ddd9d0;cursor:pointer}
 .photo-rm{position:absolute;top:-5px;right:-5px;background:#dc2626;color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .btn-dark{background:#0f1117;color:#f5f3ee;border:none;border-radius:4px;padding:8px 18px;font-size:11px;font-weight:600;cursor:pointer;font-family:monospace}
-.btn-dark:hover{background:#d4500a}
+.btn-dark:hover{background:#F7C600;color:#111}
 .btn-out{background:none;border:1.5px solid #ddd9d0;border-radius:4px;padding:8px 16px;font-size:11px;font-weight:600;cursor:pointer;font-family:monospace}
-.btn-save{background:#d4500a;color:#fff;border:none;border-radius:4px;padding:8px 20px;font-size:11px;font-weight:600;cursor:pointer;font-family:monospace}
+.btn-save{background:#F7C600;color:#111;border:none;border-radius:4px;padding:8px 20px;font-size:11px;font-weight:600;cursor:pointer;font-family:monospace}
 /* ── RESUMEN ── */
 .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
 .kpi{background:#fff;border:1px solid #ddd9d0;border-radius:4px;padding:14px;text-align:center}
 .kpi-n{font-size:30px;font-weight:600;font-family:monospace}
 .kpi-l{font-size:11px;color:#6b7280;margin-top:4px}
 .prog-wrap{background:#ddd9d0;border-radius:2px;height:5px;overflow:hidden;margin-bottom:16px}
-.prog{height:100%;background:#e8820a;border-radius:2px;transition:width .4s}
+.prog{height:100%;background:#F7C600;border-radius:2px;transition:width .4s}
 .dt{background:#fff;border:1px solid #ddd9d0;border-radius:4px;overflow:hidden}
 .dt-head{background:#0f1117;color:#fff;padding:9px 14px;display:grid;gap:10px;font-size:10px;font-weight:600;font-family:monospace;letter-spacing:.5px}
 .dt-row{padding:9px 14px;display:grid;gap:10px;border-bottom:1px solid #ddd9d0;font-size:12px;align-items:start}
@@ -101,10 +101,10 @@ input{width:100%;padding:8px 10px;border:1px solid #ddd9d0;border-radius:4px;fon
 #loader{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:300;align-items:center;justify-content:center}
 #loader.on{display:flex}
 .loader-box{background:#0f1117;color:#fff;border-radius:8px;padding:20px 28px;display:flex;align-items:center;gap:14px;font-family:monospace;font-size:12px}
-.spin{display:inline-block;width:16px;height:16px;border:2px solid #444;border-top-color:#d4500a;border-radius:50%;animation:spin .7s linear infinite}
+.spin{display:inline-block;width:16px;height:16px;border:2px solid #444;border-top-color:#F7C600;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 #toasts{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:8px;z-index:400}
-.toast{background:#0f1117;color:#fff;border-radius:4px;padding:10px 16px;font-size:13px;box-shadow:0 4px 16px rgba(0,0,0,.2);border-left:3px solid #d4500a;max-width:280px}
+.toast{background:#0f1117;color:#fff;border-radius:4px;padding:10px 16px;font-size:13px;box-shadow:0 4px 16px rgba(0,0,0,.2);border-left:3px solid #F7C600;max-width:280px}
 .toast.ok{border-left-color:#059669}.toast.err{border-left-color:#dc2626}
 .btn-del{background:none;border:1px solid #fca5a5;color:#dc2626;border-radius:4px;padding:8px 14px;font-size:11px;font-weight:600;cursor:pointer;font-family:monospace}
 .btn-del:hover{background:#fee2e2}
@@ -116,15 +116,15 @@ input{width:100%;padding:8px 10px;border:1px solid #ddd9d0;border-radius:4px;fon
 .eq-edit-btn{background:none;border:none;cursor:pointer;font-size:11px;color:#ccc;padding:0 3px;line-height:1;vertical-align:middle;display:none}
 .eq-card:hover .eq-edit-btn{display:inline}
 .eq-name-wrap{display:flex;align-items:flex-start;gap:4px;margin-bottom:5px}
-.eq-name-input{font-size:13px;font-weight:500;line-height:1.35;border:1.5px solid #d4500a;border-radius:3px;padding:2px 6px;width:100%;background:#fff;display:none}
+.eq-name-input{font-size:13px;font-weight:500;line-height:1.35;border:1.5px solid #F7C600;border-radius:3px;padding:2px 6px;width:100%;background:#fff;display:none}
 .eq-name-input.on{display:block}
 .eq-name-actions{display:none;gap:4px;margin-top:4px}
 .eq-name-actions.on{display:flex}
-.eq-name-ok{background:#d4500a;color:#fff;border:none;border-radius:3px;padding:3px 10px;font-size:10px;font-family:monospace;cursor:pointer}
+.eq-name-ok{background:#F7C600;color:#111;border:none;border-radius:3px;padding:3px 10px;font-size:10px;font-family:monospace;cursor:pointer}
 .eq-name-cancel{background:none;border:1px solid #ddd9d0;border-radius:3px;padding:3px 10px;font-size:10px;font-family:monospace;cursor:pointer}
 /* ── FOTOS INFORME ── */
-.inf-foto-btn{font-family:monospace;font-size:10px;color:#d4500a;background:none;border:1px solid #ddd9d0;border-radius:3px;padding:2px 7px;cursor:pointer;white-space:nowrap;margin-top:4px;display:inline-block}
-.inf-foto-btn:hover{background:#fff3ed;border-color:#d4500a}
+.inf-foto-btn{font-family:monospace;font-size:10px;color:#F7C600;background:none;border:1px solid #ddd9d0;border-radius:3px;padding:2px 7px;cursor:pointer;white-space:nowrap;margin-top:4px;display:inline-block}
+.inf-foto-btn:hover{background:#FFFBE6;border-color:#F7C600}
 .inf-foto-panel{display:none;margin-top:8px;padding:8px;background:#fafaf8;border-radius:4px;border:1px solid #f0ece4}
 .inf-foto-panel.on{display:flex;flex-wrap:wrap;gap:6px}
 .inf-foto-panel img{width:64px;height:64px;object-fit:cover;border-radius:3px;border:1px solid #ddd9d0;cursor:pointer}
@@ -138,9 +138,9 @@ input[type=file]{display:none}
 .comp-name{font-size:12px;font-weight:500;flex:1}
 .comp-type{font-family:monospace;font-size:9px;color:#aaa;background:#f0ece4;padding:1px 6px;border-radius:2px}
 .comp-add{display:flex;align-items:center;gap:6px;padding:5px 8px;border:1.5px dashed #ddd9d0;border-radius:4px;cursor:pointer;color:#aaa;font-size:11px;font-family:monospace;transition:all .1s;margin-top:4px}
-.comp-add:hover{border-color:#d4500a;color:#d4500a}
+.comp-add:hover{border-color:#F7C600;color:#F7C600}
 .eq-card .eq-toggle{font-family:monospace;font-size:9px;color:#aaa;margin-left:auto;padding:2px 6px;border:1px solid #eee;border-radius:2px;background:#fafafa;cursor:pointer;user-select:none;white-space:nowrap}
-.eq-card .eq-toggle:hover{border-color:#d4500a;color:#d4500a}
+.eq-card .eq-toggle:hover{border-color:#F7C600;color:#F7C600}
 /* ── LIGHTBOX ── */
 #lb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:500;align-items:center;justify-content:center}
 #lb.on{display:flex}
@@ -156,16 +156,16 @@ input[type=file]{display:none}
 .drag-ghost{position:fixed;top:-100px;left:-100px;background:#1e1030;color:#a78bfa;border-radius:4px;padding:5px 12px;font-size:11px;font-family:monospace;pointer-events:none;z-index:9999;white-space:nowrap;border:1px solid #7c3aed}
 /* ── INFORME ÁRBOL ── */
 .inf-tree-wrap{border:1px solid #ddd9d0;border-radius:6px;overflow:hidden;background:#fff}
-.inf-piso-hd{background:#1e2230;color:#e8820a;padding:9px 14px;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;font-family:monospace;font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;border-top:1px solid #2a2f40}
+.inf-piso-hd{background:#1e2230;color:#F7C600;padding:9px 14px;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;font-family:monospace;font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;border-top:1px solid #2a2f40}
 .inf-piso-hd:first-child{border-top:none}
 .inf-piso-hd:hover{background:#252b3d}
 .inf-piso-arrow{font-size:9px;transition:transform .2s;display:inline-block;flex-shrink:0}
-.inf-col-hd-bar{display:grid;grid-template-columns:22px 2.2fr 0.7fr 0.55fr 1.2fr 0.65fr 1.8fr 1.8fr;gap:6px;padding:6px 14px;background:#0f1117;font-family:monospace;font-size:9px;font-weight:600;color:#666;letter-spacing:.5px;text-transform:uppercase;position:sticky;top:0;z-index:5}
-.inf-eq-row{display:grid;grid-template-columns:22px 2.2fr 0.7fr 0.55fr 1.2fr 0.65fr 1.8fr 1.8fr;gap:6px;padding:8px 14px;align-items:start;background:#f8f6f2;cursor:pointer;transition:background .1s;border-top:1px solid #eceae3}
+.inf-col-hd-bar{display:grid;grid-template-columns:22px 2fr 0.65fr 0.9fr 0.5fr 1.1fr 0.6fr 1.6fr 1.5fr;gap:6px;padding:6px 14px;background:#0f1117;font-family:monospace;font-size:9px;font-weight:700;color:#ccc;letter-spacing:.8px;text-transform:uppercase;position:sticky;top:0;z-index:5}
+.inf-eq-row{display:grid;grid-template-columns:22px 2fr 0.65fr 0.9fr 0.5fr 1.1fr 0.6fr 1.6fr 1.5fr;gap:6px;padding:8px 14px;align-items:start;background:#f8f6f2;cursor:pointer;transition:background .1s;border-top:1px solid #eceae3}
 .inf-eq-row:hover{background:#f0ece4}
 .inf-eq-toggle{font-size:10px;color:#aaa;transition:transform .18s;display:inline-block;line-height:1.5;flex-shrink:0}
 .inf-comp-rows{display:none}
-.inf-comp-row{display:grid;grid-template-columns:22px 2.2fr 0.7fr 0.55fr 1.2fr 0.65fr 1.8fr 1.8fr;gap:6px;padding:6px 14px 6px 38px;align-items:start;border-top:1px solid #f0ece4;background:#fdfcfb;cursor:pointer;transition:background .1s}
+.inf-comp-row{display:grid;grid-template-columns:22px 2fr 0.65fr 0.9fr 0.5fr 1.1fr 0.6fr 1.6fr 1.5fr;gap:6px;padding:6px 14px 6px 38px;align-items:start;border-top:1px solid #f0ece4;background:#fdfcfb;cursor:pointer;transition:background .1s}
 .inf-comp-row:hover{background:#f5f3ee}
 /* ── ZONA USO CHECKBOXES ── */
 .zona-uso-wrap{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
@@ -185,11 +185,19 @@ input[type=file]{display:none}
 <!-- LOGIN -->
 <div id="login">
   <div class="login-box">
-    <div class="login-head">
-      <div style="margin-bottom:12px"><span class="logo">ATEX</span></div>
-      <div style="width:40px;height:3px;background:#d4500a;border-radius:2px;margin:0 auto 12px"></div>
-      <div style="font-family:monospace;font-size:22px;font-weight:600;letter-spacing:3px">LEVANTAMIENTO</div>
-      <div style="font-size:12px;color:#888;margin-top:6px">CCU Chile · Planta Temuco · Edificio Molino</div>
+    <div class="login-head" style="background:#111;padding:32px 28px 24px">
+      <!-- Logo Sustenta -->
+      <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px">
+        <div style="font-size:28px;font-weight:900;color:#F7C600;letter-spacing:3px;line-height:1">SUSTENTA</div>
+        <div style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;background:#F7C600;border-radius:5px;flex-shrink:0">
+          <span style="font-weight:900;font-size:14px;color:#111;letter-spacing:-0.5px">Ex</span>
+        </div>
+      </div>
+      <div style="font-size:9px;color:#888;letter-spacing:3px;text-transform:uppercase;text-align:center;margin-bottom:20px">Proyectos y Soluciones</div>
+      <div style="width:100%;height:1px;background:linear-gradient(90deg,transparent,#F7C600,transparent);margin-bottom:20px;opacity:.4"></div>
+      <div style="font-family:monospace;font-size:18px;font-weight:700;letter-spacing:4px;color:#fff;text-align:center">LEVANTAMIENTO</div>
+      <div style="font-family:monospace;font-size:10px;color:#F7C600;letter-spacing:2px;text-align:center;margin-top:6px;text-transform:uppercase">Equipos Ex · Clasificación ATEX</div>
+      <div style="font-size:11px;color:#555;margin-top:8px;text-align:center">CCU Chile · Planta Temuco · Edificio Molino</div>
     </div>
     <div class="login-body">
       <div class="tabs">
@@ -198,18 +206,22 @@ input[type=file]{display:none}
       </div>
       <div id="auth-msg" class="msg"></div>
       <form id="form-li" onsubmit="doLogin(event)" style="display:flex;flex-direction:column;gap:12px">
-        <div><div class="lbl">Email</div><input id="li-e" type="email" placeholder="inspector@ccu.cl" required></div>
+        <div><div class="lbl">Email</div><input id="li-e" type="email" placeholder="inspector@sustentaex.com" required></div>
         <div><div class="lbl">Contraseña</div><input id="li-p" type="password" placeholder="••••••••" required></div>
         <button class="btn-orange" type="submit" id="btn-li">INGRESAR</button>
       </form>
       <form id="form-rg" onsubmit="doRegister(event)" style="display:none;flex-direction:column;gap:12px">
         <div><div class="lbl">Nombre completo</div><input id="rg-n" type="text" placeholder="Nombre Apellido" required></div>
-        <div><div class="lbl">Email</div><input id="rg-e" type="email" placeholder="inspector@ccu.cl" required></div>
+        <div><div class="lbl">Email</div><input id="rg-e" type="email" placeholder="inspector@sustentaex.com" required></div>
         <div><div class="lbl">Contraseña (mín. 8)</div><input id="rg-p" type="password" placeholder="••••••••" required minlength="8"></div>
         <button class="btn-orange" type="submit" id="btn-rg">CREAR CUENTA</button>
       </form>
     </div>
-    <div style="padding:14px 28px;border-top:1px solid #ddd9d0;text-align:center;font-size:12px;color:#6b7280">UNE-EN 60079-10-2:2010 · IEC 60079-10-2:2009</div>
+    <div style="padding:12px 28px;border-top:1px solid #ddd9d0;text-align:center;font-size:10px;color:#aaa;display:flex;align-items:center;justify-content:center;gap:6px">
+      <span style="color:#F7C600;font-weight:700;font-size:10px">SUSTENTA</span>
+      <span>·</span>
+      <span>UNE-EN 60079-10-2:2010 · IEC 60079-10-2:2009</span>
+    </div>
   </div>
 </div>
 
@@ -217,8 +229,12 @@ input[type=file]{display:none}
 <div id="app">
   <div class="topbar">
     <div style="display:flex;align-items:center">
-      <span class="logo">ATEX</span>
-      <span class="topbar-title">Levantamiento Equipos Ex</span>
+      <div style="display:flex;align-items:center;gap:7px">
+        <span style="font-size:15px;font-weight:900;color:#F7C600;letter-spacing:2px;font-family:sans-serif">SUSTENTA</span>
+        <span style="background:#F7C600;color:#111;font-size:9px;font-weight:900;padding:2px 6px;border-radius:3px;letter-spacing:0.5px">Ex</span>
+      </div>
+      <span style="color:#444;margin:0 10px;font-size:14px">|</span>
+      <span class="topbar-title">Levantamiento Equipos Ex · CCU Temuco</span>
     </div>
     <div style="display:flex;align-items:center;gap:8px">
       <span id="user-lbl" style="font-family:monospace;font-size:10px;color:#888"></span>
@@ -255,14 +271,18 @@ input[type=file]{display:none}
   <!-- TAB RESUMEN -->
   <div id="tab-rs" style="display:none">
     <div class="page-wrap">
-      <div style="background:#0f1117;color:#fff;border-radius:8px;padding:20px 24px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+      <div style="background:#111;color:#fff;border-radius:8px;padding:20px 24px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;border-left:4px solid #F7C600">
         <div>
-          <div style="font-size:16px;font-weight:600">Edificio de Molino — Recepción y Molienda</div>
-          <div style="font-family:monospace;font-size:10px;color:#888;margin-top:3px">UNE-EN 60079-10-2:2010</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+            <span style="font-size:14px;font-weight:900;color:#F7C600;letter-spacing:2px">SUSTENTA</span>
+            <span style="background:#F7C600;color:#111;font-size:8px;font-weight:900;padding:1px 5px;border-radius:2px">Ex</span>
+          </div>
+          <div style="font-size:15px;font-weight:600">Edificio de Molino — Recepción y Molienda</div>
+          <div style="font-family:monospace;font-size:10px;color:#888;margin-top:3px">UNE-EN 60079-10-2:2010 · IEC 60079-10-2:2009</div>
         </div>
         <div style="text-align:right">
           <div style="font-family:monospace;font-size:10px;color:#888">AVANCE</div>
-          <div id="pct" style="font-family:monospace;font-size:36px;font-weight:600;color:#e8820a">0%</div>
+          <div id="pct" style="font-family:monospace;font-size:36px;font-weight:600;color:#F7C600">0%</div>
         </div>
       </div>
       <div class="prog-wrap"><div class="prog" id="prog" style="width:0%"></div></div>
@@ -322,7 +342,7 @@ input[type=file]{display:none}
       <button onclick="closeModal()" style="background:none;border:none;color:#666;font-size:20px;cursor:pointer">✕</button>
     </div>
     <div class="modal-body">
-      <div style="font-size:10px;font-weight:600;color:#d4500a;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0">Datos de placa</div>
+      <div style="font-size:10px;font-weight:600;color:#F7C600;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0">Datos de placa</div>
       <div class="two-col">
         <div><div class="field-lbl">Marca</div><input class="field-input" id="f-marca" placeholder="Siemens, SEW…"></div>
         <div><div class="field-lbl">Modelo</div><input class="field-input" id="f-modelo" placeholder="Referencia"></div>
@@ -335,7 +355,7 @@ input[type=file]{display:none}
         <div><div class="field-lbl">Potencia / Tensión</div><input class="field-input" id="f-pot" placeholder="11 kW / 380V"></div>
         <div><div class="field-lbl">Año de fabricación</div><input class="field-input" id="f-fab" type="number" min="1950" max="2099" placeholder="Ej: 1998"></div>
       </div>
-      <div style="font-size:10px;font-weight:600;color:#d4500a;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">Clasificación ATEX</div>
+      <div style="font-size:10px;font-weight:600;color:#F7C600;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">Clasificación ATEX</div>
       <div class="two-col">
         <div><div class="field-lbl">Marcado Ex</div><input class="field-input" id="f-mex" placeholder="Ex db IIB T3 Gb"></div>
         <div><div class="field-lbl">EPL / Categoría</div>
@@ -362,17 +382,17 @@ input[type=file]{display:none}
         </div>
         <div><div class="field-lbl">Temp. superficial máx.</div><input class="field-input" id="f-temp" placeholder="T3 (200°C)"></div>
       </div>
-      <div style="font-size:10px;font-weight:600;color:#d4500a;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">Conformidad</div>
+      <div style="font-size:10px;font-weight:600;color:#F7C600;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">Conformidad</div>
       <div class="radio-grp" id="rgrp">
         <span class="ropt" data-v="C" onclick="setConf('C',this)">C — Conforme</span>
         <span class="ropt" data-v="NC" onclick="setConf('NC',this)">NC — No conforme</span>
         <span class="ropt" data-v="OBS" onclick="setConf('OBS',this)">OBS — Observación</span>
         <span class="ropt" data-v="NA" onclick="setConf('NA',this)">NA — No aplica</span>
       </div>
-      <div style="font-size:10px;font-weight:600;color:#d4500a;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">Hallazgos</div>
+      <div style="font-size:10px;font-weight:600;color:#F7C600;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">Hallazgos</div>
       <div><div class="field-lbl">Brechas detectadas / Observaciones</div><textarea class="field-ta" id="f-hall" placeholder="Marcado faltante, EPL inadecuado…"></textarea></div>
       <div><div class="field-lbl">Acción correctiva</div><textarea class="field-ta" id="f-acc" placeholder="Reemplazo, re-certificación…"></textarea></div>
-      <div style="font-size:10px;font-weight:600;color:#d4500a;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">Fotografías</div>
+      <div style="font-size:10px;font-weight:600;color:#F7C600;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">Fotografías</div>
       <div class="photo-zone">
         <div class="photo-grid" id="pgrid"></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -866,7 +886,7 @@ function renderEq(){
         <div class="eq-name-wrap">
           <div style="flex:1">
             <span class="eq-name" id="eqn-${eq.id}" onclick="openModal('${eq.id}')">${nombre}</span>
-            ${isCustom?'<span style="font-family:monospace;font-size:8px;color:#d4500a;margin-left:4px" title="Nombre editado">✎</span>':''}
+            ${isCustom?'<span style="font-family:monospace;font-size:8px;color:#F7C600;margin-left:4px" title="Nombre editado">✎</span>':''}
             ${isExtra?'<span style="font-family:monospace;font-size:8px;color:#059669;margin-left:4px;background:#d1fae5;padding:1px 4px;border-radius:2px" title="Equipo duplicado">copia</span>':''}
           </div>
           <button class="eq-edit-btn" onclick="startEditName('${eq.id}')" title="Editar nombre">✎</button>
@@ -876,7 +896,7 @@ function renderEq(){
           <div class="eq-name-actions on" style="margin-top:4px">
             <button class="eq-name-ok" onclick="saveEqName('${eq.id}')">✓ Guardar</button>
             <button class="eq-name-cancel" onclick="cancelEditName('${eq.id}')">✕ Cancelar</button>
-            ${isCustom?`<button class="eq-name-cancel" onclick="resetEqName('${eq.id}')" style="color:#d4500a;border-color:#d4500a">↺ Original</button>`:''}
+            ${isCustom?`<button class="eq-name-cancel" onclick="resetEqName('${eq.id}')" style="color:#F7C600;border-color:#F7C600">↺ Original</button>`:''}
           </div>
         </div>
         <div class="eq-meta">
@@ -1339,7 +1359,7 @@ function renderFindings(){
   } else {
     el.innerHTML=`<div style="padding:10px 14px;background:#fee2e2;color:#991b1b;border-left:3px solid #dc2626;border-radius:4px;font-size:13px;margin-bottom:10px">⚠ ${nc.length} no conformidad${nc.length>1?'es':''}</div>`
       +nc.map(r=>`<div style="padding:10px 14px;background:#fff;border:1px solid #ddd9d0;border-left:3px solid #dc2626;border-radius:4px;margin-bottom:8px">
-        <div style="font-weight:500;font-size:13px;cursor:pointer;color:#d4500a" onclick="openFromInforme('${r.equipo_id}')">${r.equipo_nombre} ↗</div>
+        <div style="font-weight:500;font-size:13px;cursor:pointer;color:#F7C600" onclick="openFromInforme('${r.equipo_id}')">${r.equipo_nombre} ↗</div>
         <div style="font-size:10px;color:#aaa;font-family:monospace;margin-bottom:5px">${FL[r.piso]||r.piso}</div>
         <div style="font-size:12px;margin-bottom:3px"><strong>Brechas / Obs.:</strong> ${r.hallazgo||'—'}</div>
         <div style="font-size:12px;color:#6b7280"><strong>Acción:</strong> ${r.accion||'—'}</div>
@@ -1386,6 +1406,7 @@ function renderFindings(){
     <div></div>
     <div>EQUIPO / COMPONENTE</div>
     <div>ZONA</div>
+    <div>TAG PLANTA</div>
     <div>FAB.</div>
     <div>MARCADO Ex</div>
     <div>ESTADO</div>
@@ -1418,13 +1439,14 @@ function renderFindings(){
           <div>
             <div style="font-weight:600;font-size:12px;color:#0f1117"
               onclick="event.stopPropagation();openFromInforme('${eq.id}')"
-              onmouseover="this.style.color='#d4500a';this.style.cursor='pointer'" onmouseout="this.style.color='#0f1117'">
-              ${nombre} <span style="font-size:9px;color:#d4500a">↗</span>
+              onmouseover="this.style.color='#F7C600';this.style.cursor='pointer'" onmouseout="this.style.color='#0f1117'">
+              ${nombre} <span style="font-size:9px;color:#F7C600">↗</span>
             </div>
             ${r.marca?`<div style="font-family:monospace;font-size:9px;color:#aaa">${r.marca}${r.modelo?' · '+r.modelo:''}</div>`:''}
             ${fotosBtnHtml(r.fotos||[],'eq-'+eq.id)}
           </div>
           <div>${zpillHtml(z)}</div>
+          <div style="font-family:monospace;font-size:10px;color:#0f1117;font-weight:600">${r.tag_planta||'—'}</div>
           <div style="font-family:monospace;font-size:10px;color:#6b7280">${r.fecha_fab||'—'}</div>
           <div style="font-family:monospace;font-size:10px">${r.marcado_ex||'—'}</div>
           <div><span class="cbadge b${r.conformidad||''}">${r.conformidad||'—'}</span></div>
@@ -1443,6 +1465,7 @@ function renderFindings(){
               ${fotosBtnHtml(c.fotos||[],'comp-'+c.id)}
             </div>
             <div>${zpillHtml(c.zona||'')}</div>
+            <div style="font-family:monospace;font-size:10px;color:#0f1117;font-weight:600">${c.tag_planta||'—'}</div>
             <div style="font-family:monospace;font-size:10px;color:#6b7280">${c.fecha_fab||'—'}</div>
             <div style="font-family:monospace;font-size:10px">${c.marcado_ex||'—'}</div>
             <div><span class="cbadge b${c.conformidad||''}">${c.conformidad||'—'}</span></div>
