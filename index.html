@@ -539,6 +539,61 @@ const SUPA_URL = 'https://nyqqaaqxjdmedggpkxbj.supabase.co';
 const SUPA_KEY = 'sb_publishable_mtcCcCdVScjQQHtIQxUpYQ_awU9gt_j';
 const sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
 
+async function must(q){
+  const {data,error}=await q;
+  if(error) throw error;
+  return data;
+}
+
+function esc(v){
+  return String(v ?? '').replace(/[&<>"']/g,ch=>({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[ch]));
+}
+
+function escAttr(v){ return esc(v); }
+
+function safeDomId(v){
+  return String(v ?? '').replace(/[^A-Za-z0-9_-]/g,'_');
+}
+
+function jsArg(v){
+  return escAttr(JSON.stringify(String(v ?? '')));
+}
+
+function confClass(v){
+  const s=String(v ?? '');
+  return ['C','NC','OBS','NA'].includes(s) ? s : '';
+}
+
+function dotClass(v){
+  return confClass(v) || '-';
+}
+
+function csvCell(v){
+  return `"${String(v ?? '').replace(/"/g,'""')}"`;
+}
+
+function mdCell(v){
+  return String(v ?? '—').replace(/\|/g,'\\|').replace(/\r?\n/g,' ');
+}
+
+function getEqDef(id){
+  const base=EQ.find(e=>e.id===id);
+  const extra=equiposExtra.find(e=>e.id===id);
+  return base || (extra ? {
+    id:extra.id,n:extra.nombre,p:extra.piso,g:extra.grupo||'',z:extra.zona||'',_extra:true
+  } : null);
+}
+
+function eqTotalVisible(){
+  return Math.max(1,allEqs('all').length);
+}
+
+function pctFrom(total){
+  return Math.min(100,Math.round(total/eqTotalVisible()*100));
+}
+
 // ═══════════════════════════════════════════════════════════
 //  CATÁLOGO DE EQUIPOS — Manual TEM-ELA-MAN 006
 // ═══════════════════════════════════════════════════════════
@@ -639,6 +694,11 @@ const EQ = [
   {id:'e069',  n:'Succión polvos distribuidor malta a silos',                  p:'7',    g:'Aspiración',           z:'21'},
   {id:'e070',  n:'Succión polvos arroz a intersilos',                          p:'7',    g:'Aspiración',           z:'21'},
   {id:'e071',  n:'Succión de aire al ambiente (descarga 50% cerrada)',         p:'7',    g:'Ventilación',          z:'21'},
+  {id:'e099',  n:'Redler Transportadora Bi-dirección Malta (a redlers 1 y 2)', p:'7',    g:'Transporte',           z:'21'},
+  {id:'e100',  n:'Redler Transportadora Malta N°1 (a silos 1,2,3)',            p:'7',    g:'Transporte',           z:'21'},
+  {id:'e101',  n:'Redler Transportadora Malta N°2 (a silos 5,6,7)',            p:'7',    g:'Transporte',           z:'21'},
+  {id:'e102',  n:'Redler Transportadora Arroz (a silos 4 y 8)',                p:'7',    g:'Transporte',           z:'21'},
+  {id:'e103',  n:'Redler Transportadora Arroz (a silos exterior)',             p:'7',    g:'Transporte',           z:'21'},
 
   // ── HANGAR / PATIO RECEPCIÓN ──────────────────────────────
   {id:'e072',  n:'Pavo de recepción de malta',                                 p:'hangar',g:'Contenedor polvo',    z:'21'},
@@ -698,34 +758,33 @@ async function loadApp(){
   document.getElementById('login').style.display='none';
   document.getElementById('app').style.display='flex';
   try {
-    const {data} = await sb.from('profiles').select('*').eq('id',session.user.id).single();
-    profile=data;
+    profile = await must(sb.from('profiles').select('*').eq('id',session.user.id).single());
   } catch(e){ profile={full_name:session.user.email}; }
   const name = profile?.full_name||session.user.email;
   document.getElementById('user-lbl').textContent=name;
   document.getElementById('i-insp').value=name;
   document.getElementById('i-fecha').value=new Date().toISOString().slice(0,10);
   try {
-    const {data} = await sb.from('registros').select('*, profiles(full_name)').order('updated_at',{ascending:false});
+    const data = await must(sb.from('registros').select('*, profiles(full_name)').order('updated_at',{ascending:false}));
     if(data){ data.forEach(r=>{ recs[r.equipo_id]=r; }); allRaw=data; }
   } catch(e){ toast('Ejecuta el schema.sql en Supabase para activar la base de datos','err'); }
   try {
-    const {data:sd}=await sb.from('componentes').select('*, profiles(full_name)').order('created_at',{ascending:true});
+    const sd=await must(sb.from('componentes').select('*, profiles(full_name)').order('created_at',{ascending:true}));
     if(sd){ allSubRaw=sd; subRecs={}; sd.forEach(c=>{ if(!subRecs[c.equipo_id]) subRecs[c.equipo_id]=[]; subRecs[c.equipo_id].push(c); }); }
   } catch(e){ console.warn('componentes table not found'); }
   // Cargar nombres personalizados
   try {
-    const {data:cn}=await sb.from('equipos_custom').select('id,nombre');
+    const cn=await must(sb.from('equipos_custom').select('id,nombre'));
     if(cn){ cn.forEach(r=>{ customNames[r.id]=r.nombre; }); }
   } catch(e){ console.warn('equipos_custom table not found — ejecuta el SQL indicado'); }
   // Cargar equipos ocultos
   try {
-    const {data:ho}=await sb.from('equipos_ocultos').select('id');
+    const ho=await must(sb.from('equipos_ocultos').select('id'));
     if(ho){ ho.forEach(r=>hiddenEqs.add(r.id)); }
   } catch(e){ console.warn('equipos_ocultos table not found — ejecuta el SQL indicado'); }
   // Cargar equipos extra (duplicados)
   try {
-    const {data:ee}=await sb.from('equipos_extra').select('*').order('created_at',{ascending:true});
+    const ee=await must(sb.from('equipos_extra').select('*').order('created_at',{ascending:true}));
     if(ee){ equiposExtra=ee; }
   } catch(e){ console.warn('equipos_extra table not found — ejecuta el SQL indicado'); }
   renderEq();
@@ -764,8 +823,8 @@ async function doRegister(e){
   try {
     const {error}=await sb.auth.signUp({email:document.getElementById('rg-e').value.trim(),password:document.getElementById('rg-p').value,options:{data:{full_name:document.getElementById('rg-n').value.trim()}}});
     if(error)throw error;
-    setMsg('Cuenta creada. Revisa tu email y luego ingresa.','ok');
     authTab('li');
+    setMsg('Cuenta creada. Revisa tu email y luego ingresa.','ok');
   } catch(err){ setMsg(err.message||'Error.','err'); }
   btn.disabled=0; btn.textContent='CREAR CUENTA';
 }
@@ -793,15 +852,18 @@ async function loadAndRenderInforme(){
       sb.from('registros').select('*, profiles(full_name)').order('updated_at',{ascending:false}),
       sb.from('componentes').select('*, profiles(full_name)').order('created_at',{ascending:true})
     ]);
+    if(r1.error) throw r1.error;
+    if(r2.error) throw r2.error;
     if(r1.data){ allRaw=r1.data; recs={}; r1.data.forEach(r=>{ recs[r.equipo_id]=r; }); }
     if(r2.data){ allSubRaw=r2.data; subRecs={}; r2.data.forEach(c=>{ if(!subRecs[c.equipo_id]) subRecs[c.equipo_id]=[]; subRecs[c.equipo_id].push(c); }); }
   } catch(e){ toast('Error cargando informe','err'); }
   // Update KPIs
-  const total=allRaw.length,
-        C=allRaw.filter(r=>r.conformidad==='C').length,
-        NC=allRaw.filter(r=>r.conformidad==='NC').length,
-        OBS=allRaw.filter(r=>r.conformidad==='OBS').length;
-  const pct=Math.round(total/EQ.length*100);
+  const total=inspectedEqIds().size,
+        items=statusItems(),
+        C=items.filter(r=>r.conformidad==='C').length,
+        NC=items.filter(r=>r.conformidad==='NC').length,
+        OBS=items.filter(r=>r.conformidad==='OBS').length;
+  const pct=pctFrom(total);
   document.getElementById('pct').textContent=pct+'%';
   document.getElementById('prog').style.width=pct+'%';
   document.getElementById('kTotal').textContent=total;
@@ -818,7 +880,7 @@ async function loadAndRenderInforme(){
 // ═══════════════════════════════════════════════════════════
 function zpillHtml(z){
   const cls={20:'z20p',21:'z21p',22:'z22p',NG:'zdp','':'zdp'}[z]||'zdp';
-  return `<span class="zpill ${cls}">${z?'Z'+z:'—'}</span>`;
+  return `<span class="zpill ${cls}">${z?'Z'+esc(z):'—'}</span>`;
 }
 function worstConf(eqId){
   const comps=(subRecs[eqId]||[]);
@@ -860,6 +922,65 @@ function allEqs(floorFilter){
   return floorFilter==='all' ? combined : combined.filter(e=>e.p===floorFilter);
 }
 
+function inspectedEqIds(){
+  return new Set([
+    ...allRaw.map(r=>r.equipo_id),
+    ...allSubRaw.map(c=>c.equipo_id)
+  ]);
+}
+
+function statusItems(){
+  return [...allRaw,...allSubRaw];
+}
+
+function reportRows(){
+  const rows=[];
+  const seenEq=new Set();
+  for(const r of allRaw){
+    seenEq.add(r.equipo_id);
+    rows.push({
+      tipo:'Equipo',
+      id:r.equipo_id,
+      equipo_id:r.equipo_id,
+      nombre:eqName(r.equipo_id),
+      principal:'',
+      piso:r.piso,
+      zona:r.zona||'',
+      fecha_fab:r.fecha_fab||'',
+      marcado_ex:r.marcado_ex||'',
+      conformidad:r.conformidad||'',
+      hallazgo:r.hallazgo||'',
+      accion:r.accion||'',
+      inspector_nombre:r.inspector_nombre||'',
+      fotos:r.fotos||[]
+    });
+  }
+  for(const c of allSubRaw){
+    const eq=getEqDef(c.equipo_id)||{};
+    const parent=recs[c.equipo_id]||{};
+    rows.push({
+      tipo:'Componente',
+      id:c.id,
+      equipo_id:c.equipo_id,
+      nombre:c.nombre_comp||c.tipo||'Componente',
+      principal:eqName(c.equipo_id),
+      piso:parent.piso||eq.p||'',
+      zona:c.zona||'',
+      fecha_fab:c.fecha_fab||'',
+      marcado_ex:c.marcado_ex||'',
+      conformidad:c.conformidad||'',
+      hallazgo:c.hallazgo||'',
+      accion:c.accion||'',
+      inspector_nombre:c.inspector_nombre||'',
+      fotos:c.fotos||[]
+    });
+    if(!seenEq.has(c.equipo_id) && eq.id){
+      seenEq.add(c.equipo_id);
+    }
+  }
+  return rows;
+}
+
 function renderEq(){
   const list=document.getElementById('eq-list');
   const items=allEqs(floorF);
@@ -872,27 +993,28 @@ function renderEq(){
       const nb=eqName(b.id).toLowerCase();
       return na.localeCompare(nb,'es');
     });
-    h+=`<div class="sec-hd">${FL[fl]||fl}</div><div class="eq-grid">`;
+    h+=`<div class="sec-hd">${esc(FL[fl]||fl)}</div><div class="eq-grid">`;
     for(const eq of flItems){
       const r=recs[eq.id]||{};
       const z=r.zona||eq.z||'';
+      const zClass=['20','21','22'].includes(String(z))?' z'+z:'';
       const conf=eqConf(eq.id);
       const comps=subRecs[eq.id]||[];
       const cc=comps.length;
       const nombre=eqName(eq.id);
       const isCustom=!!customNames[eq.id];
       const isExtra=!!eq._extra;
-      h+=`<div class="eq-card${z?' z'+z:''} ${r.conformidad?'done':''}" id="card-${eq.id}">
+      h+=`<div class="eq-card${zClass} ${r.conformidad?'done':''}" id="card-${eq.id}">
         <div class="eq-name-wrap">
           <div style="flex:1">
-            <span class="eq-name" id="eqn-${eq.id}" onclick="openModal('${eq.id}')">${nombre}</span>
+            <span class="eq-name" id="eqn-${eq.id}" onclick="openModal('${eq.id}')">${esc(nombre)}</span>
             ${isCustom?'<span style="font-family:monospace;font-size:8px;color:#F7C600;margin-left:4px" title="Nombre editado">✎</span>':''}
             ${isExtra?'<span style="font-family:monospace;font-size:8px;color:#059669;margin-left:4px;background:#d1fae5;padding:1px 4px;border-radius:2px" title="Equipo duplicado">copia</span>':''}
           </div>
           <button class="eq-edit-btn" onclick="startEditName('${eq.id}')" title="Editar nombre">✎</button>
         </div>
         <div class="eq-name-input-wrap" id="enw-${eq.id}" style="display:none;margin-bottom:5px">
-          <input class="eq-name-input on" id="eni-${eq.id}" value="${nombre.replace(/"/g,'&quot;')}" onkeydown="if(event.key==='Enter')saveEqName('${eq.id}');if(event.key==='Escape')cancelEditName('${eq.id}')">
+          <input class="eq-name-input on" id="eni-${eq.id}" value="${escAttr(nombre)}" onkeydown="if(event.key==='Enter')saveEqName('${eq.id}');if(event.key==='Escape')cancelEditName('${eq.id}')">
           <div class="eq-name-actions on" style="margin-top:4px">
             <button class="eq-name-ok" onclick="saveEqName('${eq.id}')">✓ Guardar</button>
             <button class="eq-name-cancel" onclick="cancelEditName('${eq.id}')">✕ Cancelar</button>
@@ -901,11 +1023,11 @@ function renderEq(){
         </div>
         <div class="eq-meta">
           ${zpillHtml(z)}
-          <span style="font-family:monospace;font-size:9px;color:#bbb">${eq.g}</span>
-          <span class="dot d${conf||'-'}"></span>
+          <span style="font-family:monospace;font-size:9px;color:#bbb">${esc(eq.g)}</span>
+          <span class="dot d${dotClass(conf)}"></span>
           <span class="eq-toggle" onclick="toggleExpand('${eq.id}',this)">${cc?cc+' comp ▾':'+ comp'}</span>
         </div>
-        ${r.marca?`<div style="font-family:monospace;font-size:9px;color:#aaa;margin-top:4px">${r.marca}${r.modelo?' · '+r.modelo:''}${r.tag_planta?' · TAG: '+r.tag_planta:r.serie?' · S/N: '+r.serie:''}${r.fecha_fab?' · '+r.fecha_fab:''}</div>`:''}
+        ${r.marca?`<div style="font-family:monospace;font-size:9px;color:#aaa;margin-top:4px">${esc(r.marca)}${r.modelo?' · '+esc(r.modelo):''}${r.tag_planta?' · TAG: '+esc(r.tag_planta):r.serie?' · S/N: '+esc(r.serie):''}${r.fecha_fab?' · '+esc(r.fecha_fab):''}</div>`:''}
         <div class="eq-expand" id="exp-${eq.id}"
           ondragover="onExpandDragOver(event,'${eq.id}')"
           ondragleave="onExpandDragLeave(event,'${eq.id}')"
@@ -915,9 +1037,9 @@ function renderEq(){
               ondragstart="onCompDragStart(event,'${c.id}','${eq.id}')"
               ondragend="onCompDragEnd(event)"
               onclick="openSubModal(null,'${eq.id}','${c.id}')">
-              <span class="comp-type">${c.tipo||'—'}</span>
-              <span class="comp-name">${c.nombre_comp||c.tipo}</span>
-              <span class="dot d${c.conformidad||'-'}"></span>
+              <span class="comp-type">${esc(c.tipo||'—')}</span>
+              <span class="comp-name">${esc(c.nombre_comp||c.tipo)}</span>
+              <span class="dot d${dotClass(c.conformidad)}"></span>
             </div>`).join('')}
           <div class="comp-add" onclick="openSubModal('new','${eq.id}')">＋ Agregar componente</div>
         </div>
@@ -956,9 +1078,8 @@ async function saveEqName(eqId){
       updated_at:new Date().toISOString(),
       updated_by:profile?.full_name||session.user.email
     };
-    const {error}=await sb.from('equipos_custom')
-      .upsert(payload,{onConflict:'id'});
-    if(error) throw error;
+    await must(sb.from('equipos_custom')
+      .upsert(payload,{onConflict:'id'}));
     customNames[eqId]=nuevoNombre;
     toast('Nombre guardado ✓','ok');
     renderEq();
@@ -967,8 +1088,7 @@ async function saveEqName(eqId){
 async function resetEqName(eqId){
   if(!confirm('¿Restaurar el nombre original del catálogo?')) return;
   try {
-    const {error}=await sb.from('equipos_custom').delete().eq('id',eqId);
-    if(error) throw error;
+    await must(sb.from('equipos_custom').delete().eq('id',eqId));
     delete customNames[eqId];
     toast('Nombre restaurado ✓','ok');
     renderEq();
@@ -997,13 +1117,7 @@ function setFloor(fl,el){
 // ═══════════════════════════════════════════════════════════
 async function openModal(id){
   curEq=id; curConf=''; pendFiles=[]; exPaths=[];
-  // Buscar en catálogo fijo o en equipos extra
-  const eqBase = EQ.find(e=>e.id===id);
-  const eqExtra = equiposExtra.find(e=>e.id===id);
-  const eq = eqBase || (eqExtra ? {
-    id:eqExtra.id, n:eqExtra.nombre, p:eqExtra.piso,
-    g:eqExtra.grupo||'', z:eqExtra.zona||''
-  } : null);
+  const eq = getEqDef(id);
   if(!eq){ toast('Equipo no encontrado','err'); return; }
   const r=recs[id]||{};
   document.getElementById('m-name').textContent=eqName(id);
@@ -1044,10 +1158,10 @@ function renderModalComps(eqId){
   }
   el.innerHTML=comps.map(c=>`
     <div class="comp-row" onclick="openSubModal(null,'${eqId}','${c.id}')">
-      <span class="comp-type">${c.tipo||'—'}</span>
-      <span class="comp-name">${c.nombre_comp||c.tipo}</span>
-      ${c.marca?`<span style="font-family:monospace;font-size:9px;color:#aaa">${c.marca}${c.tag_planta?' · TAG: '+c.tag_planta:c.serie?' · S/N: '+c.serie:''}</span>`:''}
-      <span class="dot d${c.conformidad||'-'}" style="margin-left:auto;flex-shrink:0"></span>
+      <span class="comp-type">${esc(c.tipo||'—')}</span>
+      <span class="comp-name">${esc(c.nombre_comp||c.tipo)}</span>
+      ${c.marca?`<span style="font-family:monospace;font-size:9px;color:#aaa">${esc(c.marca)}${c.tag_planta?' · TAG: '+esc(c.tag_planta):c.serie?' · S/N: '+esc(c.serie):''}</span>`:''}
+      <span class="dot d${dotClass(c.conformidad)}" style="margin-left:auto;flex-shrink:0"></span>
     </div>`).join('');
 }
 // ── DUPLICAR EQUIPO ───────────────────────────────────────
@@ -1055,7 +1169,8 @@ async function duplicateEq(){
   if(!curEq) return;
   const copias = parseInt(prompt('¿Cuántas copias quieres crear? (1 o 2)', '1'));
   if(!copias||copias<1||copias>2){ toast('Ingresa 1 o 2 copias','err'); return; }
-  const eq = EQ.find(e=>e.id===curEq) || equiposExtra.find(e=>e.id===curEq);
+  const eq = getEqDef(curEq);
+  if(!eq){ toast('Equipo no encontrado','err'); return; }
   const r = recs[curEq]||{};
   const comps = subRecs[curEq]||[];
   const nombreBase = eqName(curEq);
@@ -1089,8 +1204,7 @@ async function duplicateEq(){
         inspector_nombre: profile?.full_name||session.user.email,
         origen_id: curEq,
       };
-      const {error:eErr}=await sb.from('equipos_extra').insert(eqPayload);
-      if(eErr) throw eErr;
+      await must(sb.from('equipos_extra').insert(eqPayload));
       // Guardar registro de inspección para el nuevo equipo
       const regPayload={
         equipo_id:newId, equipo_nombre:nombreBase+sufijo,
@@ -1107,7 +1221,7 @@ async function duplicateEq(){
         inspector_nombre:profile?.full_name||session.user.email,
       };
       if(Object.keys(r).length>0){
-        await sb.from('registros').insert(regPayload);
+        await must(sb.from('registros').insert(regPayload));
       }
       // Duplicar componentes
       for(const c of comps){
@@ -1124,7 +1238,7 @@ async function duplicateEq(){
           inspector_id:session.user.id,
           inspector_nombre:profile?.full_name||session.user.email,
         };
-        await sb.from('componentes').insert(cPayload);
+        await must(sb.from('componentes').insert(cPayload));
       }
     }
     toast(`${copias} copia${copias>1?'s':''} creada${copias>1?'s':''} ✓`,'ok');
@@ -1152,18 +1266,17 @@ async function deleteEqData(){
   try {
     const r=recs[curEq]||{};
     if(r.fotos&&r.fotos.length){
-      await sb.storage.from('atex-fotos').remove(r.fotos);
+      await must(sb.storage.from('atex-fotos').remove(r.fotos));
     }
-    const {error}=await sb.from('registros').delete().eq('equipo_id',curEq);
-    if(error) throw error;
+    await must(sb.from('registros').delete().eq('equipo_id',curEq));
     // Si es equipo extra limpiar sus datos también
     const isExtra=!!equiposExtra.find(e=>e.id===curEq);
     if(isExtra){
-      await sb.from('equipos_extra').update({
+      await must(sb.from('equipos_extra').update({
         marca:'',modelo:'',serie:'',tag_planta:'',potencia:'',fecha_fab:null,
         marcado_ex:'',epl:'',temp_max:'',conformidad:'',
         hallazgo:'',accion:'',fotos:[]
-      }).eq('id',curEq);
+      }).eq('id',curEq));
     }
     delete recs[curEq];
     allRaw=allRaw.filter(r=>r.equipo_id!==curEq);
@@ -1181,17 +1294,16 @@ async function hideEq(){
     // Si es equipo extra lo borramos directamente de la tabla
     const isExtra=!!equiposExtra.find(e=>e.id===curEq);
     if(isExtra){
-      await sb.from('equipos_extra').delete().eq('id',curEq);
-      await sb.from('registros').delete().eq('equipo_id',curEq);
-      await sb.from('componentes').delete().eq('equipo_id',curEq);
+      await must(sb.from('equipos_extra').delete().eq('id',curEq));
+      await must(sb.from('registros').delete().eq('equipo_id',curEq));
+      await must(sb.from('componentes').delete().eq('equipo_id',curEq));
       toast(`"${nombre}" eliminado ✓`,'ok');
     } else {
-      const {error}=await sb.from('equipos_ocultos').upsert({
+      await must(sb.from('equipos_ocultos').upsert({
         id:curEq,
         hidden_at:new Date().toISOString(),
         hidden_by:profile?.full_name||session.user.email
-      },{onConflict:'id'});
-      if(error) throw error;
+      },{onConflict:'id'}));
       hiddenEqs.add(curEq);
       toast(`"${nombre}" ocultado del listado ✓`,'ok');
     }
@@ -1205,24 +1317,19 @@ function closeModal(){
   document.body.style.overflow='';
   curEq=null;
 }
-function closeSubModal(){
-  document.getElementById('smodal-bg').style.display='none';
-  document.body.style.overflow='';
-  curParentEq=null; curCompId=null;
-}
 function setConf(v){ curConf=v; renderRadios(); }
 function renderRadios(){ document.querySelectorAll('#rgrp .ropt').forEach(b=>{ b.className='ropt'; if(b.dataset.v===curConf) b.classList.add('s'+curConf); }); }
 function addPhotos(e){ pendFiles.push(...e.target.files); e.target.value=''; renderPhotos(); }
 async function renderPhotos(){
   const g=document.getElementById('pgrid'); let h='';
   for(let i=0;i<exPaths.length;i++){
-    try{ const {data}=await sb.storage.from('atex-fotos').createSignedUrl(exPaths[i],3600);
-      h+=`<div class="photo-wrap"><img src="${data.signedUrl}" onclick="openLb('${data.signedUrl}')"><button class="photo-rm" onclick="exPaths.splice(${i},1);renderPhotos()">✕</button></div>`;
+    try{ const data=await must(sb.storage.from('atex-fotos').createSignedUrl(exPaths[i],3600));
+      h+=`<div class="photo-wrap"><img src="${escAttr(data.signedUrl)}" onclick="openLb(${jsArg(data.signedUrl)})"><button class="photo-rm" onclick="exPaths.splice(${i},1);renderPhotos()">✕</button></div>`;
     }catch(e){ h+=`<div style="aspect-ratio:1;background:#eee;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px">Error</div>`; }
   }
   for(let i=0;i<pendFiles.length;i++){
     const u=URL.createObjectURL(pendFiles[i]);
-    h+=`<div class="photo-wrap"><img src="${u}" onclick="openLb('${u}')"><button class="photo-rm" onclick="pendFiles.splice(${i},1);renderPhotos()">✕</button></div>`;
+    h+=`<div class="photo-wrap"><img src="${escAttr(u)}" onclick="openLb(${jsArg(u)})"><button class="photo-rm" onclick="pendFiles.splice(${i},1);renderPhotos()">✕</button></div>`;
   }
   g.innerHTML=h;
 }
@@ -1234,15 +1341,13 @@ async function saveEq(){
     const newPaths=[];
     for(const f of pendFiles){
       const ext=f.name.split('.').pop(), path=`${session.user.id}/${curEq}/${Date.now()}.${ext}`;
-      await sb.storage.from('atex-fotos').upload(path,f,{contentType:f.type});
+      await must(sb.storage.from('atex-fotos').upload(path,f,{contentType:f.type}));
       newPaths.push(path);
     }
-    const eqBase=EQ.find(e=>e.id===curEq);
-    const eqExtra=equiposExtra.find(e=>e.id===curEq);
-    const eq=eqBase||(eqExtra?{id:eqExtra.id,n:eqExtra.nombre,p:eqExtra.piso,g:eqExtra.grupo||''}:null);
-    if(!eq){ toast('Equipo no encontrado','err'); return; }
+    const eq=getEqDef(curEq);
+    if(!eq) throw new Error('Equipo no encontrado');
     const payload={
-      equipo_id:curEq, equipo_nombre:eq.n, piso:eq.p, grupo:eq.g,
+      equipo_id:curEq, equipo_nombre:eqName(curEq), piso:eq.p, grupo:eq.g,
       marca:document.getElementById('f-marca').value.trim(),
       modelo:document.getElementById('f-modelo').value.trim(),
       serie:document.getElementById('f-serie').value.trim(),
@@ -1260,10 +1365,10 @@ async function saveEq(){
       inspector_id:session.user.id,
       inspector_nombre:profile?.full_name||session.user.email,
     };
-    const {data:ex}=await sb.from('registros').select('id').eq('equipo_id',curEq).maybeSingle();
+    const ex=await must(sb.from('registros').select('id').eq('equipo_id',curEq).maybeSingle());
     let saved;
-    if(ex){ const {data}=await sb.from('registros').update(payload).eq('id',ex.id).select().single(); saved=data; }
-    else   { const {data}=await sb.from('registros').insert(payload).select().single(); saved=data; }
+    if(ex){ saved=await must(sb.from('registros').update(payload).eq('id',ex.id).select().single()); }
+    else   { saved=await must(sb.from('registros').insert(payload).select().single()); }
     recs[curEq]={...saved,profiles:{full_name:profile?.full_name}};
     toast('Equipo guardado ✓','ok');
     closeModal();
@@ -1275,15 +1380,15 @@ async function saveEq(){
 // ── RELOAD DATA ───────────────────────────────────────────
 async function reloadData(){
   try {
-    const {data}=await sb.from('registros').select('*, profiles(full_name)').order('updated_at',{ascending:false});
+    const data=await must(sb.from('registros').select('*, profiles(full_name)').order('updated_at',{ascending:false}));
     if(data){ allRaw=data; recs={}; data.forEach(r=>{ recs[r.equipo_id]=r; }); }
   } catch(e){ console.warn(e); }
   try {
-    const {data:sd}=await sb.from('componentes').select('*, profiles(full_name)').order('created_at',{ascending:true});
+    const sd=await must(sb.from('componentes').select('*, profiles(full_name)').order('created_at',{ascending:true}));
     if(sd){ allSubRaw=sd; subRecs={}; sd.forEach(c=>{ if(!subRecs[c.equipo_id]) subRecs[c.equipo_id]=[]; subRecs[c.equipo_id].push(c); }); }
   } catch(e){ console.warn(e); }
   try {
-    const {data:ee}=await sb.from('equipos_extra').select('*').order('created_at',{ascending:true});
+    const ee=await must(sb.from('equipos_extra').select('*').order('created_at',{ascending:true}));
     if(ee){ equiposExtra=ee; }
   } catch(e){ console.warn(e); }
   renderEq();
@@ -1295,13 +1400,22 @@ async function reloadData(){
 async function renderResumen(){
   loader(1);
   try {
-    const {data}=await sb.from('registros').select('*, profiles(full_name)');
-    allRaw=data||[];
-    const total=allRaw.length,
-          C=allRaw.filter(r=>r.conformidad==='C').length,
-          NC=allRaw.filter(r=>r.conformidad==='NC').length,
-          OBS=allRaw.filter(r=>r.conformidad==='OBS').length;
-    const pct=Math.round(total/EQ.length*100);
+    const [r1,r2]=await Promise.all([
+      sb.from('registros').select('*, profiles(full_name)').order('updated_at',{ascending:false}),
+      sb.from('componentes').select('*, profiles(full_name)').order('created_at',{ascending:true})
+    ]);
+    if(r1.error) throw r1.error;
+    if(r2.error) throw r2.error;
+    allRaw=r1.data||[];
+    recs={}; allRaw.forEach(r=>{ recs[r.equipo_id]=r; });
+    allSubRaw=r2.data||[];
+    subRecs={}; allSubRaw.forEach(c=>{ if(!subRecs[c.equipo_id]) subRecs[c.equipo_id]=[]; subRecs[c.equipo_id].push(c); });
+    const total=inspectedEqIds().size,
+          items=statusItems(),
+          C=items.filter(r=>r.conformidad==='C').length,
+          NC=items.filter(r=>r.conformidad==='NC').length,
+          OBS=items.filter(r=>r.conformidad==='OBS').length;
+    const pct=pctFrom(total);
     document.getElementById('pct').textContent=pct+'%';
     document.getElementById('prog').style.width=pct+'%';
     document.getElementById('kTotal').textContent=total;
@@ -1314,13 +1428,14 @@ async function renderResumen(){
 }
 function renderGapRows(){
   const rows=document.getElementById('gap-rows');
-  if(!allRaw.length){ rows.innerHTML='<div style="padding:28px;text-align:center;color:#6b7280">Sin registros</div>'; return; }
-  rows.innerHTML=allRaw.map(r=>`
+  const data=reportRows();
+  if(!data.length){ rows.innerHTML='<div style="padding:28px;text-align:center;color:#6b7280">Sin registros</div>'; return; }
+  rows.innerHTML=data.map(r=>`
     <div class="dt-row" style="grid-template-columns:2.5fr 0.8fr 0.7fr 2.5fr">
-      <div><div style="font-weight:500;font-size:12px">${r.equipo_nombre}</div><div style="font-family:monospace;font-size:9px;color:#aaa">${FL[r.piso]||r.piso}</div></div>
+      <div><div style="font-weight:500;font-size:12px">${esc(r.nombre)}</div><div style="font-family:monospace;font-size:9px;color:#aaa">${esc(FL[r.piso]||r.piso)}${r.principal?' · '+esc(r.principal):''}</div></div>
       <div>${zpillHtml(r.zona||'')}</div>
-      <div><span class="cbadge b${r.conformidad}">${r.conformidad}</span></div>
-      <div style="font-size:11px;color:#6b7280">${r.hallazgo||'—'}</div>
+      <div><span class="cbadge b${confClass(r.conformidad)}">${esc(r.conformidad||'—')}</span></div>
+      <div style="font-size:11px;color:#6b7280">${esc(r.hallazgo||'—')}</div>
     </div>`).join('');
 }
 
@@ -1329,8 +1444,10 @@ function renderGapRows(){
 // ═══════════════════════════════════════════════════════════
 function fotosBtnHtml(fotos, rowId){
   if(!fotos||!fotos.length) return '';
-  return `<button class="inf-foto-btn" onclick="toggleInfFotos('${rowId}',${JSON.stringify(fotos).replace(/"/g,'&quot;')})">📷 ${fotos.length} foto${fotos.length>1?'s':''}</button>
-<div class="inf-foto-panel" id="ifp-${rowId}"><span class="inf-spin">Cargando…</span></div>`;
+  const safeId=safeDomId(rowId);
+  const fotosJson=escAttr(JSON.stringify(fotos));
+  return `<button class="inf-foto-btn" onclick="toggleInfFotos('${safeId}',${fotosJson})">📷 ${fotos.length} foto${fotos.length>1?'s':''}</button>
+<div class="inf-foto-panel" id="ifp-${safeId}"><span class="inf-spin">Cargando…</span></div>`;
 }
 
 async function toggleInfFotos(rowId, fotos){
@@ -1343,8 +1460,8 @@ async function toggleInfFotos(rowId, fotos){
   let h = '';
   for(const path of fotos){
     try {
-      const {data} = await sb.storage.from('atex-fotos').createSignedUrl(path, 3600);
-      h += `<img src="${data.signedUrl}" onclick="openLb('${data.signedUrl}')" title="${path}">`;
+      const data = await must(sb.storage.from('atex-fotos').createSignedUrl(path, 3600));
+      h += `<img src="${escAttr(data.signedUrl)}" onclick="openLb(${jsArg(data.signedUrl)})" title="${escAttr(path)}">`;
     } catch(e){ h += `<div style="width:64px;height:64px;background:#eee;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;color:#aaa">Error</div>`; }
   }
   panel.innerHTML = h || '<span class="inf-spin">Sin fotos</span>';
@@ -1352,18 +1469,18 @@ async function toggleInfFotos(rowId, fotos){
 
 function renderFindings(){
   // ── NC Summary ──────────────────────────────────────────
-  const nc=allRaw.filter(r=>r.conformidad==='NC');
+  const nc=reportRows().filter(r=>r.conformidad==='NC');
   const el=document.getElementById('nc-sum');
   if(!nc.length){
     el.innerHTML='<div style="padding:10px 14px;background:#d1fae5;color:#065f46;border-left:3px solid #059669;border-radius:4px;font-size:13px">✓ Sin no conformidades.</div>';
   } else {
     el.innerHTML=`<div style="padding:10px 14px;background:#fee2e2;color:#991b1b;border-left:3px solid #dc2626;border-radius:4px;font-size:13px;margin-bottom:10px">⚠ ${nc.length} no conformidad${nc.length>1?'es':''}</div>`
       +nc.map(r=>`<div style="padding:10px 14px;background:#fff;border:1px solid #ddd9d0;border-left:3px solid #dc2626;border-radius:4px;margin-bottom:8px">
-        <div style="font-weight:500;font-size:13px;cursor:pointer;color:#F7C600" onclick="openFromInforme('${r.equipo_id}')">${r.equipo_nombre} ↗</div>
-        <div style="font-size:10px;color:#aaa;font-family:monospace;margin-bottom:5px">${FL[r.piso]||r.piso}</div>
-        <div style="font-size:12px;margin-bottom:3px"><strong>Brechas / Obs.:</strong> ${r.hallazgo||'—'}</div>
-        <div style="font-size:12px;color:#6b7280"><strong>Acción:</strong> ${r.accion||'—'}</div>
-        ${fotosBtnHtml(r.fotos,'nc-'+r.equipo_id)}
+        <div style="font-weight:500;font-size:13px;cursor:pointer;color:#F7C600" onclick="openFromInforme(${jsArg(r.equipo_id)})">${esc(r.tipo==='Componente'?r.principal+' · '+r.nombre:r.nombre)} ↗</div>
+        <div style="font-size:10px;color:#aaa;font-family:monospace;margin-bottom:5px">${esc(r.tipo)} · ${esc(FL[r.piso]||r.piso)}</div>
+        <div style="font-size:12px;margin-bottom:3px"><strong>Brechas / Obs.:</strong> ${esc(r.hallazgo||'—')}</div>
+        <div style="font-size:12px;color:#6b7280"><strong>Acción:</strong> ${esc(r.accion||'—')}</div>
+        ${fotosBtnHtml(r.fotos,'nc-'+r.tipo+'-'+r.id)}
       </div>`).join('');
   }
 
@@ -1421,7 +1538,7 @@ function renderFindings(){
 
     h+=`<div class="inf-piso-hd" onclick="togglePiso('${piso}')">
       <span class="inf-piso-arrow" id="ipa-${piso}">▼</span>
-      ${FL[piso]||piso}
+      ${esc(FL[piso]||piso)}
       <span style="margin-left:auto;font-size:9px;color:#888;font-weight:400;text-transform:none;letter-spacing:0">${eqs.length} equipo${eqs.length!==1?'s':''} · ${compCount} comp.</span>
     </div>
     <div id="ipb-${piso}">`;
@@ -1440,18 +1557,18 @@ function renderFindings(){
             <div style="font-weight:600;font-size:12px;color:#0f1117"
               onclick="event.stopPropagation();openFromInforme('${eq.id}')"
               onmouseover="this.style.color='#F7C600';this.style.cursor='pointer'" onmouseout="this.style.color='#0f1117'">
-              ${nombre} <span style="font-size:9px;color:#F7C600">↗</span>
+              ${esc(nombre)} <span style="font-size:9px;color:#F7C600">↗</span>
             </div>
-            ${r.marca?`<div style="font-family:monospace;font-size:9px;color:#aaa">${r.marca}${r.modelo?' · '+r.modelo:''}</div>`:''}
+            ${r.marca?`<div style="font-family:monospace;font-size:9px;color:#aaa">${esc(r.marca)}${r.modelo?' · '+esc(r.modelo):''}</div>`:''}
             ${fotosBtnHtml(r.fotos||[],'eq-'+eq.id)}
           </div>
           <div>${zpillHtml(z)}</div>
-          <div style="font-family:monospace;font-size:10px;color:#0f1117;font-weight:600">${r.tag_planta||'—'}</div>
-          <div style="font-family:monospace;font-size:10px;color:#6b7280">${r.fecha_fab||'—'}</div>
-          <div style="font-family:monospace;font-size:10px">${r.marcado_ex||'—'}</div>
-          <div><span class="cbadge b${r.conformidad||''}">${r.conformidad||'—'}</span></div>
-          <div style="font-size:11px">${r.hallazgo||'—'}</div>
-          <div style="font-size:11px;color:#6b7280">${r.accion||'—'}</div>
+          <div style="font-family:monospace;font-size:10px;color:#0f1117;font-weight:600">${esc(r.tag_planta||'—')}</div>
+          <div style="font-family:monospace;font-size:10px;color:#6b7280">${esc(r.fecha_fab||'—')}</div>
+          <div style="font-family:monospace;font-size:10px">${esc(r.marcado_ex||'—')}</div>
+          <div><span class="cbadge b${confClass(r.conformidad)}">${esc(r.conformidad||'—')}</span></div>
+          <div style="font-size:11px">${esc(r.hallazgo||'—')}</div>
+          <div style="font-size:11px;color:#6b7280">${esc(r.accion||'—')}</div>
         </div>`;
 
       if(hasComps){
@@ -1460,17 +1577,17 @@ function renderFindings(){
           h+=`<div class="inf-comp-row" onclick="openSubModal(null,'${eq.id}','${c.id}')">
             <div></div>
             <div>
-              <div style="font-size:11px;color:#5b21b6">↳ ${c.nombre_comp||c.tipo}</div>
-              <div style="font-family:monospace;font-size:9px;color:#aaa">${c.tipo||''}${c.marca?' · '+c.marca:''}${c.modelo?' '+c.modelo:''}</div>
+              <div style="font-size:11px;color:#5b21b6">↳ ${esc(c.nombre_comp||c.tipo)}</div>
+              <div style="font-family:monospace;font-size:9px;color:#aaa">${esc(c.tipo||'')}${c.marca?' · '+esc(c.marca):''}${c.modelo?' '+esc(c.modelo):''}</div>
               ${fotosBtnHtml(c.fotos||[],'comp-'+c.id)}
             </div>
             <div>${zpillHtml(c.zona||'')}</div>
-            <div style="font-family:monospace;font-size:10px;color:#0f1117;font-weight:600">${c.tag_planta||'—'}</div>
-            <div style="font-family:monospace;font-size:10px;color:#6b7280">${c.fecha_fab||'—'}</div>
-            <div style="font-family:monospace;font-size:10px">${c.marcado_ex||'—'}</div>
-            <div><span class="cbadge b${c.conformidad||''}">${c.conformidad||'—'}</span></div>
-            <div style="font-size:11px">${c.hallazgo||'—'}</div>
-            <div style="font-size:11px;color:#6b7280">${c.accion||'—'}</div>
+            <div style="font-family:monospace;font-size:10px;color:#0f1117;font-weight:600">${esc(c.tag_planta||'—')}</div>
+            <div style="font-family:monospace;font-size:10px;color:#6b7280">${esc(c.fecha_fab||'—')}</div>
+            <div style="font-family:monospace;font-size:10px">${esc(c.marcado_ex||'—')}</div>
+            <div><span class="cbadge b${confClass(c.conformidad)}">${esc(c.conformidad||'—')}</span></div>
+            <div style="font-size:11px">${esc(c.hallazgo||'—')}</div>
+            <div style="font-size:11px;color:#6b7280">${esc(c.accion||'—')}</div>
           </div>`;
         }
         h+=`</div>`;
@@ -1533,26 +1650,22 @@ async function openFromInforme(eqId){
 
 function exportCSV(){
   const rows=[['Tipo','Equipo / Componente','Equipo principal','Piso','Zona','Fabricación','Marcado Ex','Conformidad','Hallazgo','Acción','Inspector']];
-  for(const r of allRaw){
+  for(const r of reportRows()){
     rows.push([
-      'Equipo',`"${r.equipo_nombre}"`, '',
-      r.piso, r.zona||'', r.fecha_fab||'', r.marcado_ex||'', r.conformidad||'',
-      `"${(r.hallazgo||'').replace(/"/g,"'")}"`,
-      `"${(r.accion||'').replace(/"/g,"'")}"`,
-      `"${r.inspector_nombre||''}"`
+      r.tipo,
+      r.nombre,
+      r.principal,
+      FL[r.piso]||r.piso,
+      r.zona||'',
+      r.fecha_fab||'',
+      r.marcado_ex||'',
+      r.conformidad||'',
+      r.hallazgo||'',
+      r.accion||'',
+      r.inspector_nombre||''
     ]);
-    const comps=allSubRaw.filter(c=>c.equipo_id===r.equipo_id);
-    for(const c of comps){
-      rows.push([
-        'Componente',`"${c.nombre_comp||c.tipo}"`,`"${r.equipo_nombre}"`,
-        r.piso, c.zona||'', c.fecha_fab||'', c.marcado_ex||'', c.conformidad||'',
-        `"${(c.hallazgo||'').replace(/"/g,"'")}"`,
-        `"${(c.accion||'').replace(/"/g,"'")}"`,
-        `"${c.inspector_nombre||''}"`
-      ]);
-    }
   }
-  const blob=new Blob(['\ufeff'+rows.map(r=>r.join(',')).join('\n')],{type:'text/csv;charset=utf-8'});
+  const blob=new Blob(['\ufeff'+rows.map(r=>r.map(csvCell).join(',')).join('\n')],{type:'text/csv;charset=utf-8'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
   a.download=`ATEX_CCU_${new Date().toISOString().slice(0,10)}.csv`; a.click();
   toast('CSV descargado ✓','ok');
@@ -1561,12 +1674,10 @@ function exportCSV(){
 function copyMD(){
   let md=`# Informe ATEX — CCU Chile · Planta Temuco\n\n**Inspector:** ${document.getElementById('i-insp').value||'—'}  \n**Fecha:** ${document.getElementById('i-fecha').value||'—'}  \n**Norma:** UNE-EN 60079-10-2:2010\n\n`;
   md+=`| Tipo | Equipo / Componente | Piso | Zona | Fabricación | Marcado Ex | Estado | Hallazgo |\n|---|---|---|---|---|---|---|---|\n`;
-  for(const r of allRaw){
-    md+=`| **Equipo** | **${r.equipo_nombre}** | ${FL[r.piso]||r.piso} | ${r.zona?'Z'+r.zona:'—'} | ${r.fecha_fab||'—'} | ${r.marcado_ex||'—'} | ${r.conformidad||'—'} | ${r.hallazgo||'—'} |\n`;
-    const comps=allSubRaw.filter(c=>c.equipo_id===r.equipo_id);
-    for(const c of comps){
-      md+=`| ↳ Comp. | ${c.nombre_comp||c.tipo} | ${FL[r.piso]||r.piso} | ${c.zona?'Z'+c.zona:'—'} | ${c.fecha_fab||'—'} | ${c.marcado_ex||'—'} | ${c.conformidad||'—'} | ${c.hallazgo||'—'} |\n`;
-    }
+  for(const r of reportRows()){
+    const tipo=r.tipo==='Equipo'?'**Equipo**':'↳ Comp.';
+    const nombre=r.tipo==='Equipo'?`**${mdCell(r.nombre)}**`:mdCell(r.nombre);
+    md+=`| ${tipo} | ${nombre} | ${mdCell(FL[r.piso]||r.piso)} | ${r.zona?'Z'+mdCell(r.zona):'—'} | ${mdCell(r.fecha_fab||'—')} | ${mdCell(r.marcado_ex||'—')} | ${mdCell(r.conformidad||'—')} | ${mdCell(r.hallazgo||'—')} |\n`;
   }
   navigator.clipboard.writeText(md).then(()=>toast('Markdown copiado ✓','ok')).catch(()=>toast('Error al copiar','err'));
 }
@@ -1576,8 +1687,8 @@ function copyMD(){
 // ═══════════════════════════════════════════════════════════
 async function openSubModal(mode, parentEqId, compId){
   curParentEq=parentEqId; curCompId=compId||null; subConf=''; subPendFiles=[]; subExPaths=[];
-  const eq=EQ.find(e=>e.id===parentEqId);
-  document.getElementById('sm-parent-name').textContent=eq?eq.n:'';
+  const eq=getEqDef(parentEqId);
+  document.getElementById('sm-parent-name').textContent=eq?eqName(parentEqId):'';
   let comp={};
   if(compId){ comp=(subRecs[parentEqId]||[]).find(c=>c.id===compId)||{}; }
   const sv=(fid,v)=>{document.getElementById(fid).value=v||'';};
@@ -1622,13 +1733,13 @@ function addSubPhotos(e){ subPendFiles.push(...e.target.files); e.target.value='
 async function renderSubPhotos(){
   const g=document.getElementById('sm-pgrid'); let h='';
   for(let i=0;i<subExPaths.length;i++){
-    try{ const {data}=await sb.storage.from('atex-fotos').createSignedUrl(subExPaths[i],3600);
-      h+=`<div class="photo-wrap"><img src="${data.signedUrl}" onclick="openLb('${data.signedUrl}')"><button class="photo-rm" onclick="subExPaths.splice(${i},1);renderSubPhotos()">✕</button></div>`;
+    try{ const data=await must(sb.storage.from('atex-fotos').createSignedUrl(subExPaths[i],3600));
+      h+=`<div class="photo-wrap"><img src="${escAttr(data.signedUrl)}" onclick="openLb(${jsArg(data.signedUrl)})"><button class="photo-rm" onclick="subExPaths.splice(${i},1);renderSubPhotos()">✕</button></div>`;
     }catch(e){ h+=`<div style="aspect-ratio:1;background:#eee;border-radius:4px"></div>`; }
   }
   for(let i=0;i<subPendFiles.length;i++){
     const u=URL.createObjectURL(subPendFiles[i]);
-    h+=`<div class="photo-wrap"><img src="${u}" onclick="openLb('${u}')"><button class="photo-rm" onclick="subPendFiles.splice(${i},1);renderSubPhotos()">✕</button></div>`;
+    h+=`<div class="photo-wrap"><img src="${escAttr(u)}" onclick="openLb(${jsArg(u)})"><button class="photo-rm" onclick="subPendFiles.splice(${i},1);renderSubPhotos()">✕</button></div>`;
   }
   g.innerHTML=h;
 }
@@ -1644,7 +1755,7 @@ async function saveComp(){
     for(const f of subPendFiles){
       const ext=f.name.split('.').pop();
       const path=`${session.user.id}/${curParentEq}/comp_${Date.now()}.${ext}`;
-      await sb.storage.from('atex-fotos').upload(path,f,{contentType:f.type});
+      await must(sb.storage.from('atex-fotos').upload(path,f,{contentType:f.type}));
       newPaths.push(path);
     }
     const zonaUso=['20','21','22'].filter(z=>{
@@ -1673,11 +1784,9 @@ async function saveComp(){
     };
     let saved;
     if(curCompId){
-      const {data,error}=await sb.from('componentes').update(payload).eq('id',curCompId).select().single();
-      if(error)throw error; saved=data;
+      saved=await must(sb.from('componentes').update(payload).eq('id',curCompId).select().single());
     } else {
-      const {data,error}=await sb.from('componentes').insert(payload).select().single();
-      if(error)throw error; saved=data;
+      saved=await must(sb.from('componentes').insert(payload).select().single());
     }
     if(!subRecs[curParentEq]) subRecs[curParentEq]=[];
     const idx=subRecs[curParentEq].findIndex(c=>c.id===saved.id);
@@ -1693,8 +1802,7 @@ async function saveComp(){
 async function deleteComp(){
   if(!curCompId||!confirm('¿Eliminar este componente?')) return;
   try {
-    const {error}=await sb.from('componentes').delete().eq('id',curCompId);
-    if(error)throw error;
+    await must(sb.from('componentes').delete().eq('id',curCompId));
     subRecs[curParentEq]=(subRecs[curParentEq]||[]).filter(c=>c.id!==curCompId);
     toast('Componente eliminado','ok');
     closeSubModal();
@@ -1750,8 +1858,7 @@ async function onExpandDrop(e, toEqId){
   const fromId=dragFromEqId, cId=dragCompId;
   dragCompId=null; dragFromEqId=null;
   try {
-    const {error}=await sb.from('componentes').update({equipo_id:toEqId}).eq('id',cId);
-    if(error) throw error;
+    await must(sb.from('componentes').update({equipo_id:toEqId}).eq('id',cId));
     // Update local state
     const comp=(subRecs[fromId]||[]).find(c=>c.id===cId);
     if(comp){
