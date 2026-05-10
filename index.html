@@ -97,6 +97,16 @@ input{width:100%;padding:8px 10px;border:1px solid #ddd9d0;border-radius:4px;fon
 /* ── INFORME ── */
 .card{background:#fff;border:1px solid #ddd9d0;border-radius:8px;padding:16px 18px}
 .btn-lg{padding:11px 24px;font-size:12px}
+.btn-print{background:#F7C600;color:#111}
+.btn-print:hover{background:#0f1117;color:#f5f3ee}
+.nc-head{display:flex;align-items:center;gap:10px;justify-content:space-between;padding:10px 14px;background:#fee2e2;color:#991b1b;border-left:3px solid #dc2626;border-radius:4px;font-size:13px;margin-bottom:8px}
+.nc-head.ok{background:#d1fae5;color:#065f46;border-left-color:#059669}
+.nc-head-main{display:flex;align-items:center;gap:8px;font-weight:600}
+.nc-toggle{background:#fff;border:1px solid rgba(153,27,27,.25);border-radius:4px;color:#991b1b;cursor:pointer;font-family:monospace;font-size:10px;font-weight:600;padding:5px 9px;white-space:nowrap}
+.nc-toggle:hover{background:#fff7f7;border-color:#dc2626}
+.nc-list{display:none}
+.nc-list.on{display:block}
+.nc-item{padding:10px 14px;background:#fff;border:1px solid #ddd9d0;border-left:3px solid #dc2626;border-radius:4px;margin-bottom:8px}
 /* ── LOADER/TOAST ── */
 #loader{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:300;align-items:center;justify-content:center}
 #loader.on{display:flex}
@@ -320,6 +330,7 @@ input[type=file]{display:none}
       <div class="sec-hd">Tabla completa</div>
       <div id="findings" style="overflow-x:auto"><div style="padding:28px;text-align:center;color:#6b7280">Sin datos</div></div>
       <div style="display:flex;gap:10px;margin-top:22px;flex-wrap:wrap">
+        <button class="btn-dark btn-lg btn-print" onclick="printInforme()">PDF / Imprimir</button>
         <button class="btn-dark btn-lg" onclick="exportCSV()">⬇ CSV</button>
         <button class="btn-dark btn-lg" onclick="copyMD()">📋 Markdown</button>
       </div>
@@ -742,6 +753,7 @@ let curParentEq=null, curCompId=null, subConf='', subPendFiles=[], subExPaths=[]
 let customNames={}; // { eqId: nombrePersonalizado }
 let hiddenEqs=new Set(); // ids ocultos
 let equiposExtra=[]; // equipos duplicados guardados en Supabase
+let ncExpanded=false;
 
 // ═══════════════════════════════════════════════════════════
 //  BOOT
@@ -946,6 +958,9 @@ function reportRows(){
       principal:'',
       piso:r.piso,
       zona:r.zona||'',
+      tag_planta:r.tag_planta||'',
+      marca:r.marca||'',
+      modelo:r.modelo||'',
       fecha_fab:r.fecha_fab||'',
       marcado_ex:r.marcado_ex||'',
       conformidad:r.conformidad||'',
@@ -966,6 +981,9 @@ function reportRows(){
       principal:eqName(c.equipo_id),
       piso:parent.piso||eq.p||'',
       zona:c.zona||'',
+      tag_planta:c.tag_planta||'',
+      marca:c.marca||'',
+      modelo:c.modelo||'',
       fecha_fab:c.fecha_fab||'',
       marcado_ex:c.marcado_ex||'',
       conformidad:c.conformidad||'',
@@ -1472,16 +1490,20 @@ function renderFindings(){
   const nc=reportRows().filter(r=>r.conformidad==='NC');
   const el=document.getElementById('nc-sum');
   if(!nc.length){
-    el.innerHTML='<div style="padding:10px 14px;background:#d1fae5;color:#065f46;border-left:3px solid #059669;border-radius:4px;font-size:13px">✓ Sin no conformidades.</div>';
+    el.innerHTML='<div class="nc-head ok"><div class="nc-head-main">✓ Sin no conformidades.</div></div>';
   } else {
-    el.innerHTML=`<div style="padding:10px 14px;background:#fee2e2;color:#991b1b;border-left:3px solid #dc2626;border-radius:4px;font-size:13px;margin-bottom:10px">⚠ ${nc.length} no conformidad${nc.length>1?'es':''}</div>`
-      +nc.map(r=>`<div style="padding:10px 14px;background:#fff;border:1px solid #ddd9d0;border-left:3px solid #dc2626;border-radius:4px;margin-bottom:8px">
+    el.innerHTML=`<div class="nc-head">
+        <div class="nc-head-main"><span id="nc-arrow">${ncExpanded?'▼':'▶'}</span> ⚠ ${nc.length} no conformidad${nc.length>1?'es':''}</div>
+        <button class="nc-toggle" id="nc-toggle-btn" onclick="toggleNC()">${ncExpanded?'Contraer':'Ver detalle'}</button>
+      </div>
+      <div id="nc-list" class="nc-list ${ncExpanded?'on':''}">`
+      +nc.map(r=>`<div class="nc-item">
         <div style="font-weight:500;font-size:13px;cursor:pointer;color:#F7C600" onclick="openFromInforme(${jsArg(r.equipo_id)})">${esc(r.tipo==='Componente'?r.principal+' · '+r.nombre:r.nombre)} ↗</div>
         <div style="font-size:10px;color:#aaa;font-family:monospace;margin-bottom:5px">${esc(r.tipo)} · ${esc(FL[r.piso]||r.piso)}</div>
         <div style="font-size:12px;margin-bottom:3px"><strong>Brechas / Obs.:</strong> ${esc(r.hallazgo||'—')}</div>
         <div style="font-size:12px;color:#6b7280"><strong>Acción:</strong> ${esc(r.accion||'—')}</div>
         ${fotosBtnHtml(r.fotos,'nc-'+r.tipo+'-'+r.id)}
-      </div>`).join('');
+      </div>`).join('')+'</div>';
   }
 
   // ── Árbol Piso → Equipo → Componente ──────────────────
@@ -1600,6 +1622,16 @@ function renderFindings(){
   findEl.innerHTML=h;
 }
 
+function toggleNC(){
+  ncExpanded=!ncExpanded;
+  const panel=document.getElementById('nc-list');
+  const btn=document.getElementById('nc-toggle-btn');
+  const arrow=document.getElementById('nc-arrow');
+  if(panel) panel.classList.toggle('on',ncExpanded);
+  if(btn) btn.textContent=ncExpanded?'Contraer':'Ver detalle';
+  if(arrow) arrow.textContent=ncExpanded?'▼':'▶';
+}
+
 // ── Árbol expand/collapse ─────────────────────────────────
 function togglePiso(piso){
   const body=document.getElementById('ipb-'+piso);
@@ -1680,6 +1712,137 @@ function copyMD(){
     md+=`| ${tipo} | ${nombre} | ${mdCell(FL[r.piso]||r.piso)} | ${r.zona?'Z'+mdCell(r.zona):'—'} | ${mdCell(r.fecha_fab||'—')} | ${mdCell(r.marcado_ex||'—')} | ${mdCell(r.conformidad||'—')} | ${mdCell(r.hallazgo||'—')} |\n`;
   }
   navigator.clipboard.writeText(md).then(()=>toast('Markdown copiado ✓','ok')).catch(()=>toast('Error al copiar','err'));
+}
+
+function printInforme(){
+  const rows=reportRows();
+  if(!rows.length){ toast('No hay datos para imprimir','err'); return; }
+  const win=window.open('','_blank');
+  if(!win){ toast('Permite ventanas emergentes para generar el PDF','err'); return; }
+  win.document.open();
+  win.document.write(buildPrintableInforme(rows));
+  win.document.close();
+  win.focus();
+  setTimeout(()=>win.print(),350);
+}
+
+function buildPrintableInforme(rows){
+  const meta={
+    inspector:document.getElementById('i-insp').value||'—',
+    fecha:document.getElementById('i-fecha').value||'—',
+    area:document.getElementById('i-area').value||'—',
+    rev:document.getElementById('i-rev').value||'—',
+    concl:document.getElementById('i-concl').value||'—'
+  };
+  const items=statusItems();
+  const total=inspectedEqIds().size;
+  const C=items.filter(r=>r.conformidad==='C').length;
+  const NC=items.filter(r=>r.conformidad==='NC').length;
+  const OBS=items.filter(r=>r.conformidad==='OBS').length;
+  const ncRows=rows.filter(r=>r.conformidad==='NC');
+  const pisoOrder=Object.keys(FL);
+  const sorted=[...rows].sort((a,b)=>{
+    const pa=pisoOrder.indexOf(a.piso), pb=pisoOrder.indexOf(b.piso);
+    if(pa!==pb) return (pa<0?99:pa)-(pb<0?99:pb);
+    const ap=(a.principal||a.nombre||'').toLowerCase();
+    const bp=(b.principal||b.nombre||'').toLowerCase();
+    return ap.localeCompare(bp,'es') || (a.tipo||'').localeCompare(b.tipo||'','es') || (a.nombre||'').localeCompare(b.nombre||'','es');
+  });
+  const ncHtml=ncRows.length ? ncRows.map(printNcRowHtml).join('') : '<div class="okbox">Sin no conformidades registradas.</div>';
+  const tableHtml=sorted.map(printTableRowHtml).join('');
+  return `<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Informe ATEX - CCU Temuco</title>
+<style>
+@page{size:A4 landscape;margin:12mm}
+*{box-sizing:border-box}
+body{font-family:Arial,Helvetica,sans-serif;color:#111827;margin:0;background:#fff;font-size:10px;line-height:1.35}
+.cover{border-bottom:3px solid #F7C600;padding-bottom:12px;margin-bottom:14px;display:flex;align-items:flex-start;justify-content:space-between;gap:18px}
+.brand{font-size:24px;font-weight:900;letter-spacing:2px;color:#111}
+.brand span{background:#F7C600;border-radius:3px;color:#111;font-size:12px;margin-left:6px;padding:3px 7px;vertical-align:middle}
+.title{font-size:18px;font-weight:800;margin-top:6px}
+.sub{color:#6b7280;font-family:Consolas,monospace;margin-top:3px}
+.meta{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}
+.meta div,.kpi div,.concl{border:1px solid #d1d5db;border-radius:4px;padding:8px}
+.lbl{display:block;color:#6b7280;font-family:Consolas,monospace;font-size:8px;text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px}
+.kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0 14px}
+.kpi strong{display:block;font-size:22px;font-family:Consolas,monospace}
+h2{font-size:12px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #d1d5db;padding-bottom:5px;margin:16px 0 8px;color:#111}
+.nc{break-inside:avoid;border:1px solid #fecaca;border-left:4px solid #dc2626;border-radius:4px;margin-bottom:7px;padding:8px}
+.nc-name{font-weight:700;color:#991b1b;margin-bottom:3px}
+.okbox{border:1px solid #bbf7d0;border-left:4px solid #059669;border-radius:4px;color:#065f46;padding:8px}
+table{width:100%;border-collapse:collapse;font-size:8.2px}
+th{background:#111827;color:#fff;text-align:left;font-family:Consolas,monospace;font-size:7.5px;letter-spacing:.4px;text-transform:uppercase}
+th,td{border:1px solid #d1d5db;padding:4px;vertical-align:top}
+tbody tr:nth-child(even){background:#f9fafb}
+.badge{display:inline-block;border-radius:3px;font-family:Consolas,monospace;font-weight:700;padding:1px 5px}
+.bC{background:#d1fae5;color:#065f46}.bNC{background:#fee2e2;color:#991b1b}.bOBS{background:#fef3c7;color:#92400e}.bNA{background:#f3f4f6;color:#374151}
+.small{color:#6b7280;font-size:8px}
+.footer{margin-top:14px;color:#6b7280;font-size:8px;text-align:right}
+@media print{button{display:none}}
+</style>
+</head>
+<body>
+  <section class="cover">
+    <div>
+      <div class="brand">SUSTENTA <span>Ex</span></div>
+      <div class="title">Informe ATEX - Levantamiento de Equipos Ex</div>
+      <div class="sub">UNE-EN 60079-10-2:2010 · IEC 60079-10-2:2009</div>
+    </div>
+    <div class="sub" style="text-align:right">CCU Chile · Planta Temuco<br>Edificio de Molino</div>
+  </section>
+  <section class="meta">
+    <div><span class="lbl">Inspector</span>${esc(meta.inspector)}</div>
+    <div><span class="lbl">Fecha</span>${esc(meta.fecha)}</div>
+    <div><span class="lbl">Area</span>${esc(meta.area)}</div>
+    <div><span class="lbl">Revision</span>${esc(meta.rev)}</div>
+  </section>
+  <section class="kpi">
+    <div><span class="lbl">Equipos inspeccionados</span><strong>${total}</strong></div>
+    <div><span class="lbl">Conformes</span><strong style="color:#059669">${C}</strong></div>
+    <div><span class="lbl">No conformidades</span><strong style="color:#dc2626">${NC}</strong></div>
+    <div><span class="lbl">Observaciones</span><strong style="color:#d97706">${OBS}</strong></div>
+  </section>
+  <h2>Conclusiones</h2>
+  <div class="concl">${esc(meta.concl).replace(/\n/g,'<br>')}</div>
+  <h2>No conformidades</h2>
+  ${ncHtml}
+  <h2>Tabla completa</h2>
+  <table>
+    <thead>
+      <tr><th>Tipo</th><th>Equipo / Componente</th><th>Equipo principal</th><th>Piso</th><th>Zona</th><th>TAG</th><th>Marcado Ex</th><th>Estado</th><th>Brechas / Obs.</th><th>Accion</th></tr>
+    </thead>
+    <tbody>${tableHtml}</tbody>
+  </table>
+  <div class="footer">Generado ${esc(new Date().toLocaleString('es-CL'))}</div>
+</body>
+</html>`;
+}
+
+function printNcRowHtml(r){
+  return `<div class="nc">
+    <div class="nc-name">${esc(r.tipo==='Componente'?r.principal+' · '+r.nombre:r.nombre)}</div>
+    <div class="small">${esc(r.tipo)} · ${esc(FL[r.piso]||r.piso)} · ${r.zona?'Z'+esc(r.zona):'Zona —'} · TAG ${esc(r.tag_planta||'—')}</div>
+    <div><strong>Brechas / Obs.:</strong> ${esc(r.hallazgo||'—')}</div>
+    <div><strong>Accion:</strong> ${esc(r.accion||'—')}</div>
+  </div>`;
+}
+
+function printTableRowHtml(r){
+  return `<tr>
+    <td>${esc(r.tipo)}</td>
+    <td><strong>${esc(r.nombre)}</strong>${r.marca||r.modelo?`<div class="small">${esc(r.marca)} ${esc(r.modelo)}</div>`:''}</td>
+    <td>${esc(r.principal||'—')}</td>
+    <td>${esc(FL[r.piso]||r.piso||'—')}</td>
+    <td>${r.zona?'Z'+esc(r.zona):'—'}</td>
+    <td>${esc(r.tag_planta||'—')}</td>
+    <td>${esc(r.marcado_ex||'—')}</td>
+    <td><span class="badge b${confClass(r.conformidad)}">${esc(r.conformidad||'—')}</span></td>
+    <td>${esc(r.hallazgo||'—')}</td>
+    <td>${esc(r.accion||'—')}</td>
+  </tr>`;
 }
 
 // ═══════════════════════════════════════════════════════════
