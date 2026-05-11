@@ -151,6 +151,38 @@ input[type=file]{display:none}
 .comp-add:hover{border-color:#F7C600;color:#F7C600}
 .eq-card .eq-toggle{font-family:monospace;font-size:9px;color:#aaa;margin-left:auto;padding:2px 6px;border:1px solid #eee;border-radius:2px;background:#fafafa;cursor:pointer;user-select:none;white-space:nowrap}
 .eq-card .eq-toggle:hover{border-color:#F7C600;color:#F7C600}
+/* ── BÚSQUEDA GLOBAL ── */
+#search-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:250;padding:16px;overflow-y:auto;align-items:flex-start;justify-content:center}
+#search-bg.on{display:flex}
+.search-box{background:#f5f3ee;border-radius:8px;width:100%;max-width:700px;margin:auto;border-top:3px solid #F7C600;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.45)}
+.search-input-wrap{display:flex;align-items:center;gap:10px;padding:14px 18px;background:#0f1117;border-bottom:1px solid #1e2230}
+.search-input-wrap .si-icon{font-size:16px;color:#F7C600;flex-shrink:0}
+#search-input{flex:1;background:transparent;border:none;color:#f5f3ee;font-size:15px;outline:none;font-family:monospace;letter-spacing:.3px}
+#search-input::placeholder{color:#444}
+.search-close{background:none;border:none;color:#555;font-size:20px;cursor:pointer;flex-shrink:0;line-height:1}
+.search-close:hover{color:#f5f3ee}
+.search-filters{display:flex;gap:6px;padding:9px 14px;background:#1e2230;flex-wrap:wrap;align-items:center}
+.sf-label{font-family:monospace;font-size:9px;color:#444;flex-shrink:0}
+.sf-chip{padding:3px 10px;border:1px solid #2a2f40;border-radius:20px;font-size:10px;cursor:pointer;color:#777;font-family:monospace;transition:all .12s;user-select:none}
+.sf-chip:hover{border-color:#555;color:#ccc}
+.sf-chip.on{background:#F7C600;color:#111;border-color:#F7C600;font-weight:700}
+.search-results{max-height:62vh;overflow-y:auto}
+.search-count{padding:7px 16px;font-family:monospace;font-size:10px;color:#888;background:#eceae3;border-bottom:1px solid #ddd9d0}
+.search-empty{padding:44px;text-align:center;color:#aaa;font-family:monospace;font-size:12px;line-height:1.8}
+.sr-item{display:flex;align-items:flex-start;gap:12px;padding:11px 16px;border-bottom:1px solid #f0ece4;cursor:pointer;transition:background .1s;outline:none}
+.sr-item:hover,.sr-item:focus{background:#f0ece4}
+.sr-item:last-child{border-bottom:none}
+.sr-icon{width:30px;height:30px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;margin-top:1px}
+.sr-icon.eq{background:#fef3c7}
+.sr-icon.comp{background:#ede9fe}
+.sr-body{flex:1;min-width:0}
+.sr-name{font-size:13px;font-weight:600;color:#0f1117;margin-bottom:3px;line-height:1.3}
+.sr-name mark{background:#fef3c7;color:#92400e;border-radius:2px;padding:0 2px;font-style:normal}
+.sr-meta{font-family:monospace;font-size:10px;color:#888;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.sr-meta span{white-space:nowrap}
+.sr-hallazgo{font-size:10px;color:#dc2626;margin-top:4px;font-family:monospace;line-height:1.4}
+.sr-badge{font-family:monospace;font-size:9px;font-weight:700;padding:2px 7px;border-radius:2px;flex-shrink:0;align-self:flex-start;margin-top:2px}
+.sr-shortcut{font-family:monospace;font-size:9px;color:#444;background:#1e2230;border:1px solid #2a2f40;border-radius:3px;padding:2px 6px;margin-left:auto}
 /* ── LIGHTBOX ── */
 #lb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:500;align-items:center;justify-content:center}
 #lb.on{display:flex}
@@ -248,6 +280,9 @@ input[type=file]{display:none}
     </div>
     <div style="display:flex;align-items:center;gap:8px">
       <span id="user-lbl" style="font-family:monospace;font-size:10px;color:#888"></span>
+      <button onclick="openSearch()" style="background:none;border:1px solid #2a2f40;color:#888;font-size:11px;cursor:pointer;border-radius:4px;padding:4px 10px;font-family:monospace;display:flex;align-items:center;gap:5px" title="Ctrl+K">
+        🔍 <span style="display:none" id="srch-hint">Ctrl+K</span>
+      </button>
       <button onclick="doLogout()" style="background:none;border:none;color:#666;font-size:18px;cursor:pointer" title="Salir">⎋</button>
     </div>
   </div>
@@ -333,6 +368,34 @@ input[type=file]{display:none}
         <button class="btn-dark btn-lg btn-print" onclick="printInforme()">PDF / Imprimir</button>
         <button class="btn-dark btn-lg" onclick="exportCSV()">⬇ CSV</button>
         <button class="btn-dark btn-lg" onclick="copyMD()">📋 Markdown</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BÚSQUEDA GLOBAL -->
+<div id="search-bg" onclick="closeSearchBg(event)">
+  <div class="search-box">
+    <div class="search-input-wrap">
+      <span class="si-icon">🔍</span>
+      <input id="search-input" placeholder="Nombre, TAG planta, marca, modelo, zona, hallazgo…"
+        oninput="runSearch()" onkeydown="searchKeydown(event)"
+        autocomplete="off" spellcheck="false">
+      <span class="sr-shortcut">Ctrl+K</span>
+      <button class="search-close" onclick="closeSearch()">✕</button>
+    </div>
+    <div class="search-filters">
+      <span class="sf-label">FILTRAR:</span>
+      <span class="sf-chip on" data-f="all"  onclick="setSfChip(this,'all')">Todo</span>
+      <span class="sf-chip"    data-f="eq"   onclick="setSfChip(this,'eq')">Equipos</span>
+      <span class="sf-chip"    data-f="comp" onclick="setSfChip(this,'comp')">Componentes</span>
+      <span class="sf-chip"    data-f="NC"   onclick="setSfChip(this,'NC')">NC</span>
+      <span class="sf-chip"    data-f="OBS"  onclick="setSfChip(this,'OBS')">Observación</span>
+      <span class="sf-chip"    data-f="C"    onclick="setSfChip(this,'C')">Conforme</span>
+    </div>
+    <div id="search-results">
+      <div class="search-empty">Escribe para buscar entre equipos y componentes<br>
+        <span style="font-size:10px;color:#666">Busca por nombre · TAG · marca · modelo · zona · marcado Ex · hallazgo</span>
       </div>
     </div>
   </div>
@@ -1242,22 +1305,17 @@ async function duplicateEq(){
         await must(sb.from('registros').insert(regPayload));
       }
       // Duplicar componentes
-      for(const c of comps){
-        const cPayload={
-          equipo_id:newId, tipo:c.tipo, nombre_comp:c.nombre_comp,
-          marca:c.marca||'', modelo:c.modelo||'',
-          serie:c.serie||'', tag_planta:c.tag_planta||'', potencia:c.potencia||'',
-          fecha_fab:c.fecha_fab||null,
-          marcado_ex:c.marcado_ex||'', epl:c.epl||'',
-          zona:c.zona||'', temp_max:c.temp_max||'',
-          conformidad:c.conformidad||'',
-          hallazgo:c.hallazgo||'', accion:c.accion||'',
-          fotos:c.fotos||[],
-          inspector_id:session.user.id,
-          inspector_nombre:profile?.full_name||session.user.email,
-        };
-        await must(sb.from('componentes').insert(cPayload));
-      }
+      // Duplicar componentes en paralelo
+      await Promise.all(comps.map(c=>must(sb.from('componentes').insert({
+        equipo_id:newId, tipo:c.tipo, nombre_comp:c.nombre_comp,
+        marca:c.marca||'', modelo:c.modelo||'',
+        serie:c.serie||'', tag_planta:c.tag_planta||'', potencia:c.potencia||'',
+        fecha_fab:c.fecha_fab||null, marcado_ex:c.marcado_ex||'', epl:c.epl||'',
+        zona:c.zona||'', zona_uso:c.zona_uso||[], temp_max:c.temp_max||'',
+        conformidad:c.conformidad||'', hallazgo:c.hallazgo||'', accion:c.accion||'',
+        fotos:c.fotos||[], inspector_id:session.user.id,
+        inspector_nombre:profile?.full_name||session.user.email,
+      }))));
     }
     toast(`${copias} copia${copias>1?'s':''} creada${copias>1?'s':''} ✓`,'ok');
     closeModal();
@@ -1339,16 +1397,18 @@ function setConf(v){ curConf=v; renderRadios(); }
 function renderRadios(){ document.querySelectorAll('#rgrp .ropt').forEach(b=>{ b.className='ropt'; if(b.dataset.v===curConf) b.classList.add('s'+curConf); }); }
 function addPhotos(e){ pendFiles.push(...e.target.files); e.target.value=''; renderPhotos(); }
 async function renderPhotos(){
-  const g=document.getElementById('pgrid'); let h='';
-  for(let i=0;i<exPaths.length;i++){
-    try{ const data=await must(sb.storage.from('atex-fotos').createSignedUrl(exPaths[i],3600));
-      h+=`<div class="photo-wrap"><img src="${escAttr(data.signedUrl)}" onclick="openLb(${jsArg(data.signedUrl)})"><button class="photo-rm" onclick="exPaths.splice(${i},1);renderPhotos()">✕</button></div>`;
-    }catch(e){ h+=`<div style="aspect-ratio:1;background:#eee;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px">Error</div>`; }
-  }
-  for(let i=0;i<pendFiles.length;i++){
-    const u=URL.createObjectURL(pendFiles[i]);
-    h+=`<div class="photo-wrap"><img src="${escAttr(u)}" onclick="openLb(${jsArg(u)})"><button class="photo-rm" onclick="pendFiles.splice(${i},1);renderPhotos()">✕</button></div>`;
-  }
+  const g=document.getElementById('pgrid');
+  const signed=await Promise.all(exPaths.map((p,i)=>
+    sb.storage.from('atex-fotos').createSignedUrl(p,3600)
+      .then(({data})=>({ok:true,url:data.signedUrl,i}))
+      .catch(()=>({ok:false,i}))
+  ));
+  let h='';
+  signed.forEach(r=>{ h+=r.ok
+    ?`<div class="photo-wrap"><img src="${escAttr(r.url)}" onclick="openLb(${jsArg(r.url)})"><button class="photo-rm" onclick="exPaths.splice(${r.i},1);renderPhotos()">✕</button></div>`
+    :`<div style="aspect-ratio:1;background:#eee;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px">Error</div>`; });
+  pendFiles.forEach((f,i)=>{ const u=URL.createObjectURL(f);
+    h+=`<div class="photo-wrap"><img src="${escAttr(u)}" onclick="openLb(${jsArg(u)})"><button class="photo-rm" onclick="pendFiles.splice(${i},1);renderPhotos()">✕</button></div>`; });
   g.innerHTML=h;
 }
 async function saveEq(){
@@ -1851,7 +1911,8 @@ function printTableRowHtml(r){
 async function openSubModal(mode, parentEqId, compId){
   curParentEq=parentEqId; curCompId=compId||null; subConf=''; subPendFiles=[]; subExPaths=[];
   const eq=getEqDef(parentEqId);
-  document.getElementById('sm-parent-name').textContent=eq?eqName(parentEqId):'';
+  if(!eq){ toast('Equipo padre no encontrado','err'); return; }
+  document.getElementById('sm-parent-name').textContent=eqName(parentEqId);
   let comp={};
   if(compId){ comp=(subRecs[parentEqId]||[]).find(c=>c.id===compId)||{}; }
   const sv=(fid,v)=>{document.getElementById(fid).value=v||'';};
@@ -1894,16 +1955,18 @@ function renderSubRadios(){
 }
 function addSubPhotos(e){ subPendFiles.push(...e.target.files); e.target.value=''; renderSubPhotos(); }
 async function renderSubPhotos(){
-  const g=document.getElementById('sm-pgrid'); let h='';
-  for(let i=0;i<subExPaths.length;i++){
-    try{ const data=await must(sb.storage.from('atex-fotos').createSignedUrl(subExPaths[i],3600));
-      h+=`<div class="photo-wrap"><img src="${escAttr(data.signedUrl)}" onclick="openLb(${jsArg(data.signedUrl)})"><button class="photo-rm" onclick="subExPaths.splice(${i},1);renderSubPhotos()">✕</button></div>`;
-    }catch(e){ h+=`<div style="aspect-ratio:1;background:#eee;border-radius:4px"></div>`; }
-  }
-  for(let i=0;i<subPendFiles.length;i++){
-    const u=URL.createObjectURL(subPendFiles[i]);
-    h+=`<div class="photo-wrap"><img src="${escAttr(u)}" onclick="openLb(${jsArg(u)})"><button class="photo-rm" onclick="subPendFiles.splice(${i},1);renderSubPhotos()">✕</button></div>`;
-  }
+  const g=document.getElementById('sm-pgrid');
+  const signed=await Promise.all(subExPaths.map((p,i)=>
+    sb.storage.from('atex-fotos').createSignedUrl(p,3600)
+      .then(({data})=>({ok:true,url:data.signedUrl,i}))
+      .catch(()=>({ok:false,i}))
+  ));
+  let h='';
+  signed.forEach(r=>{ h+=r.ok
+    ?`<div class="photo-wrap"><img src="${escAttr(r.url)}" onclick="openLb(${jsArg(r.url)})"><button class="photo-rm" onclick="subExPaths.splice(${r.i},1);renderSubPhotos()">✕</button></div>`
+    :`<div style="aspect-ratio:1;background:#eee;border-radius:4px"></div>`; });
+  subPendFiles.forEach((f,i)=>{ const u=URL.createObjectURL(f);
+    h+=`<div class="photo-wrap"><img src="${escAttr(u)}" onclick="openLb(${jsArg(u)})"><button class="photo-rm" onclick="subPendFiles.splice(${i},1);renderSubPhotos()">✕</button></div>`; });
   g.innerHTML=h;
 }
 async function saveComp(){
@@ -2041,6 +2104,171 @@ async function onExpandDrop(e, toEqId){
 function updateZonaUso(cb, z){
   const opt=document.getElementById('zuo-'+z);
   if(opt) opt.classList.toggle('sel-'+z, cb.checked);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  BÚSQUEDA GLOBAL
+// ═══════════════════════════════════════════════════════════
+let sfFilter='all';
+let _srIdx=-1;
+
+function openSearch(){
+  document.getElementById('search-bg').classList.add('on');
+  document.body.style.overflow='hidden';
+  const inp=document.getElementById('search-input');
+  setTimeout(()=>{ inp.focus(); inp.select(); },60);
+  runSearch();
+}
+function closeSearch(){
+  document.getElementById('search-bg').classList.remove('on');
+  document.body.style.overflow='';
+  _srIdx=-1;
+}
+function closeSearchBg(e){
+  if(e.target===document.getElementById('search-bg')) closeSearch();
+}
+function setSfChip(el,f){
+  sfFilter=f;
+  document.querySelectorAll('.sf-chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  runSearch();
+}
+
+// Ctrl+K / Cmd+K y Escape
+document.addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key==='k'){ e.preventDefault(); openSearch(); }
+  if(e.key==='Escape'&&document.getElementById('search-bg').classList.contains('on')) closeSearch();
+});
+
+function hlText(text,q){
+  if(!q) return esc(text);
+  const re=new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');
+  return esc(text).replace(re,'<mark>$1</mark>');
+}
+
+function buildSearchIndex(){
+  const items=[];
+  for(const eq of allEqs('all')){
+    const r=recs[eq.id]||{};
+    items.push({
+      tipo:'eq', id:eq.id, nombre:eqName(eq.id),
+      piso:eq.p, grupo:eq.g, zona:r.zona||eq.z||'',
+      tag:r.tag_planta||'', marca:r.marca||'', modelo:r.modelo||'',
+      marcado_ex:r.marcado_ex||'', conformidad:r.conformidad||'',
+      hallazgo:r.hallazgo||'', parentNombre:'', parentId:'', compId:'',
+    });
+  }
+  for(const c of allSubRaw){
+    const pRec=recs[c.equipo_id]||{};
+    const pEq=allEqs('all').find(e=>e.id===c.equipo_id)||{};
+    items.push({
+      tipo:'comp', id:c.id, nombre:c.nombre_comp||c.tipo||'Componente',
+      piso:pRec.piso||pEq.p||'', grupo:c.tipo||'',
+      zona:c.zona||'', tag:c.tag_planta||'',
+      marca:c.marca||'', modelo:c.modelo||'',
+      marcado_ex:c.marcado_ex||'', conformidad:c.conformidad||'',
+      hallazgo:c.hallazgo||'', parentNombre:eqName(c.equipo_id),
+      parentId:c.equipo_id, compId:c.id,
+    });
+  }
+  return items;
+}
+
+function runSearch(){
+  const q=document.getElementById('search-input').value.trim().toLowerCase();
+  const container=document.getElementById('search-results');
+  _srIdx=-1;
+
+  let items=buildSearchIndex();
+
+  // Filtro tipo/conformidad
+  if(sfFilter==='eq')   items=items.filter(it=>it.tipo==='eq');
+  else if(sfFilter==='comp') items=items.filter(it=>it.tipo==='comp');
+  else if(['NC','OBS','C'].includes(sfFilter)) items=items.filter(it=>it.conformidad===sfFilter);
+
+  // Filtro texto — todas las palabras deben aparecer
+  if(q){
+    const words=q.split(/\s+/).filter(Boolean);
+    items=items.filter(it=>{
+      const hay=[it.nombre,it.tag,it.marca,it.modelo,it.zona,
+                 it.marcado_ex,it.hallazgo,it.parentNombre,it.grupo]
+        .join(' ').toLowerCase();
+      return words.every(w=>hay.includes(w));
+    });
+  }
+
+  if(!q&&sfFilter==='all'){
+    container.innerHTML='<div class="search-empty">Escribe para buscar entre equipos y componentes<br><span style="font-size:10px;color:#666">Busca por nombre · TAG · marca · modelo · zona · marcado Ex · hallazgo</span></div>';
+    return;
+  }
+  if(!items.length){
+    container.innerHTML=`<div class="search-empty">Sin resultados para "<strong>${esc(q||sfFilter)}</strong>"<br><span style="font-size:10px;color:#666">Intenta con otra palabra clave</span></div>`;
+    return;
+  }
+
+  // Ordenar NC → OBS → C → NA → sin conformidad, luego alfa
+  const ord={NC:0,OBS:1,C:2,NA:3,'':4};
+  items.sort((a,b)=>(ord[a.conformidad]??4)-(ord[b.conformidad]??4)||a.nombre.localeCompare(b.nombre,'es'));
+
+  const countHtml=`<div class="search-count">${items.length} resultado${items.length!==1?'s':''}${sfFilter!=='all'?' · filtro: <strong>'+sfFilter+'</strong>':''}</div>`;
+
+  const rowsHtml=items.map((it,idx)=>{
+    const pisoLabel=FL[it.piso]||it.piso||'';
+    const meta=[];
+    if(pisoLabel) meta.push(pisoLabel);
+    if(it.tag)    meta.push('TAG: '+esc(it.tag));
+    if(it.marca)  meta.push(esc(it.marca)+(it.modelo?' · '+esc(it.modelo):''));
+    if(it.zona)   meta.push('Z'+esc(it.zona));
+    if(it.marcado_ex) meta.push(esc(it.marcado_ex));
+    if(it.tipo==='comp'&&it.parentNombre) meta.push('↳ '+esc(it.parentNombre));
+
+    const nameHtml=hlText(it.nombre,q);
+    const iconCls=it.tipo==='eq'?'eq':'comp';
+    const iconLbl=it.tipo==='eq'?'⚙':'⬡';
+    const conf=it.conformidad;
+    const onclick=it.tipo==='eq'
+      ?`srOpenEq(${jsArg(it.id)})`
+      :`srOpenComp(${jsArg(it.parentId)},${jsArg(it.compId)})`;
+
+    return `<div class="sr-item" tabindex="0" data-si="${idx}" onclick="${onclick}" onkeydown="srKeyItem(event,${idx})">
+      <div class="sr-icon ${iconCls}">${iconLbl}</div>
+      <div class="sr-body">
+        <div class="sr-name">${nameHtml}</div>
+        <div class="sr-meta">${meta.map(m=>`<span>${m}</span>`).join('')}</div>
+        ${it.hallazgo?`<div class="sr-hallazgo">${esc(it.hallazgo.substring(0,90))}${it.hallazgo.length>90?'…':''}</div>`:''}
+      </div>
+      ${conf?`<span class="sr-badge cbadge b${confClass(conf)}">${esc(conf)}</span>`:''}
+    </div>`;
+  }).join('');
+
+  container.innerHTML=countHtml+'<div id="sr-list">'+rowsHtml+'</div>';
+}
+
+function searchKeydown(e){
+  const items=document.querySelectorAll('#sr-list .sr-item');
+  if(e.key==='ArrowDown'){ e.preventDefault(); _srIdx=Math.min(_srIdx+1,items.length-1); items[_srIdx]?.focus(); }
+  else if(e.key==='ArrowUp'){ e.preventDefault(); _srIdx=Math.max(_srIdx-1,-1); _srIdx<0?document.getElementById('search-input').focus():items[_srIdx]?.focus(); }
+  else if(e.key==='Enter'&&_srIdx<0) document.querySelector('#sr-list .sr-item')?.click();
+}
+function srKeyItem(e,idx){
+  if(e.key==='Enter') document.querySelector(`[data-si="${idx}"]`)?.click();
+  else if(e.key==='ArrowDown'){ e.preventDefault(); _srIdx=idx+1; document.querySelector(`[data-si="${_srIdx}"]`)?.focus()||document.getElementById('search-input').focus(); }
+  else if(e.key==='ArrowUp'){ e.preventDefault(); _srIdx=idx-1; _srIdx<0?document.getElementById('search-input').focus():document.querySelector(`[data-si="${_srIdx}"]`)?.focus(); }
+}
+
+async function srOpenEq(eqId){
+  closeSearch();
+  document.querySelectorAll('.nav-btn').forEach((b,i)=>b.classList.toggle('on',i===0));
+  ['eq','rs','inf'].forEach(t=>{ document.getElementById('tab-'+t).style.display=t==='eq'?'block':'none'; });
+  const eq=allEqs('all').find(e=>e.id===eqId);
+  if(eq){ setFloor(eq.p, document.querySelector(`.chip[onclick="setFloor('${eq.p}',this)"]`)||document.querySelector('.chip.on')); }
+  await openModal(eqId);
+}
+async function srOpenComp(parentId,compId){
+  closeSearch();
+  document.querySelectorAll('.nav-btn').forEach((b,i)=>b.classList.toggle('on',i===0));
+  ['eq','rs','inf'].forEach(t=>{ document.getElementById('tab-'+t).style.display=t==='eq'?'block':'none'; });
+  await openSubModal(null,parentId,compId);
 }
 
 // ═══════════════════════════════════════════════════════════
