@@ -151,6 +151,29 @@ input[type=file]{display:none}
 .comp-add:hover{border-color:#F7C600;color:#F7C600}
 .eq-card .eq-toggle{font-family:monospace;font-size:9px;color:#aaa;margin-left:auto;padding:2px 6px;border:1px solid #eee;border-radius:2px;background:#fafafa;cursor:pointer;user-select:none;white-space:nowrap}
 .eq-card .eq-toggle:hover{border-color:#F7C600;color:#F7C600}
+/* ── CICLOS ── */
+.ciclo-card{background:#fff;border:1px solid #ddd9d0;border-left:4px solid #ccc8be;border-radius:6px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:box-shadow .12s}
+.ciclo-card:hover{box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.ciclo-card.abierto{border-left-color:#059669}
+.ciclo-card.cerrado{border-left-color:#d97706}
+.ciclo-card.aprobado{border-left-color:#6b7280;background:#fafaf8}
+.ciclo-badge{font-family:monospace;font-size:9px;font-weight:700;padding:2px 8px;border-radius:2px;text-transform:uppercase}
+.cb-abierto{background:#d1fae5;color:#065f46}
+.cb-cerrado{background:#fef3c7;color:#92400e}
+.cb-aprobado{background:#f3f4f6;color:#374151}
+.ciclo-tipo{font-family:monospace;font-size:9px;color:#aaa;background:#f3f4f6;padding:1px 6px;border-radius:2px}
+.insp-row{display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid #f0ece4;cursor:pointer;transition:background .1s}
+.insp-row:hover{background:#f5f3ee}
+.insp-row:last-child{border-bottom:none}
+.insp-row.completado{background:#f0fdf4}
+.insp-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.id-pendiente{background:#ddd9d0}
+.id-C{background:#059669}
+.id-NC{background:#dc2626}
+.id-OBS{background:#d97706}
+.id-NA{background:#9ca3af}
+.prog-ciclo{background:#ddd9d0;border-radius:2px;height:6px;overflow:hidden;margin:8px 0 4px}
+.prog-ciclo-bar{height:100%;background:#059669;border-radius:2px;transition:width .4s}
 /* ── BÚSQUEDA GLOBAL ── */
 #search-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:250;padding:16px;overflow-y:auto;align-items:flex-start;justify-content:center}
 #search-bg.on{display:flex}
@@ -290,6 +313,7 @@ input[type=file]{display:none}
     <div class="nav-btn on" onclick="goTab('eq',this)">📋 EQUIPOS</div>
     <div class="nav-btn" onclick="goTab('rs',this)">📊 RESUMEN</div>
     <div class="nav-btn" onclick="goTab('inf',this)">📄 INFORME</div>
+    <div class="nav-btn" onclick="goTab('ciclos',this)">📅 CICLOS</div>
   </div>
 
   <!-- TAB EQUIPOS -->
@@ -371,9 +395,158 @@ input[type=file]{display:none}
       </div>
     </div>
   </div>
+
+  <!-- TAB CICLOS -->
+  <div id="tab-ciclos" style="display:none">
+    <div class="page-wrap">
+
+      <!-- Header con rol y botón crear -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+        <div>
+          <div style="font-size:16px;font-weight:700;color:#0f1117">Ciclos de Inspección</div>
+          <div id="ciclo-rol-lbl" style="font-family:monospace;font-size:10px;color:#aaa;margin-top:2px"></div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button id="btn-nuevo-ciclo" onclick="openNuevoCiclo()" style="display:none;background:#F7C600;color:#111;border:none;border-radius:4px;padding:8px 18px;font-size:11px;font-weight:700;cursor:pointer;font-family:monospace">＋ Nuevo ciclo</button>
+        </div>
+      </div>
+
+      <!-- Lista ciclos -->
+      <div id="ciclos-list"><div style="padding:40px;text-align:center;color:#aaa;font-family:monospace">Cargando ciclos…</div></div>
+
+    </div>
+  </div>
 </div>
 
-<!-- BÚSQUEDA GLOBAL -->
+<!-- MODAL NUEVO CICLO -->
+<div id="mciclo-bg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;padding:16px;overflow-y:auto;align-items:flex-start;justify-content:center">
+  <div class="modal" style="border-top-color:#059669">
+    <div class="modal-head" style="background:#064e3b">
+      <div style="flex:1">
+        <div style="font-size:11px;font-family:monospace;color:#6ee7b7;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">NUEVO CICLO DE INSPECCIÓN</div>
+        <div style="font-size:15px;font-weight:600">Configurar ciclo</div>
+      </div>
+      <button onclick="closeNuevoCiclo()" style="background:none;border:none;color:#666;font-size:20px;cursor:pointer">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="two-col">
+        <div style="grid-column:1/-1"><div class="field-lbl">Nombre del ciclo</div><input class="field-input" id="nc-nombre" placeholder="Ej: Inspección Anual 2025 · Intervención Motor P3"></div>
+        <div><div class="field-lbl">Tipo</div>
+          <select class="field-sel" id="nc-tipo">
+            <option value="anual">Anual</option>
+            <option value="semestral">Semestral</option>
+            <option value="intervencion">Intervención puntual</option>
+          </select>
+        </div>
+        <div><div class="field-lbl">Fecha inicio</div><input class="field-input" id="nc-fecha" type="date"></div>
+        <div style="grid-column:1/-1"><div class="field-lbl">Notas / Alcance</div><textarea class="field-ta" id="nc-notas" placeholder="Alcance, áreas incluidas, motivo de la intervención…" style="min-height:60px"></textarea></div>
+      </div>
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:4px;padding:10px 14px;font-size:11px;color:#065f46;font-family:monospace">
+        ℹ El sistema copiará automáticamente el estado actual de todos los equipos como línea base de este ciclo.
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-out" onclick="closeNuevoCiclo()">Cancelar</button>
+      <button class="btn-save" style="background:#059669" onclick="crearCiclo()" id="btn-crear-ciclo">CREAR CICLO</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL INSPECCIÓN EQUIPO EN CICLO -->
+<div id="minsp-bg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;padding:16px;overflow-y:auto;align-items:flex-start;justify-content:center">
+  <div class="modal" style="border-top-color:#0ea5e9;max-width:720px">
+    <div class="modal-head" style="background:#0c4a6e">
+      <div style="flex:1">
+        <div style="font-size:11px;font-family:monospace;color:#7dd3fc;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px" id="minsp-ciclo-nombre"></div>
+        <div style="font-size:15px;font-weight:600" id="minsp-eq-nombre"></div>
+        <div style="font-family:monospace;font-size:10px;color:#7dd3fc;margin-top:2px" id="minsp-eq-meta"></div>
+      </div>
+      <button onclick="closeInspModal()" style="background:none;border:none;color:#666;font-size:20px;cursor:pointer">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- Estado línea base -->
+      <div style="background:#1e2230;border-radius:6px;padding:12px 14px;margin-bottom:4px">
+        <div style="font-size:9px;font-weight:700;color:#F7C600;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">LÍNEA BASE (estado anterior)</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div><div style="font-size:9px;color:#888;font-family:monospace;margin-bottom:2px">CONFORMIDAD</div>
+            <span id="base-conf-badge" class="cbadge" style="font-size:11px">—</span></div>
+          <div><div style="font-size:9px;color:#888;font-family:monospace;margin-bottom:2px">MARCADO Ex</div>
+            <span id="base-mex" style="font-family:monospace;font-size:11px;color:#f5f3ee">—</span></div>
+          <div style="grid-column:1/-1"><div style="font-size:9px;color:#888;font-family:monospace;margin-bottom:2px">HALLAZGO / ACCIÓN ANTERIOR</div>
+            <div id="base-hallazgo" style="font-size:11px;color:#f5f3ee;line-height:1.4">—</div>
+            <div id="base-accion" style="font-size:10px;color:#aaa;margin-top:3px;font-family:monospace">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Verificación acción correctiva -->
+      <div style="font-size:10px;font-weight:600;color:#0ea5e9;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">Verificación acción correctiva</div>
+      <div>
+        <div class="field-lbl">¿Se implementó la acción correctiva anterior?</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
+          <span class="ropt" data-av="si" onclick="setAccionVerif('si',this)">✓ Sí — Implementada</span>
+          <span class="ropt" data-av="parcial" onclick="setAccionVerif('parcial',this)">◐ Parcial</span>
+          <span class="ropt" data-av="no" onclick="setAccionVerif('no',this)">✕ No implementada</span>
+          <span class="ropt" data-av="na" onclick="setAccionVerif('na',this)">— No aplica</span>
+        </div>
+      </div>
+      <div><div class="field-lbl">Observación verificación</div><textarea class="field-ta" id="insp-av-obs" placeholder="Detallar resultado de la verificación…" style="min-height:48px"></textarea></div>
+
+      <!-- Nuevo estado -->
+      <div style="font-size:10px;font-weight:600;color:#0ea5e9;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">Nuevo estado</div>
+      <div class="two-col">
+        <div><div class="field-lbl">Marcado Ex actualizado</div><input class="field-input" id="insp-mex" placeholder="Ex db IIB T3 Gb"></div>
+        <div><div class="field-lbl">EPL / Categoría</div>
+          <select class="field-sel" id="insp-epl">
+            <option value="">— seleccionar —</option>
+            <option>EPL Da / Cat. 1D — Muy alta</option>
+            <option>EPL Db / Cat. 2D — Alta</option>
+            <option>EPL Dc / Cat. 3D — Mejorada</option>
+            <option>Sin marcado Ex — requiere reemplazo</option>
+            <option>Marcado no visible / ilegible</option>
+            <option>Equipo no eléctrico / mecánico</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <div class="field-lbl">Conformidad</div>
+        <div class="radio-grp" id="insp-rgrp">
+          <span class="ropt" data-v="C"   onclick="setInspConf('C',this)">C — Conforme</span>
+          <span class="ropt" data-v="NC"  onclick="setInspConf('NC',this)">NC — No conforme</span>
+          <span class="ropt" data-v="OBS" onclick="setInspConf('OBS',this)">OBS — Observación</span>
+          <span class="ropt" data-v="NA"  onclick="setInspConf('NA',this)">NA — No aplica</span>
+        </div>
+      </div>
+      <div><div class="field-lbl">Hallazgos</div><textarea class="field-ta" id="insp-hallazgo" placeholder="Nuevas brechas, cambios de estado…"></textarea></div>
+      <div><div class="field-lbl">Acción correctiva</div><textarea class="field-ta" id="insp-accion" placeholder="Reemplazo, certificación pendiente…"></textarea></div>
+
+      <!-- Fotos OBLIGATORIAS -->
+      <div style="font-size:10px;font-weight:600;color:#0ea5e9;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">
+        Fotografías <span style="color:#dc2626;font-size:10px;font-family:monospace">* obligatorio</span>
+      </div>
+      <div class="photo-zone" id="insp-photo-zone">
+        <div class="photo-grid" id="insp-pgrid"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn-dark" onclick="document.getElementById('insp-cam').click()" style="font-size:11px;padding:6px 14px">📷 Tomar foto</button>
+          <button class="btn-dark" onclick="document.getElementById('insp-gal').click()" style="font-size:11px;padding:6px 14px;background:#444">🖼 Galería</button>
+        </div>
+        <input type="file" id="insp-cam" accept="image/*" capture="environment" onchange="addInspPhotos(event)">
+        <input type="file" id="insp-gal" accept="image/*" multiple onchange="addInspPhotos(event)">
+        <div id="insp-foto-warn" style="display:none;font-size:10px;color:#dc2626;margin-top:6px;font-family:monospace">⚠ Se requiere al menos 1 foto para guardar</div>
+      </div>
+
+      <!-- Componentes -->
+      <div style="font-size:10px;font-weight:600;color:#7c3aed;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">Componentes del equipo</div>
+      <div id="insp-comps-list"></div>
+
+    </div>
+    <div class="modal-foot">
+      <button class="btn-out" onclick="closeInspModal()">Cancelar</button>
+      <button class="btn-save" style="background:#0ea5e9" onclick="saveInspeccion()" id="btn-save-insp">GUARDAR INSPECCIÓN</button>
+    </div>
+  </div>
+</div>
 <div id="search-bg" onclick="closeSearchBg(event)">
   <div class="search-box">
     <div class="search-input-wrap">
@@ -817,6 +990,9 @@ let customNames={}; // { eqId: nombrePersonalizado }
 let hiddenEqs=new Set(); // ids ocultos
 let equiposExtra=[]; // equipos duplicados guardados en Supabase
 let ncExpanded=false;
+// ── CICLOS ──
+let ciclos=[], curCiclo=null, curInspEqId=null, curInspId=null;
+let inspConf='', accionVerif='', inspPendFiles=[], inspExPaths=[];
 
 // ═══════════════════════════════════════════════════════════
 //  BOOT
@@ -915,9 +1091,10 @@ async function doLogout(){
 function goTab(name,el){
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('on'));
   el.classList.add('on');
-  ['eq','rs','inf'].forEach(t=>{ document.getElementById('tab-'+t).style.display=t===name?'block':'none'; });
+  ['eq','rs','inf','ciclos'].forEach(t=>{ document.getElementById('tab-'+t).style.display=t===name?'block':'none'; });
   if(name==='rs') renderResumen();
   if(name==='inf') loadAndRenderInforme();
+  if(name==='ciclos') loadCiclos();
 }
 
 async function loadAndRenderInforme(){
@@ -2104,6 +2281,607 @@ async function onExpandDrop(e, toEqId){
 function updateZonaUso(cb, z){
   const opt=document.getElementById('zuo-'+z);
   if(opt) opt.classList.toggle('sel-'+z, cb.checked);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  MÓDULO CICLOS DE INSPECCIÓN
+// ═══════════════════════════════════════════════════════════
+
+// ── Helpers rol ──────────────────────────────────────────
+function userRol(){ return profile?.rol||'inspector'; }
+function canEdit(){ return ['supervisor','admin'].includes(userRol()); }
+function isAdmin(){ return userRol()==='admin'; }
+
+// ── Cargar y renderizar lista de ciclos ──────────────────
+async function loadCiclos(){
+  // Mostrar/ocultar botón según rol
+  const btnNuevo=document.getElementById('btn-nuevo-ciclo');
+  if(btnNuevo) btnNuevo.style.display=canEdit()?'inline-block':'none';
+  document.getElementById('ciclo-rol-lbl').textContent='Rol: '+userRol().toUpperCase();
+
+  const container=document.getElementById('ciclos-list');
+  container.innerHTML='<div style="padding:30px;text-align:center;color:#aaa;font-family:monospace">Cargando…</div>';
+  try {
+    const {data,error}=await sb.from('ciclos').select('*').order('created_at',{ascending:false});
+    if(error) throw error;
+    ciclos=data||[];
+    renderCiclosList();
+  } catch(e){ container.innerHTML=`<div style="padding:30px;text-align:center;color:#dc2626;font-family:monospace">Error: ${esc(e.message)}</div>`; }
+}
+
+function renderCiclosList(){
+  const container=document.getElementById('ciclos-list');
+  if(!ciclos.length){
+    container.innerHTML=`<div style="padding:60px;text-align:center;color:#aaa">
+      <div style="font-size:32px;margin-bottom:12px">📅</div>
+      <div style="font-family:monospace;font-size:12px">Sin ciclos de inspección aún</div>
+      ${canEdit()?'<div style="font-size:11px;color:#bbb;margin-top:6px">Crea el primer ciclo con el botón superior</div>':''}
+    </div>`;
+    return;
+  }
+  const abiertos=ciclos.filter(c=>c.estado==='abierto');
+  const resto=ciclos.filter(c=>c.estado!=='abierto');
+  let h='';
+  if(abiertos.length){
+    h+=`<div class="sec-hd" style="margin-top:0">Ciclos abiertos</div>`;
+    abiertos.forEach(c=>{ h+=cicloCardHtml(c); });
+  }
+  if(resto.length){
+    h+=`<div class="sec-hd">Historial</div>`;
+    resto.forEach(c=>{ h+=cicloCardHtml(c); });
+  }
+  container.innerHTML=h;
+}
+
+function cicloCardHtml(c){
+  const tipoBadge={anual:'Anual',semestral:'Semestral',intervencion:'Intervención'}[c.tipo]||c.tipo;
+  const estadoBadge=`<span class="ciclo-badge cb-${c.estado}">${c.estado}</span>`;
+  const acciones=[];
+  if(c.estado==='abierto'){
+    acciones.push(`<button onclick="event.stopPropagation();openCicloDetalle('${c.id}')" style="background:#0ea5e9;color:#fff;border:none;border-radius:4px;padding:5px 12px;font-size:10px;font-family:monospace;cursor:pointer">Ver inspecciones</button>`);
+    if(canEdit()) acciones.push(`<button onclick="event.stopPropagation();cerrarCiclo('${c.id}')" style="background:none;border:1px solid #d97706;color:#d97706;border-radius:4px;padding:5px 12px;font-size:10px;font-family:monospace;cursor:pointer">Cerrar ciclo</button>`);
+  } else if(c.estado==='cerrado'){
+    acciones.push(`<button onclick="event.stopPropagation();openCicloDetalle('${c.id}')" style="background:#0f1117;color:#fff;border:none;border-radius:4px;padding:5px 12px;font-size:10px;font-family:monospace;cursor:pointer">Ver informe</button>`);
+    if(isAdmin()) acciones.push(`<button onclick="event.stopPropagation();aprobarCiclo('${c.id}')" style="background:#059669;color:#fff;border:none;border-radius:4px;padding:5px 12px;font-size:10px;font-family:monospace;cursor:pointer">✓ Aprobar</button>`);
+  } else {
+    acciones.push(`<button onclick="event.stopPropagation();openCicloDetalle('${c.id}')" style="background:#6b7280;color:#fff;border:none;border-radius:4px;padding:5px 12px;font-size:10px;font-family:monospace;cursor:pointer">Ver informe</button>`);
+  }
+  return `<div class="ciclo-card ${c.estado}">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap">
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap">
+          ${estadoBadge}
+          <span class="ciclo-tipo">${esc(tipoBadge)}</span>
+          <span style="font-family:monospace;font-size:10px;color:#aaa">${c.fecha_ini||''}</span>
+        </div>
+        <div style="font-size:15px;font-weight:600;margin-bottom:3px">${esc(c.nombre)}</div>
+        ${c.notas?`<div style="font-size:11px;color:#6b7280;margin-bottom:5px">${esc(c.notas)}</div>`:''}
+        <div style="font-family:monospace;font-size:9px;color:#aaa">Creado por ${esc(c.creado_nombre||'—')}</div>
+        ${c.aprobado_nombre?`<div style="font-family:monospace;font-size:9px;color:#059669">✓ Aprobado por ${esc(c.aprobado_nombre)} · ${new Date(c.aprobado_at).toLocaleDateString('es-CL')}</div>`:''}
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:flex-start">
+        ${acciones.join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── Nuevo ciclo ──────────────────────────────────────────
+function openNuevoCiclo(){
+  document.getElementById('nc-nombre').value='';
+  document.getElementById('nc-tipo').value='anual';
+  document.getElementById('nc-fecha').value=new Date().toISOString().slice(0,10);
+  document.getElementById('nc-notas').value='';
+  document.getElementById('mciclo-bg').style.display='flex';
+  document.body.style.overflow='hidden';
+}
+function closeNuevoCiclo(){
+  document.getElementById('mciclo-bg').style.display='none';
+  document.body.style.overflow='';
+}
+
+async function crearCiclo(){
+  const nombre=document.getElementById('nc-nombre').value.trim();
+  if(!nombre){ toast('Ingresa un nombre para el ciclo','err'); return; }
+  const btn=document.getElementById('btn-crear-ciclo');
+  btn.disabled=1; btn.textContent='Creando…';
+  try {
+    // Crear el ciclo
+    const {data:ciclo,error}=await sb.from('ciclos').insert({
+      nombre,
+      tipo:document.getElementById('nc-tipo').value,
+      fecha_ini:document.getElementById('nc-fecha').value,
+      notas:document.getElementById('nc-notas').value.trim(),
+      estado:'abierto',
+      creado_por:session.user.id,
+      creado_nombre:profile?.full_name||session.user.email,
+    }).select().single();
+    if(error) throw error;
+
+    // Snapshot de todos los equipos visibles como inspecciones base
+    const eqsVisibles=allEqs('all');
+    const inspRows=eqsVisibles.map(eq=>{
+      const r=recs[eq.id]||{};
+      return {
+        ciclo_id:ciclo.id,
+        equipo_id:eq.id,
+        equipo_nombre:eqName(eq.id),
+        piso:eq.p,
+        base_conformidad:r.conformidad||'',
+        base_hallazgo:r.hallazgo||'',
+        base_accion:r.accion||'',
+        base_marcado_ex:r.marcado_ex||'',
+        completado:false,
+      };
+    });
+    // Insertar en lotes de 50
+    for(let i=0;i<inspRows.length;i+=50){
+      const {error:ie}=await sb.from('inspecciones').insert(inspRows.slice(i,i+50));
+      if(ie) throw ie;
+    }
+
+    toast(`Ciclo "${nombre}" creado con ${inspRows.length} equipos ✓`,'ok');
+    closeNuevoCiclo();
+    await loadCiclos();
+  } catch(e){ toast('Error: '+e.message,'err'); }
+  btn.disabled=0; btn.textContent='CREAR CICLO';
+}
+
+// ── Detalle ciclo (lista de inspecciones) ─────────────────
+async function openCicloDetalle(cicloId){
+  curCiclo=ciclos.find(c=>c.id===cicloId);
+  if(!curCiclo) return;
+
+  const container=document.getElementById('ciclos-list');
+  container.innerHTML='<div style="padding:30px;text-align:center;color:#aaa;font-family:monospace">Cargando inspecciones…</div>';
+
+  try {
+    const {data,error}=await sb.from('inspecciones').select('*')
+      .eq('ciclo_id',cicloId).order('piso').order('equipo_nombre');
+    if(error) throw error;
+
+    const inspArr=data||[];
+    const total=inspArr.length;
+    const completados=inspArr.filter(i=>i.completado).length;
+    const pct=total?Math.round(completados/total*100):0;
+    const pisoOrder=Object.keys(FL);
+    const byPiso={};
+    inspArr.forEach(i=>{ if(!byPiso[i.piso]) byPiso[i.piso]=[]; byPiso[i.piso].push(i); });
+
+    let h=`<div style="margin-bottom:16px">
+      <button onclick="loadCiclos()" style="background:none;border:none;color:#F7C600;font-family:monospace;font-size:11px;cursor:pointer;padding:0;margin-bottom:10px">← Volver a ciclos</button>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px">
+        <div>
+          <div style="font-size:16px;font-weight:700">${esc(curCiclo.nombre)}</div>
+          <div style="font-family:monospace;font-size:10px;color:#aaa;margin-top:2px">${esc(curCiclo.tipo)} · ${esc(curCiclo.fecha_ini||'')}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-family:monospace;font-size:10px;color:#aaa">PROGRESO</div>
+          <div style="font-family:monospace;font-size:24px;font-weight:700;color:${pct===100?'#059669':'#F7C600'}">${pct}%</div>
+          <div style="font-family:monospace;font-size:10px;color:#aaa">${completados}/${total} equipos</div>
+        </div>
+      </div>
+      <div class="prog-ciclo"><div class="prog-ciclo-bar" style="width:${pct}%"></div></div>
+    </div>`;
+
+    // Filtro rápido
+    h+=`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
+      <span class="chip on" onclick="filterInspList('all',this)">TODOS</span>
+      <span class="chip" onclick="filterInspList('pendiente',this)">Pendientes</span>
+      <span class="chip" onclick="filterInspList('NC',this)">NC</span>
+      <span class="chip" onclick="filterInspList('OBS',this)">OBS</span>
+      <span class="chip" onclick="filterInspList('C',this)">Conformes</span>
+    </div>`;
+
+    h+=`<div id="insp-list-wrap">`;
+    for(const piso of [...pisoOrder,'']){
+      const rows=(byPiso[piso]||[]);
+      if(!rows.length) continue;
+      h+=`<div class="sec-hd" style="${piso===pisoOrder[0]?'margin-top:0':''}">${esc(FL[piso]||piso||'Sin piso')}</div>
+      <div style="background:#fff;border:1px solid #ddd9d0;border-radius:6px;overflow:hidden;margin-bottom:10px">`;
+      rows.forEach(insp=>{
+        const dotCls=insp.completado?(insp.conformidad?'id-'+insp.conformidad:'id-C'):'id-pendiente';
+        const estadoLabel=insp.completado?(insp.conformidad||'—'):'Pendiente';
+        const canInspect=curCiclo.estado==='abierto';
+        h+=`<div class="insp-row ${insp.completado?'completado':''}" data-conf="${insp.completado?insp.conformidad:''}" data-comp="${insp.completado?'1':'0'}"
+          onclick="${canInspect?`openInspModal('${cicloId}','${insp.id}','${insp.equipo_id}')`:''}"
+          style="${canInspect?'':'cursor:default'}">
+          <div class="insp-dot ${dotCls}"></div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(insp.equipo_nombre)}</div>
+            ${insp.completado&&insp.inspector_nombre?`<div style="font-family:monospace;font-size:9px;color:#aaa">${esc(insp.inspector_nombre)} · ${insp.fecha_insp||''}</div>`:''}
+            ${insp.completado&&insp.hallazgo?`<div style="font-size:10px;color:#6b7280;margin-top:1px">${esc(insp.hallazgo.substring(0,60))}${insp.hallazgo.length>60?'…':''}</div>`:''}
+          </div>
+          <span class="cbadge b${confClass(insp.completado?insp.conformidad:'')||''}" style="font-size:9px">${estadoLabel}</span>
+          ${canInspect?'<span style="color:#aaa;font-size:12px">›</span>':''}
+        </div>`;
+      });
+      h+=`</div>`;
+    }
+    h+=`</div>`; // insp-list-wrap
+
+    // Botones según estado y rol
+    if(curCiclo.estado==='abierto'&&canEdit()){
+      h+=`<div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="exportCicloCSV('${cicloId}')" class="btn-dark btn-lg">⬇ CSV ciclo</button>
+        <button onclick="cerrarCiclo('${cicloId}')" style="background:none;border:1.5px solid #d97706;color:#d97706;border-radius:4px;padding:8px 18px;font-size:11px;font-weight:600;cursor:pointer;font-family:monospace">Cerrar ciclo</button>
+      </div>`;
+    } else if(curCiclo.estado!=='abierto'){
+      h+=`<div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="exportCicloCSV('${cicloId}')" class="btn-dark btn-lg">⬇ CSV ciclo</button>
+        <button onclick="printCicloInforme('${cicloId}')" class="btn-dark btn-lg btn-print">PDF Comparativo</button>
+      </div>`;
+    }
+
+    container.innerHTML=h;
+  } catch(e){ container.innerHTML=`<div style="padding:30px;text-align:center;color:#dc2626">${esc(e.message)}</div>`; }
+}
+
+function filterInspList(f,el){
+  document.querySelectorAll('#ciclos-list .chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  document.querySelectorAll('#insp-list-wrap .insp-row').forEach(row=>{
+    const conf=row.dataset.conf;
+    const comp=row.dataset.comp==='1';
+    let show=true;
+    if(f==='pendiente') show=!comp;
+    else if(f==='NC'||f==='OBS'||f==='C') show=comp&&conf===f;
+    row.style.display=show?'':'none';
+  });
+}
+
+// ── Modal inspección equipo ───────────────────────────────
+async function openInspModal(cicloId,inspId,eqId){
+  curCiclo=ciclos.find(c=>c.id===cicloId)||curCiclo;
+  curInspEqId=eqId; curInspId=inspId;
+  inspConf=''; accionVerif=''; inspPendFiles=[]; inspExPaths=[];
+
+  // Cargar datos de la inspección
+  const {data:insp}=await sb.from('inspecciones').select('*').eq('id',inspId).single();
+  if(!insp){ toast('Error cargando inspección','err'); return; }
+
+  // Header modal
+  document.getElementById('minsp-ciclo-nombre').textContent=curCiclo?.nombre||'';
+  document.getElementById('minsp-eq-nombre').textContent=eqName(eqId);
+  const eq=getEqDef(eqId)||{};
+  document.getElementById('minsp-eq-meta').textContent=(FL[insp.piso]||insp.piso||'')+(eq.g?' · '+eq.g:'');
+
+  // Línea base
+  const bConf=insp.base_conformidad||'';
+  const badge=document.getElementById('base-conf-badge');
+  badge.textContent=bConf||'—';
+  badge.className='cbadge'+(bConf?' b'+bConf:'');
+  document.getElementById('base-mex').textContent=insp.base_marcado_ex||'—';
+  document.getElementById('base-hallazgo').textContent=insp.base_hallazgo||'Sin hallazgos registrados';
+  document.getElementById('base-accion').textContent=insp.base_accion?'→ '+insp.base_accion:'';
+
+  // Si ya tenía datos previos, pre-rellenar
+  const fv=(id,v)=>{ const el=document.getElementById(id); if(el) el.value=v||''; };
+  fv('insp-mex',insp.marcado_ex);
+  fv('insp-epl',insp.epl);
+  fv('insp-hallazgo',insp.hallazgo);
+  fv('insp-accion',insp.accion);
+  fv('insp-av-obs',insp.accion_resultado);
+  inspConf=insp.conformidad||'';
+  accionVerif=insp.accion_verificada?'si':'';
+  if(insp.accion_resultado&&!insp.accion_verificada) accionVerif='no';
+  renderInspRadios();
+  renderAvRadios();
+
+  // Fotos existentes
+  inspExPaths=insp.fotos||[];
+  await renderInspPhotos();
+  document.getElementById('insp-foto-warn').style.display='none';
+
+  // Componentes del equipo en este ciclo
+  await renderInspComps(cicloId,inspId,eqId);
+
+  document.getElementById('minsp-bg').style.display='flex';
+  document.body.style.overflow='hidden';
+}
+
+function closeInspModal(){
+  document.getElementById('minsp-bg').style.display='none';
+  document.body.style.overflow='';
+}
+
+function setInspConf(v,el){
+  inspConf=v;
+  renderInspRadios();
+}
+function renderInspRadios(){
+  document.querySelectorAll('#insp-rgrp .ropt').forEach(b=>{
+    b.className='ropt'; if(b.dataset.v===inspConf) b.classList.add('s'+inspConf);
+  });
+}
+function setAccionVerif(v,el){
+  accionVerif=v;
+  renderAvRadios();
+}
+function renderAvRadios(){
+  document.querySelectorAll('[data-av]').forEach(b=>{
+    b.className='ropt'; if(b.dataset.av===accionVerif) b.classList.add('sC');
+  });
+}
+
+function addInspPhotos(e){ inspPendFiles.push(...e.target.files); e.target.value=''; renderInspPhotos(); }
+async function renderInspPhotos(){
+  const g=document.getElementById('insp-pgrid');
+  const signed=await Promise.all(inspExPaths.map((p,i)=>
+    sb.storage.from('atex-fotos').createSignedUrl(p,3600)
+      .then(({data})=>({ok:true,url:data.signedUrl,i}))
+      .catch(()=>({ok:false,i}))
+  ));
+  let h='';
+  signed.forEach(r=>{ h+=r.ok
+    ?`<div class="photo-wrap"><img src="${escAttr(r.url)}" onclick="openLb(${jsArg(r.url)})"><button class="photo-rm" onclick="inspExPaths.splice(${r.i},1);renderInspPhotos()">✕</button></div>`
+    :`<div style="aspect-ratio:1;background:#eee;border-radius:4px"></div>`; });
+  inspPendFiles.forEach((f,i)=>{ const u=URL.createObjectURL(f);
+    h+=`<div class="photo-wrap"><img src="${escAttr(u)}" onclick="openLb(${jsArg(u)})"><button class="photo-rm" onclick="inspPendFiles.splice(${i},1);renderInspPhotos()">✕</button></div>`; });
+  g.innerHTML=h;
+}
+
+async function renderInspComps(cicloId,inspId,eqId){
+  const el=document.getElementById('insp-comps-list');
+  const comps=subRecs[eqId]||[];
+  if(!comps.length){
+    el.innerHTML='<div style="font-size:11px;color:#aaa;font-family:monospace;padding:8px 0">Sin componentes registrados en línea base</div>';
+    return;
+  }
+  // Cargar inspecciones_comp existentes para este ciclo+equipo
+  const {data:ic}=await sb.from('inspecciones_comp')
+    .select('*').eq('ciclo_id',cicloId).eq('equipo_id',eqId);
+  const icMap={};
+  (ic||[]).forEach(r=>{ icMap[r.comp_id]=r; });
+
+  el.innerHTML=comps.map(c=>{
+    const ic=icMap[c.id]||{};
+    const conf=ic.conformidad||c.conformidad||'';
+    const dotCls=ic.id?'id-'+(conf||'C'):'id-pendiente';
+    return `<div class="insp-row" onclick="openInspCompModal('${cicloId}','${inspId}','${eqId}','${c.id}')"
+      style="border:1px solid #f0ece4;border-radius:4px;margin-bottom:4px">
+      <div class="insp-dot ${dotCls}"></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:11px;font-weight:600">${esc(c.nombre_comp||c.tipo)}</div>
+        <div style="font-family:monospace;font-size:9px;color:#aaa">${esc(c.tipo||'—')}</div>
+        ${ic.hallazgo?`<div style="font-size:10px;color:#6b7280">${esc(ic.hallazgo.substring(0,50))}</div>`:''}
+      </div>
+      <span class="cbadge b${confClass(conf)||''}" style="font-size:9px">${conf||'Pendiente'}</span>
+      <span style="color:#aaa;font-size:12px">›</span>
+    </div>`;
+  }).join('');
+}
+
+async function saveInspeccion(){
+  if(!curInspId) return;
+  // Fotos obligatorias
+  if(!inspExPaths.length&&!inspPendFiles.length){
+    document.getElementById('insp-foto-warn').style.display='block';
+    toast('Se requiere al menos 1 foto','err'); return;
+  }
+  if(!inspConf){ toast('Selecciona la conformidad','err'); return; }
+  const btn=document.getElementById('btn-save-insp');
+  btn.disabled=1; btn.textContent='Guardando…';
+  try {
+    // Subir fotos nuevas
+    const newPaths=await Promise.all(inspPendFiles.map(async f=>{
+      const ext=f.name.split('.').pop();
+      const path=`ciclos/${curInspId}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+      await sb.storage.from('atex-fotos').upload(path,f,{contentType:f.type});
+      return path;
+    }));
+    const allFotos=[...inspExPaths,...newPaths];
+
+    await must(sb.from('inspecciones').update({
+      conformidad:inspConf,
+      hallazgo:document.getElementById('insp-hallazgo').value.trim(),
+      accion:document.getElementById('insp-accion').value.trim(),
+      marcado_ex:document.getElementById('insp-mex').value.trim(),
+      epl:document.getElementById('insp-epl').value,
+      accion_verificada:accionVerif==='si',
+      accion_resultado:document.getElementById('insp-av-obs').value.trim(),
+      fotos:allFotos,
+      inspector_id:session.user.id,
+      inspector_nombre:profile?.full_name||session.user.email,
+      fecha_insp:new Date().toISOString().slice(0,10),
+      completado:true,
+      updated_at:new Date().toISOString(),
+    }).eq('id',curInspId));
+
+    toast('Inspección guardada ✓','ok');
+    closeInspModal();
+    await openCicloDetalle(curCiclo.id);
+  } catch(e){ toast('Error: '+e.message,'err'); }
+  btn.disabled=0; btn.textContent='GUARDAR INSPECCIÓN';
+}
+
+// ── Modal inspección componente (inline simplificado) ─────
+async function openInspCompModal(cicloId,inspId,eqId,compId){
+  const comp=(subRecs[eqId]||[]).find(c=>c.id===compId);
+  if(!comp) return;
+  const {data:ic}=await sb.from('inspecciones_comp')
+    .select('*').eq('ciclo_id',cicloId).eq('comp_id',compId).maybeSingle();
+
+  const confActual=ic?.conformidad||'';
+  const confOpciones=['C','NC','OBS','NA'].map(v=>
+    `<option value="${v}" ${confActual===v?'selected':''}>${v}</option>`
+  ).join('');
+
+  const html=`<div style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;display:flex;align-items:center;justify-content:center;padding:16px" id="icomp-overlay" onclick="if(event.target===this)this.remove()">
+    <div style="background:#f5f3ee;border-radius:8px;width:100%;max-width:500px;border-top:3px solid #7c3aed;overflow:hidden">
+      <div style="background:#1e1030;color:#f5f3ee;padding:12px 18px;display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-size:10px;font-family:monospace;color:#a78bfa">COMPONENTE · ${esc(eqName(eqId))}</div>
+          <div style="font-size:14px;font-weight:600">${esc(comp.nombre_comp||comp.tipo)}</div>
+        </div>
+        <button onclick="document.getElementById('icomp-overlay').remove()" style="background:none;border:none;color:#666;font-size:18px;cursor:pointer">✕</button>
+      </div>
+      <div style="padding:16px;display:flex;flex-direction:column;gap:10px">
+        <div style="background:#1e2230;border-radius:4px;padding:10px 12px;font-family:monospace;font-size:10px;color:#ccc">
+          Base: <span class="cbadge b${confClass(comp.conformidad)||''}">${comp.conformidad||'—'}</span>
+          ${comp.hallazgo?` · ${esc(comp.hallazgo.substring(0,50))}`:' · Sin hallazgos'}
+        </div>
+        <div>
+          <div class="field-lbl">Verificación acción anterior</div>
+          <select class="field-sel" id="ic-av">
+            <option value="">— seleccionar —</option>
+            <option value="si" ${ic?.accion_verificada?'selected':''}>✓ Implementada</option>
+            <option value="parcial">◐ Parcial</option>
+            <option value="no" ${ic&&!ic.accion_verificada&&ic.accion_resultado?'selected':''}>✕ No implementada</option>
+            <option value="na">— No aplica</option>
+          </select>
+        </div>
+        <div>
+          <div class="field-lbl">Conformidad</div>
+          <select class="field-sel" id="ic-conf">
+            <option value="">— seleccionar —</option>
+            ${confOpciones}
+          </select>
+        </div>
+        <div><div class="field-lbl">Hallazgo</div><textarea class="field-ta" id="ic-hall" style="min-height:48px">${esc(ic?.hallazgo||'')}</textarea></div>
+        <div><div class="field-lbl">Acción</div><textarea class="field-ta" id="ic-acc" style="min-height:48px">${esc(ic?.accion||'')}</textarea></div>
+      </div>
+      <div style="padding:12px 16px;border-top:1px solid #ddd9d0;background:#eceae3;display:flex;justify-content:flex-end;gap:8px">
+        <button class="btn-out" onclick="document.getElementById('icomp-overlay').remove()">Cancelar</button>
+        <button style="background:#7c3aed;color:#fff;border:none;border-radius:4px;padding:8px 18px;font-size:11px;font-weight:600;cursor:pointer;font-family:monospace"
+          onclick="saveInspComp('${cicloId}','${inspId}','${eqId}','${compId}','${ic?.id||''}')">GUARDAR</button>
+      </div>
+    </div>
+  </div>`;
+  document.body.insertAdjacentHTML('beforeend',html);
+}
+
+async function saveInspComp(cicloId,inspId,eqId,compId,icId){
+  const conf=document.getElementById('ic-conf').value;
+  const av=document.getElementById('ic-av').value;
+  try {
+    const payload={
+      ciclo_id:cicloId, inspeccion_id:inspId, equipo_id:eqId,
+      comp_id:compId,
+      comp_nombre:(subRecs[eqId]||[]).find(c=>c.id===compId)?.nombre_comp||'',
+      comp_tipo:(subRecs[eqId]||[]).find(c=>c.id===compId)?.tipo||'',
+      base_conformidad:(subRecs[eqId]||[]).find(c=>c.id===compId)?.conformidad||'',
+      accion_verificada:av==='si',
+      accion_resultado:av,
+      conformidad:conf,
+      hallazgo:document.getElementById('ic-hall').value.trim(),
+      accion:document.getElementById('ic-acc').value.trim(),
+      inspector_id:session.user.id,
+      inspector_nombre:profile?.full_name||session.user.email,
+      updated_at:new Date().toISOString(),
+    };
+    if(icId){
+      await must(sb.from('inspecciones_comp').update(payload).eq('id',icId));
+    } else {
+      await must(sb.from('inspecciones_comp').insert(payload));
+    }
+    document.getElementById('icomp-overlay')?.remove();
+    toast('Componente guardado ✓','ok');
+    await renderInspComps(cicloId,curInspId,eqId);
+  } catch(e){ toast('Error: '+e.message,'err'); }
+}
+
+// ── Cerrar y aprobar ciclo ────────────────────────────────
+async function cerrarCiclo(cicloId){
+  const c=ciclos.find(x=>x.id===cicloId);
+  if(!confirm(`¿Cerrar el ciclo "${c?.nombre}"?\n\nUna vez cerrado no se podrán editar las inspecciones.\nEl ciclo quedará disponible para aprobación.`)) return;
+  try {
+    await must(sb.from('ciclos').update({estado:'cerrado'}).eq('id',cicloId));
+    toast('Ciclo cerrado ✓','ok');
+    await loadCiclos();
+  } catch(e){ toast('Error: '+e.message,'err'); }
+}
+
+async function aprobarCiclo(cicloId){
+  const c=ciclos.find(x=>x.id===cicloId);
+  if(!confirm(`¿Aprobar el ciclo "${c?.nombre}"?\n\nEsto firma digitalmente el ciclo con tu usuario. Esta acción no se puede deshacer.`)) return;
+  try {
+    await must(sb.from('ciclos').update({
+      estado:'aprobado',
+      aprobado_por:session.user.id,
+      aprobado_nombre:profile?.full_name||session.user.email,
+      aprobado_at:new Date().toISOString(),
+    }).eq('id',cicloId));
+    toast('Ciclo aprobado ✓','ok');
+    await loadCiclos();
+  } catch(e){ toast('Error: '+e.message,'err'); }
+}
+
+// ── Export CSV ciclo ──────────────────────────────────────
+async function exportCicloCSV(cicloId){
+  const {data}=await sb.from('inspecciones').select('*').eq('ciclo_id',cicloId).order('piso').order('equipo_nombre');
+  const c=ciclos.find(x=>x.id===cicloId);
+  const rows=[['Equipo','Piso','Base Conformidad','Base Hallazgo','Acción Verificada','Conformidad Nueva','Hallazgo Nuevo','Acción Nueva','Marcado Ex','Inspector','Fecha']];
+  (data||[]).forEach(r=>{
+    rows.push([r.equipo_nombre,FL[r.piso]||r.piso,r.base_conformidad||'',r.base_hallazgo||'',
+      r.accion_verificada?'Sí':'No',r.conformidad||'',r.hallazgo||'',r.accion||'',
+      r.marcado_ex||'',r.inspector_nombre||'',r.fecha_insp||''].map(v=>`"${String(v).replace(/"/g,'""')}"`));
+  });
+  const blob=new Blob(['\ufeff'+rows.map(r=>r.join(',')).join('\n')],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download=`CICLO_${(c?.nombre||cicloId).replace(/\s+/g,'_')}_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  toast('CSV descargado ✓','ok');
+}
+
+// ── Print comparativo ciclo ───────────────────────────────
+async function printCicloInforme(cicloId){
+  const {data}=await sb.from('inspecciones').select('*').eq('ciclo_id',cicloId).order('piso').order('equipo_nombre');
+  const c=ciclos.find(x=>x.id===cicloId)||{};
+  const inspArr=data||[];
+  const win=window.open('','_blank');
+  if(!win){ toast('Permite ventanas emergentes','err'); return; }
+  const pisoOrder=Object.keys(FL);
+  const sorted=[...inspArr].sort((a,b)=>{
+    const pa=pisoOrder.indexOf(a.piso), pb=pisoOrder.indexOf(b.piso);
+    return (pa<0?99:pa)-(pb<0?99:pb)||a.equipo_nombre.localeCompare(b.equipo_nombre,'es');
+  });
+  const rows=sorted.map(r=>{
+    const cambio=r.base_conformidad!==r.conformidad&&r.conformidad;
+    return `<tr style="${cambio?'background:#fffbeb':''}">
+      <td>${esc(r.equipo_nombre)}</td>
+      <td>${esc(FL[r.piso]||r.piso||'—')}</td>
+      <td><span class="badge b${confClass(r.base_conformidad)||''}">${esc(r.base_conformidad||'—')}</span></td>
+      <td><span class="badge b${confClass(r.conformidad)||''}">${esc(r.conformidad||'—')}</span></td>
+      <td>${r.accion_verificada?'<span style="color:#059669">✓ Sí</span>':'<span style="color:#dc2626">✕ No</span>'}</td>
+      <td>${esc(r.hallazgo||'—')}</td>
+      <td>${esc(r.accion||'—')}</td>
+      <td>${esc(r.inspector_nombre||'—')}</td>
+    </tr>`;
+  }).join('');
+  const completados=inspArr.filter(i=>i.completado).length;
+  const NC=inspArr.filter(i=>i.conformidad==='NC').length;
+  win.document.write(`<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Ciclo ${esc(c.nombre||'')}</title>
+  <style>
+  @page{size:A4 landscape;margin:12mm}
+  *{box-sizing:border-box}body{font-family:Arial,sans-serif;font-size:10px;color:#111}
+  h1{font-size:18px;font-weight:900;margin-bottom:4px}
+  .meta{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}
+  .meta div{border:1px solid #d1d5db;border-radius:4px;padding:8px}
+  .lbl{display:block;font-size:8px;color:#6b7280;text-transform:uppercase;margin-bottom:2px;font-family:Consolas,monospace}
+  table{width:100%;border-collapse:collapse;font-size:8.5px}
+  th{background:#111;color:#fff;padding:5px;text-align:left;font-family:Consolas,monospace;font-size:8px}
+  td{border:1px solid #e5e7eb;padding:4px;vertical-align:top}
+  tr:nth-child(even){background:#f9fafb}
+  .badge{display:inline-block;border-radius:2px;padding:1px 5px;font-weight:700;font-family:Consolas,monospace}
+  .bC{background:#d1fae5;color:#065f46}.bNC{background:#fee2e2;color:#991b1b}.bOBS{background:#fef3c7;color:#92400e}
+  .brand{font-size:20px;font-weight:900;color:#111;letter-spacing:2px}
+  .brand span{background:#F7C600;border-radius:3px;color:#111;font-size:11px;margin-left:6px;padding:2px 7px;vertical-align:middle}
+  </style></head><body>
+  <div class="brand">SUSTENTA <span>Ex</span></div>
+  <h1>Informe Comparativo · ${esc(c.nombre||'Ciclo')}</h1>
+  <div style="font-size:10px;color:#6b7280">Tipo: ${esc(c.tipo||'—')} · Inicio: ${esc(c.fecha_ini||'—')} · Estado: ${esc(c.estado||'—')}</div>
+  <div class="meta">
+    <div><span class="lbl">Total equipos</span><strong>${inspArr.length}</strong></div>
+    <div><span class="lbl">Completados</span><strong>${completados}</strong></div>
+    <div><span class="lbl">No conformidades</span><strong style="color:#dc2626">${NC}</strong></div>
+    <div><span class="lbl">Aprobado por</span>${esc(c.aprobado_nombre||'Pendiente')}</div>
+  </div>
+  <table><thead><tr><th>Equipo</th><th>Piso</th><th>Base</th><th>Nuevo estado</th><th>Acción verificada</th><th>Hallazgo</th><th>Acción</th><th>Inspector</th></tr></thead>
+  <tbody>${rows}</tbody></table>
+  <div style="margin-top:12px;font-size:8px;color:#9ca3af;text-align:right">Generado ${new Date().toLocaleString('es-CL')}</div>
+  </body></html>`);
+  win.document.close(); win.focus(); setTimeout(()=>win.print(),350);
 }
 
 // ═══════════════════════════════════════════════════════════
