@@ -318,6 +318,46 @@ input[type=file]{display:none}
 .perm-matrix .pr:nth-child(12n+1){background:#fafaf8}
 .perm-matrix .pc:nth-child(12n){background:#fafaf8}
 
+
+/* ── PANEL ADMIN ── */
+#admin-panel{display:none;position:fixed;inset:0;background:#0a0d14;z-index:160;overflow-y:auto}
+#admin-panel.on{display:flex;flex-direction:column}
+.admin-topbar{background:#0f1117;border-bottom:2px solid #7c3aed;padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;flex-shrink:0}
+.admin-nav{display:flex;background:#111;border-bottom:1px solid #1e2230;flex-shrink:0}
+.admin-nav-btn{padding:11px 20px;font-size:11px;font-weight:700;color:#666;cursor:pointer;border-bottom:2px solid transparent;font-family:monospace;letter-spacing:.5px;white-space:nowrap;transition:color .15s}
+.admin-nav-btn.on{color:#a78bfa;border-bottom-color:#7c3aed}
+.admin-nav-btn:hover:not(.on){color:#9aa3b8}
+.admin-content{flex:1;padding:28px;max-width:1000px;margin:0 auto;width:100%}
+/* Tabla usuarios */
+.usr-table{width:100%;border-collapse:collapse;background:#1e2230;border:1px solid #2a2f40;border-radius:6px;overflow:hidden}
+.usr-table th{background:#0f1117;color:#888;font-family:monospace;font-size:9px;letter-spacing:.8px;text-transform:uppercase;padding:10px 14px;text-align:left;font-weight:600}
+.usr-table td{padding:11px 14px;border-bottom:1px solid #2a2f40;font-size:12px;vertical-align:middle;color:#d1d5db}
+.usr-table tr:last-child td{border-bottom:none}
+.usr-table tr:hover td{background:rgba(255,255,255,.03)}
+.rol-pill{font-family:monospace;font-size:9px;font-weight:700;padding:2px 8px;border-radius:3px;letter-spacing:.5px;display:inline-block}
+.rol-admin{background:#7c3aed;color:#fff}
+.rol-supervisor{background:#0284c7;color:#fff}
+.rol-inspector{background:#059669;color:#fff}
+.rol-cliente{background:#d97706;color:#fff}
+.rol-visita{background:#4b5563;color:#fff}
+/* Modal admin */
+#adm-usr-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;padding:16px;overflow-y:auto;align-items:flex-start;justify-content:center}
+#adm-usr-modal-bg.on{display:flex}
+#adm-asign-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:310;padding:16px;overflow-y:auto;align-items:flex-start;justify-content:center}
+#adm-asign-modal-bg.on{display:flex}
+.asign-proy-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid #2a2f40;border-radius:4px;margin-bottom:6px;background:#1a1f2e}
+.asign-proy-name{flex:1;font-size:13px;font-weight:500;color:#e5e7eb}
+/* Perm matrix */
+.perm-matrix{display:grid;grid-template-columns:2fr repeat(5,1fr);border:1px solid #2a2f40;border-radius:6px;overflow:hidden;font-size:11px}
+.perm-matrix .ph{background:#0f1117;color:#888;font-family:monospace;font-size:8px;letter-spacing:.5px;text-transform:uppercase;padding:9px 6px;text-align:center;font-weight:600}
+.perm-matrix .ph:first-child{text-align:left;padding-left:14px}
+.perm-matrix .pr{padding:8px 14px;border-top:1px solid #1e2230;color:#9ca3af;font-size:11px;display:flex;align-items:center}
+.perm-matrix .pc{border-top:1px solid #1e2230;text-align:center;display:flex;align-items:center;justify-content:center;font-size:13px}
+.perm-on{color:#34d399}.perm-off{color:#374151}
+/* Icono admin en topbar */
+.admin-icon-btn{background:none;border:1px solid #2a2f40;border-radius:4px;color:#7c3aed;font-size:14px;cursor:pointer;padding:4px 8px;display:none;transition:all .15s}
+.admin-icon-btn:hover{background:#1e1030;border-color:#7c3aed}
+
 </style>
 </head>
 <body>
@@ -459,6 +499,148 @@ input[type=file]{display:none}
   </div>
 </div>
 
+
+<!-- ══════════════ PANEL ADMIN ══════════════ -->
+<div id="admin-panel">
+  <div class="admin-topbar">
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="font-size:15px;font-weight:900;color:#F7C600;letter-spacing:2px">SUSTENTA</span>
+      <span style="background:#F7C600;color:#111;font-size:9px;font-weight:900;padding:2px 6px;border-radius:3px">Ex</span>
+      <span style="color:#333;margin:0 6px">|</span>
+      <span style="font-family:monospace;font-size:11px;font-weight:700;color:#a78bfa;letter-spacing:1px">PANEL DE ADMINISTRACI&#211;N</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span id="adm-user-lbl" style="font-family:monospace;font-size:10px;color:#666"></span>
+      <button onclick="closeAdminPanel()" style="background:none;border:1px solid #2a2f40;border-radius:4px;color:#888;font-size:11px;font-family:monospace;padding:5px 12px;cursor:pointer">&#8592; Volver</button>
+    </div>
+  </div>
+  <div class="admin-nav">
+    <div class="admin-nav-btn on" id="adm-tab-usuarios" onclick="switchAdminTab('usuarios',this)">&#128100; USUARIOS</div>
+    <div class="admin-nav-btn" id="adm-tab-proyectos" onclick="switchAdminTab('proyectos',this)">&#128203; PROYECTOS</div>
+    <div class="admin-nav-btn" id="adm-tab-permisos" onclick="switchAdminTab('permisos',this)">&#128274; PERMISOS</div>
+  </div>
+  <div class="admin-content">
+
+    <!-- Panel Usuarios -->
+    <div id="adm-panel-usuarios">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:20px">
+        <div>
+          <div style="font-size:18px;font-weight:700;color:#f5f3ee;margin-bottom:3px">Usuarios del sistema</div>
+          <div style="font-size:11px;color:#666;font-family:monospace">Gestiona accesos, roles y asignaciones por proyecto</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <input id="adm-usr-search" placeholder="Buscar usuario&#8230;" oninput="filterUsuariosTable()" style="padding:7px 12px;border:1px solid #2a2f40;border-radius:4px;font-size:12px;background:#1e2230;color:#e5e7eb;width:200px">
+          <button onclick="openAdmUsrModal('new')" style="background:#7c3aed;color:#fff;border:none;border-radius:4px;padding:8px 16px;font-size:11px;font-weight:600;cursor:pointer;font-family:monospace">&#65291; Nuevo usuario</button>
+        </div>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="usr-table">
+          <thead><tr>
+            <th>NOMBRE</th><th>EMAIL</th><th>ROL GLOBAL</th><th>PROYECTOS</th><th>&#218;LT. ACCESO</th><th>ACCIONES</th>
+          </tr></thead>
+          <tbody id="adm-usr-tbody">
+            <tr><td colspan="6" style="text-align:center;color:#666;padding:28px;font-family:monospace;font-size:11px">Cargando&#8230;</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Panel Proyectos -->
+    <div id="adm-panel-proyectos" style="display:none">
+      <div style="font-size:18px;font-weight:700;color:#f5f3ee;margin-bottom:3px">Proyectos activos</div>
+      <div style="font-size:11px;color:#666;font-family:monospace;margin-bottom:20px">Administra todos los proyectos y sus usuarios asignados</div>
+      <div id="adm-proy-list"></div>
+    </div>
+
+    <!-- Panel Permisos -->
+    <div id="adm-panel-permisos" style="display:none">
+      <div style="font-size:18px;font-weight:700;color:#f5f3ee;margin-bottom:3px">Matriz de permisos</div>
+      <div style="font-size:11px;color:#666;font-family:monospace;margin-bottom:20px">Referencia de permisos por rol en el sistema</div>
+      <div class="perm-matrix">
+        <div class="ph">ACCI&#211;N</div>
+        <div class="ph">ADMIN</div><div class="ph">SUPERV.</div><div class="ph">INSP.</div><div class="ph">CLIENTE</div><div class="ph">VISITA</div>
+        <div class="pr">Ver proyectos asignados</div><div class="pc perm-on">&#10003;</div><div class="pc perm-on">&#10003;</div><div class="pc perm-on">&#10003;</div><div class="pc perm-on">&#10003;</div><div class="pc perm-on">&#10003;</div>
+        <div class="pr">Crear / editar proyectos</div><div class="pc perm-on">&#10003;</div><div class="pc perm-on">&#10003;</div><div class="pc perm-off">&#10005;</div><div class="pc perm-off">&#10005;</div><div class="pc perm-off">&#10005;</div>
+        <div class="pr">Eliminar proyectos</div><div class="pc perm-on">&#10003;</div><div class="pc perm-off">&#10005;</div><div class="pc perm-off">&#10005;</div><div class="pc perm-off">&#10005;</div><div class="pc perm-off">&#10005;</div>
+        <div class="pr">Gestionar usuarios</div><div class="pc perm-on">&#10003;</div><div class="pc perm-off">&#10005;</div><div class="pc perm-off">&#10005;</div><div class="pc perm-off">&#10005;</div><div class="pc perm-off">&#10005;</div>
+        <div class="pr">Llenar fichas / fotos</div><div class="pc perm-on">&#10003;</div><div class="pc perm-on">&#10003;</div><div class="pc perm-on">&#10003;</div><div class="pc perm-off">&#10005;</div><div class="pc perm-off">&#10005;</div>
+        <div class="pr">Crear / editar equipos</div><div class="pc perm-on">&#10003;</div><div class="pc perm-on">&#10003;</div><div class="pc perm-on">&#10003;</div><div class="pc perm-off">&#10005;</div><div class="pc perm-off">&#10005;</div>
+        <div class="pr">Eliminar equipos / datos</div><div class="pc perm-on">&#10003;</div><div class="pc perm-on">&#10003;</div><div class="pc perm-off">&#10005;</div><div class="pc perm-off">&#10005;</div><div class="pc perm-off">&#10005;</div>
+        <div class="pr">Ver informes / resumen</div><div class="pc perm-on">&#10003;</div><div class="pc perm-on">&#10003;</div><div class="pc perm-on">&#10003;</div><div class="pc perm-on">&#10003;</div><div class="pc perm-on">&#10003;</div>
+        <div class="pr">Exportar PDF / CSV</div><div class="pc perm-on">&#10003;</div><div class="pc perm-on">&#10003;</div><div class="pc perm-on">&#10003;</div><div class="pc perm-on">&#10003;</div><div class="pc perm-off">&#10005;</div>
+        <div class="pr">Comentar / agregar obs.</div><div class="pc perm-on">&#10003;</div><div class="pc perm-on">&#10003;</div><div class="pc perm-on">&#10003;</div><div class="pc perm-on">&#10003;</div><div class="pc perm-off">&#10005;</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL USUARIO (Admin) -->
+<div id="adm-usr-modal-bg">
+  <div class="modal" style="border-top-color:#7c3aed;max-width:520px">
+    <div class="modal-head" style="background:#1e1030">
+      <div style="flex:1">
+        <div style="font-size:11px;font-family:monospace;color:#a78bfa;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">USUARIO</div>
+        <div id="adm-um-title" style="font-size:15px;font-weight:600">Nuevo usuario</div>
+      </div>
+      <button onclick="closeAdmUsrModal()" style="background:none;border:none;color:#666;font-size:20px;cursor:pointer">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <div><div class="field-lbl">Nombre completo</div><input class="field-input" id="adm-um-nombre" placeholder="Nombre Apellido"></div>
+      <div><div class="field-lbl">Email</div><input class="field-input" id="adm-um-email" type="email" placeholder="usuario@empresa.com"></div>
+      <div>
+        <div class="field-lbl">Rol global</div>
+        <select class="field-sel" id="adm-um-rol" onchange="updateAdmRolDesc()">
+          <option value="inspector">Inspector</option>
+          <option value="supervisor">Supervisor</option>
+          <option value="cliente">Cliente</option>
+          <option value="visita">Visita</option>
+          <option value="admin">Administrador</option>
+        </select>
+        <div id="adm-um-rol-desc" style="font-size:10px;color:#888;font-family:monospace;margin-top:5px;padding:6px 10px;background:#f5f3ee;border-radius:4px;line-height:1.5"></div>
+      </div>
+      <div>
+        <div class="field-lbl">Proyectos asignados <span style="color:#aaa;font-weight:400;text-transform:none;letter-spacing:0">(y rol en cada uno)</span></div>
+        <div id="adm-um-proy-list" style="display:flex;flex-direction:column;gap:6px;margin-top:4px;margin-bottom:8px"></div>
+        <button onclick="openAdmAsignModal()" class="btn-out" style="font-size:11px;padding:6px 14px">&#65291; Asignar proyectos</button>
+      </div>
+      <div id="adm-um-prev" style="display:none;padding:8px 10px;background:#eceae3;border-radius:4px;font-size:10px;color:#6b7280;font-family:monospace"></div>
+      <div id="adm-um-del-wrap" style="display:none">
+        <div class="del-section">
+          <div class="del-section-title">&#9888; Zona de administraci&#243;n</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn-del" onclick="admDeactivateUser()">&#128274; Restringir a Visita</button>
+          </div>
+          <div style="font-size:10px;color:#aaa;margin-top:6px;font-family:monospace">Cambia rol a Visita &#183; Solo lectura sin exportar</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-out" onclick="closeAdmUsrModal()">Cancelar</button>
+      <button class="btn-save" onclick="saveAdmUsuario()" id="adm-um-sv" style="background:#7c3aed;color:#fff">GUARDAR</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ASIGNAR PROYECTOS (Admin) -->
+<div id="adm-asign-modal-bg">
+  <div class="modal" style="border-top-color:#F7C600;max-width:500px">
+    <div class="modal-head" style="background:#0f1117">
+      <div style="flex:1">
+        <div style="font-size:11px;font-family:monospace;color:#F7C600;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">ASIGNAR PROYECTOS</div>
+        <div id="adm-asign-user-name" style="font-size:14px;font-weight:600"></div>
+      </div>
+      <button onclick="closeAdmAsignModal()" style="background:none;border:none;color:#666;font-size:20px;cursor:pointer">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <div id="adm-asign-proy-list" style="display:flex;flex-direction:column;gap:8px"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-out" onclick="closeAdmAsignModal()">Listo</button>
+    </div>
+  </div>
+</div>
+
 <!-- LOGIN -->
 <div id="login">
   <div class="login-box">
@@ -527,7 +709,6 @@ input[type=file]{display:none}
     <div class="nav-btn" onclick="goTab('rs',this)">📊 RESUMEN</div>
     <div class="nav-btn" onclick="goTab('inf',this)">📄 INFORME</div>
     <div class="nav-btn" onclick="goTab('ciclos',this)">📅 CICLOS</div>
-    <div class="nav-btn" id="nav-usuarios" onclick="goTab('usuarios',this)" style="display:none">&#128100; USUARIOS</div>
   </div>
 
   <!-- TAB EQUIPOS -->
@@ -1298,10 +1479,10 @@ async function loadApp(){
   document.getElementById('user-lbl').textContent=name;
   document.getElementById('i-insp').value=name;
   document.getElementById('i-fecha').value=new Date().toISOString().slice(0,10);
-  // Guardar perfil global y mostrar tab usuarios si es admin
+  // Guardar perfil global y mostrar icono admin si es admin
   perfilActual = profile;
-  const navUsr=document.getElementById('nav-usuarios');
-  if(navUsr) navUsr.style.display=(profile?.rol==='admin')?'block':'none';
+  const adminIcon=document.getElementById('admin-icon');
+  if(adminIcon) adminIcon.style.display=(profile?.rol==='admin')?'flex':'none';
   const pill=document.getElementById('proy-pill-name');
   if(pill) pill.textContent=curProyecto.nombre;
   const tt=document.querySelector('.topbar-title');
@@ -1396,11 +1577,11 @@ async function doLogout(){
 function goTab(name,el){
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('on'));
   el.classList.add('on');
-  ['eq','rs','inf','ciclos','usuarios'].forEach(t=>{ document.getElementById('tab-'+t).style.display=t===name?'block':'none'; });
+  ['eq','rs','inf','ciclos'].forEach(t=>{ document.getElementById('tab-'+t).style.display=t===name?'block':'none'; });
   if(name==='rs') renderResumen();
   if(name==='inf') loadAndRenderInforme();
   if(name==='ciclos') loadCiclos();
-  if(name==='usuarios') loadUsuarios();
+
 }
 
 async function loadAndRenderInforme(){
@@ -3571,6 +3752,12 @@ async function showProyectos(){
     } catch(e){ proysFiltrados=[]; }
   }
   renderProyectoGrid(statsMap, proysFiltrados);
+  // Mostrar/ocultar botón crear según rol
+  const btnCrear=document.getElementById('btn-crear-proy');
+  if(btnCrear){
+    const puedeCrear=['admin','supervisor','inspector'].includes(perfilActual?.rol);
+    btnCrear.style.display=puedeCrear?'flex':'none';
+  }
   document.getElementById('proyecto-selector').classList.add('on');
   loader(0);
 }
@@ -3952,6 +4139,303 @@ async function loadProyectosParaUsuario(userId){
     const ids = (asign||[]).map(a=>a.proyecto_id);
     return proyectos.filter(p=>ids.includes(p.id));
   } catch(e){ return []; }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  PANEL ADMINISTRACION
+// ═══════════════════════════════════════════════════════════
+let admCurUsrId=null, admCurUsrAsignaciones=[], admTodosUsuarios=[], admCurTab='usuarios';
+
+function openAdminPanel(){
+  document.getElementById('adm-user-lbl').textContent=profile?.full_name||session.user.email;
+  document.getElementById('admin-panel').classList.add('on');
+  document.body.style.overflow='hidden';
+  switchAdminTab('usuarios', document.getElementById('adm-tab-usuarios'));
+}
+function closeAdminPanel(){
+  document.getElementById('admin-panel').classList.remove('on');
+  document.body.style.overflow='';
+}
+function switchAdminTab(tab, el){
+  admCurTab=tab;
+  document.querySelectorAll('.admin-nav-btn').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  ['usuarios','proyectos','permisos'].forEach(t=>{
+    const p=document.getElementById('adm-panel-'+t);
+    if(p) p.style.display=t===tab?'block':'none';
+  });
+  if(tab==='usuarios') loadAdmUsuarios();
+  if(tab==='proyectos') loadAdmProyectos();
+}
+
+// ── Cargar usuarios ───────────────────────────────────────
+async function loadAdmUsuarios(){
+  const tbody=document.getElementById('adm-usr-tbody');
+  if(!tbody) return;
+  tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:#666;padding:28px;font-family:monospace;font-size:11px">Cargando&#8230;</td></tr>';
+  try {
+    const data=await must(sb.from('usuarios_vista').select('*').order('created_at',{ascending:false}));
+    admTodosUsuarios=data||[];
+    renderAdmUsuariosTable(admTodosUsuarios);
+  } catch(e){
+    tbody.innerHTML=`<tr><td colspan="6" style="text-align:center;color:#dc2626;padding:28px;font-size:11px">${esc(e.message)}</td></tr>`;
+  }
+}
+
+function filterUsuariosTable(){
+  const q=(document.getElementById('adm-usr-search')?.value||'').toLowerCase();
+  const filtrados=q?admTodosUsuarios.filter(u=>(u.full_name||'').toLowerCase().includes(q)||(u.email||'').toLowerCase().includes(q)):admTodosUsuarios;
+  renderAdmUsuariosTable(filtrados);
+}
+
+function renderAdmUsuariosTable(lista){
+  const tbody=document.getElementById('adm-usr-tbody');
+  if(!tbody) return;
+  if(!lista.length){
+    tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:#666;padding:28px;font-family:monospace;font-size:11px">Sin usuarios</td></tr>';
+    return;
+  }
+  tbody.innerHTML=lista.map(u=>{
+    const rol=u.rol_global||'inspector';
+    const lastAccess=u.last_sign_in_at?new Date(u.last_sign_in_at).toLocaleDateString('es-CL'):'Nunca';
+    const isMe=u.id===session?.user?.id;
+    return `<tr>
+      <td><span style="font-weight:600;color:#f5f3ee">${esc(u.full_name||'Sin nombre')}</span>${isMe?'<span style="font-family:monospace;font-size:8px;color:#F7C600;margin-left:6px;background:#1e2230;padding:1px 5px;border-radius:2px;border:1px solid #2a2f40">TU</span>':''}</td>
+      <td style="font-family:monospace;font-size:11px;color:#6b7280">${esc(u.email||'—')}</td>
+      <td><span class="rol-pill ${rolClass(rol)}">${rolLabel(rol)}</span></td>
+      <td style="font-family:monospace;font-size:11px;color:#9ca3af">${u.proyectos_count||0} proyecto${u.proyectos_count!==1?'s':''}</td>
+      <td style="font-family:monospace;font-size:10px;color:#4b5563">${lastAccess}</td>
+      <td>
+        <div style="display:flex;gap:6px">
+          <button onclick="openAdmUsrModal('edit','${u.id}')" style="background:none;border:1px solid #2a2f40;border-radius:3px;padding:4px 10px;font-size:10px;font-family:monospace;cursor:pointer;color:#9ca3af">&#9998; Editar</button>
+          <button onclick="openAdmAsignFromTable('${u.id}','${escAttr(u.full_name||u.email)}')" style="background:none;border:1px solid #2a2f40;border-radius:3px;padding:4px 10px;font-size:10px;font-family:monospace;cursor:pointer;color:#60a5fa">&#128203; Proyectos</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Proyectos en admin ────────────────────────────────────
+async function loadAdmProyectos(){
+  const el=document.getElementById('adm-proy-list');
+  if(!el) return;
+  el.innerHTML='<div style="color:#666;font-family:monospace;font-size:11px;padding:20px">Cargando&#8230;</div>';
+  try {
+    // Cargar usuarios por proyecto
+    const pu=await must(sb.from('proyecto_usuarios').select('*, profiles(full_name,rol)'));
+    const puMap={};
+    (pu||[]).forEach(u=>{ if(!puMap[u.proyecto_id]) puMap[u.proyecto_id]=[]; puMap[u.proyecto_id].push(u); });
+    el.innerHTML=proyectos.map(p=>{
+      const users=puMap[p.id]||[];
+      return `<div style="background:#1e2230;border:1px solid #2a2f40;border-radius:8px;padding:16px 20px;margin-bottom:12px;border-left:4px solid #F7C600">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px">
+          <div>
+            <div style="font-size:15px;font-weight:700;color:#f5f3ee;margin-bottom:3px">${esc(p.nombre)}</div>
+            <div style="font-family:monospace;font-size:10px;color:#666">${esc(p.cliente||'')}${p.planta?' · '+esc(p.planta):''} · <span style="color:#4b5563">${esc(p.tipo_ubicacion||'Piso')}s</span></div>
+          </div>
+          <span style="font-family:monospace;font-size:9px;color:#374151;background:#111;padding:2px 8px;border-radius:2px">${esc(p.id)}</span>
+        </div>
+        <div style="font-size:11px;color:#6b7280;margin-bottom:8px;font-family:monospace">
+          ${users.length} usuario${users.length!==1?'s':''} asignado${users.length!==1?'s':''}
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          ${users.map(u=>`<div style="display:flex;align-items:center;gap:6px;background:#111;border:1px solid #2a2f40;border-radius:4px;padding:4px 10px">
+            <span style="font-size:11px;color:#d1d5db">${esc(u.profiles?.full_name||'—')}</span>
+            <span class="rol-pill ${rolClass(u.rol)}" style="font-size:8px">${rolLabel(u.rol)}</span>
+            <button onclick="removeProyUser('${p.id}','${u.user_id}')" style="background:none;border:none;cursor:pointer;color:#dc2626;font-size:11px;padding:0 2px" title="Quitar acceso">&#10005;</button>
+          </div>`).join('')}
+          <button onclick="openAdmAsignProy('${p.id}','${escAttr(p.nombre)}')" style="background:none;border:1px dashed #2a2f40;border-radius:4px;padding:4px 10px;font-size:10px;font-family:monospace;cursor:pointer;color:#666">&#65291; Agregar usuario</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e){ el.innerHTML=`<div style="color:#dc2626;font-size:12px">${esc(e.message)}</div>`; }
+}
+
+async function removeProyUser(proyId, userId){
+  if(!confirm('&#191;Quitar acceso de este usuario al proyecto?')) return;
+  try {
+    await must(sb.from('proyecto_usuarios').delete().eq('proyecto_id',proyId).eq('user_id',userId));
+    toast('Acceso removido ✓','ok');
+    loadAdmProyectos();
+  } catch(e){ toast('Error: '+e.message,'err'); }
+}
+
+async function openAdmAsignProy(proyId, proyNombre){
+  // Abrir modal de asignación centrado en el proyecto
+  admCurUsrId=null;
+  document.getElementById('adm-asign-user-name').textContent=proyNombre;
+  // Mostrar lista de todos los usuarios para asignar a este proyecto
+  const el=document.getElementById('adm-asign-proy-list');
+  const existing=await must(sb.from('proyecto_usuarios').select('user_id,rol').eq('proyecto_id',proyId));
+  const existMap={};
+  (existing||[]).forEach(r=>{ existMap[r.user_id]=r.rol; });
+  el.innerHTML=(admTodosUsuarios||[]).map(u=>`
+    <div class="asign-proy-row">
+      <div class="asign-proy-name">${esc(u.full_name||u.email)}<div style="font-size:10px;color:#666;font-family:monospace">${esc(u.email||'')}</div></div>
+      <select onchange="updateProyUserRol('${proyId}','${u.id}',this.value)" style="font-size:11px;padding:4px 8px;border:1px solid #2a2f40;border-radius:4px;background:#111;color:#e5e7eb">
+        <option value="">&#8212; Sin acceso &#8212;</option>
+        <option value="inspector" ${existMap[u.id]==='inspector'?'selected':''}>Inspector</option>
+        <option value="supervisor" ${existMap[u.id]==='supervisor'?'selected':''}>Supervisor</option>
+        <option value="cliente" ${existMap[u.id]==='cliente'?'selected':''}>Cliente</option>
+        <option value="visita" ${existMap[u.id]==='visita'?'selected':''}>Visita</option>
+      </select>
+    </div>`).join('');
+  document.getElementById('adm-asign-modal-bg').classList.add('on');
+}
+
+async function updateProyUserRol(proyId, userId, rol){
+  try {
+    if(!rol){
+      await must(sb.from('proyecto_usuarios').delete().eq('proyecto_id',proyId).eq('user_id',userId));
+      toast('Acceso removido ✓','ok');
+    } else {
+      await must(sb.from('proyecto_usuarios').upsert({proyecto_id:proyId,user_id:userId,rol,asignado_por:profile?.full_name||session.user.email},{onConflict:'proyecto_id,user_id'}));
+      toast('Asignado ✓','ok');
+    }
+  } catch(e){ toast('Error: '+e.message,'err'); }
+}
+
+// ── Modal usuario admin ───────────────────────────────────
+async function openAdmUsrModal(modo, userId=null){
+  admCurUsrId=userId; admCurUsrAsignaciones=[];
+  document.getElementById('adm-um-title').textContent=modo==='new'?'Nuevo usuario':'Editar usuario';
+  document.getElementById('adm-um-nombre').value='';
+  document.getElementById('adm-um-email').value='';
+  document.getElementById('adm-um-rol').value='inspector';
+  document.getElementById('adm-um-prev').style.display='none';
+  document.getElementById('adm-um-del-wrap').style.display='none';
+  updateAdmRolDesc();
+  if(modo==='edit'&&userId){
+    const u=admTodosUsuarios.find(u=>u.id===userId);
+    if(u){
+      document.getElementById('adm-um-nombre').value=u.full_name||'';
+      document.getElementById('adm-um-email').value=u.email||'';
+      document.getElementById('adm-um-rol').value=u.rol_global||'inspector';
+      document.getElementById('adm-um-prev').style.display='block';
+      document.getElementById('adm-um-prev').textContent=`ID: ${u.id.slice(0,16)}... · Registro: ${new Date(u.created_at).toLocaleDateString('es-CL')}`;
+      document.getElementById('adm-um-del-wrap').style.display='block';
+      updateAdmRolDesc();
+      try {
+        const asign=await must(sb.from('proyecto_usuarios').select('*').eq('user_id',userId));
+        admCurUsrAsignaciones=asign||[];
+      } catch(e){ admCurUsrAsignaciones=[]; }
+      renderAdmUsrProyList();
+    }
+  }
+  document.getElementById('adm-usr-modal-bg').classList.add('on');
+  document.body.style.overflow='hidden';
+}
+function closeAdmUsrModal(){ document.getElementById('adm-usr-modal-bg').classList.remove('on'); document.body.style.overflow=''; }
+function updateAdmRolDesc(){
+  const rol=document.getElementById('adm-um-rol')?.value;
+  const desc=document.getElementById('adm-um-rol-desc');
+  if(desc) desc.textContent=rolDesc(rol);
+}
+function renderAdmUsrProyList(){
+  const el=document.getElementById('adm-um-proy-list');
+  if(!el) return;
+  if(!admCurUsrAsignaciones.length){
+    el.innerHTML='<div style="font-size:11px;color:#aaa;font-family:monospace;padding:4px">Sin proyectos asignados</div>';
+    return;
+  }
+  el.innerHTML=admCurUsrAsignaciones.map(a=>{
+    const proy=proyectos.find(p=>p.id===a.proyecto_id);
+    return `<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#f5f3ee;border-radius:4px;border:1px solid #ddd9d0">
+      <span style="flex:1;font-size:12px;font-weight:500">${esc(proy?.nombre||a.proyecto_id)}</span>
+      <span class="rol-pill ${rolClass(a.rol)}" style="font-size:8px">${rolLabel(a.rol)}</span>
+      <button onclick="admRemoveAsign('${a.proyecto_id}')" style="background:none;border:none;cursor:pointer;color:#dc2626;font-size:12px">&#10005;</button>
+    </div>`;
+  }).join('');
+}
+async function admRemoveAsign(proyId){
+  if(!admCurUsrId) return;
+  try {
+    await must(sb.from('proyecto_usuarios').delete().eq('user_id',admCurUsrId).eq('proyecto_id',proyId));
+    admCurUsrAsignaciones=admCurUsrAsignaciones.filter(a=>a.proyecto_id!==proyId);
+    renderAdmUsrProyList(); toast('Acceso removido ✓','ok');
+  } catch(e){ toast('Error: '+e.message,'err'); }
+}
+async function saveAdmUsuario(){
+  const nombre=document.getElementById('adm-um-nombre').value.trim();
+  const rol=document.getElementById('adm-um-rol').value;
+  if(!nombre){ toast('El nombre es obligatorio','err'); return; }
+  const btn=document.getElementById('adm-um-sv'); btn.disabled=1; btn.textContent='Guardando&#8230;';
+  try {
+    if(admCurUsrId){
+      await must(sb.from('profiles').update({full_name:nombre,rol}).eq('id',admCurUsrId));
+      const u=admTodosUsuarios.find(u=>u.id===admCurUsrId);
+      if(u){ u.full_name=nombre; u.rol_global=rol; }
+      toast('Usuario actualizado ✓','ok');
+      renderAdmUsuariosTable(admTodosUsuarios);
+      closeAdmUsrModal();
+    } else {
+      toast('Para crear usuarios usa Supabase → Authentication → Invite user. Luego asigna rol aqui.','ok');
+    }
+  } catch(e){ toast('Error: '+e.message,'err'); }
+  btn.disabled=0; btn.textContent='GUARDAR';
+}
+async function admDeactivateUser(){
+  if(!admCurUsrId||!confirm('&#191;Restringir acceso de este usuario a solo Visita?')) return;
+  try {
+    await must(sb.from('profiles').update({rol:'visita'}).eq('id',admCurUsrId));
+    toast('Rol cambiado a Visita ✓','ok');
+    closeAdmUsrModal(); await loadAdmUsuarios();
+  } catch(e){ toast('Error: '+e.message,'err'); }
+}
+
+// ── Modal asignar proyectos desde tabla ───────────────────
+async function openAdmAsignFromTable(userId, userName){
+  admCurUsrId=userId;
+  try {
+    const asign=await must(sb.from('proyecto_usuarios').select('*').eq('user_id',userId));
+    admCurUsrAsignaciones=asign||[];
+  } catch(e){ admCurUsrAsignaciones=[]; }
+  document.getElementById('adm-asign-user-name').textContent=userName;
+  renderAdmAsignProyList();
+  document.getElementById('adm-asign-modal-bg').classList.add('on');
+}
+function openAdmAsignModal(){
+  const nombre=document.getElementById('adm-um-nombre').value||'Usuario';
+  document.getElementById('adm-asign-user-name').textContent=nombre;
+  renderAdmAsignProyList();
+  document.getElementById('adm-asign-modal-bg').classList.add('on');
+}
+function closeAdmAsignModal(){
+  document.getElementById('adm-asign-modal-bg').classList.remove('on');
+  renderAdmUsrProyList();
+}
+function renderAdmAsignProyList(){
+  const el=document.getElementById('adm-asign-proy-list');
+  if(!el||!proyectos.length){ if(el) el.innerHTML='<div style="color:#aaa;font-size:12px;font-family:monospace">Sin proyectos disponibles</div>'; return; }
+  el.innerHTML=proyectos.map(p=>{
+    const asign=admCurUsrAsignaciones.find(a=>a.proyecto_id===p.id);
+    return `<div class="asign-proy-row">
+      <div class="asign-proy-name">${esc(p.nombre)}<div style="font-size:10px;color:#666;font-family:monospace">${esc(p.cliente||'')}${p.planta?' · '+esc(p.planta):''}</div></div>
+      <select onchange="admUpdateAsignRol('${p.id}',this.value)" style="font-size:11px;padding:4px 8px;border:1px solid #2a2f40;border-radius:4px;background:#111;color:#e5e7eb">
+        <option value="">&#8212; Sin acceso &#8212;</option>
+        <option value="inspector" ${asign?.rol==='inspector'?'selected':''}>Inspector</option>
+        <option value="supervisor" ${asign?.rol==='supervisor'?'selected':''}>Supervisor</option>
+        <option value="cliente" ${asign?.rol==='cliente'?'selected':''}>Cliente</option>
+        <option value="visita" ${asign?.rol==='visita'?'selected':''}>Visita</option>
+      </select>
+    </div>`;
+  }).join('');
+}
+async function admUpdateAsignRol(proyId, rol){
+  if(!admCurUsrId) return;
+  try {
+    if(!rol){
+      await must(sb.from('proyecto_usuarios').delete().eq('user_id',admCurUsrId).eq('proyecto_id',proyId));
+      admCurUsrAsignaciones=admCurUsrAsignaciones.filter(a=>a.proyecto_id!==proyId);
+      toast('Acceso removido ✓','ok');
+    } else {
+      const saved=await must(sb.from('proyecto_usuarios').upsert({user_id:admCurUsrId,proyecto_id:proyId,rol,asignado_por:profile?.full_name||session.user.email},{onConflict:'proyecto_id,user_id'}).select().single());
+      const idx=admCurUsrAsignaciones.findIndex(a=>a.proyecto_id===proyId);
+      if(idx>=0) admCurUsrAsignaciones[idx]=saved; else admCurUsrAsignaciones.push(saved);
+      toast('Asignado ✓','ok');
+    }
+    renderAdmUsrProyList();
+  } catch(e){ toast('Error: '+e.message,'err'); }
 }
 </script>
 </body>
