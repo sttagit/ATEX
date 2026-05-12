@@ -375,8 +375,8 @@ input[type=file]{display:none}
       <span style="background:#F7C600;color:#111;font-size:9px;font-weight:900;padding:2px 6px;border-radius:3px">Ex</span>
     </div>
     <div style="display:flex;align-items:center;gap:10px">
-      <span id="sel-user-lbl" style="font-family:monospace;font-size:10px;color:#555"></span>
-      <button id="sel-admin-btn" onclick="openAdminPanel()" style="display:none;background:none;border:1px solid #2a2f40;border-radius:4px;color:#a78bfa;font-size:10px;font-family:monospace;padding:4px 10px;cursor:pointer">&#9881; Admin</button>
+      <span id="sel-user-lbl" style="font-family:monospace;font-size:10px;color:#888"></span>
+      <button id="sel-admin-btn" onclick="openAdminPanel()" style="display:none;background:none;border:1px solid #2a2f40;border-radius:4px;color:#a78bfa;font-size:10px;font-family:monospace;padding:4px 10px;cursor:pointer;align-items:center;gap:4px">&#9881; Admin</button>
       <button onclick="doLogout()" style="background:none;border:1px solid #2a2f40;border-radius:4px;color:#888;font-size:10px;font-family:monospace;padding:4px 10px;cursor:pointer">&#8592; Salir</button>
     </div>
   </div>
@@ -389,7 +389,7 @@ input[type=file]{display:none}
     <div style="font-size:14px;color:#888;font-family:monospace;letter-spacing:1px">SELECCIONAR PROYECTO</div>
   </div>
   <div class="proy-grid" id="proy-grid"></div>
-  <button class="btn-nuevo-proy" id="btn-crear-proy" onclick="openNuevoProy()">&#65291; Crear nuevo proyecto</button>
+  <button class="btn-nuevo-proy" id="btn-crear-proy" onclick="openNuevoProy()">＋ Crear nuevo proyecto</button>
 </div>
 
 <!-- ══════════════ MODAL NUEVO PROYECTO ══════════════ -->
@@ -3743,6 +3743,13 @@ async function showProyectos(){
   loader(1);
   document.getElementById('app').style.display='none';
   document.getElementById('login').style.display='none';
+  // Cargar perfil si no está disponible aún
+  if(!perfilActual && session){
+    try {
+      profile = await must(sb.from('profiles').select('*').eq('id',session.user.id).single());
+      perfilActual = profile;
+    } catch(e){ perfilActual={rol:'inspector'}; }
+  }
   try {
     const data=await must(sb.from('proyectos').select('*').eq('activo',true).order('created_at',{ascending:true}));
     proyectos=data||[];
@@ -3770,6 +3777,11 @@ async function showProyectos(){
     const puedeCrear=['admin','supervisor','inspector'].includes(perfilActual?.rol);
     btnCrear.style.display=puedeCrear?'flex':'none';
   }
+  // Actualizar barra superior del selector
+  const selUserLbl=document.getElementById('sel-user-lbl');
+  if(selUserLbl) selUserLbl.textContent=perfilActual?.full_name||profile?.full_name||session?.user?.email||'';
+  const selAdminBtn=document.getElementById('sel-admin-btn');
+  if(selAdminBtn) selAdminBtn.style.display=perfilActual?.rol==='admin'?'block':'none';
   document.getElementById('proyecto-selector').classList.add('on');
   loader(0);
 }
@@ -4177,9 +4189,8 @@ function switchAdminTab(tab, el){
     const p=document.getElementById('adm-panel-'+t);
     if(p) p.style.display=t===tab?'block':'none';
   });
-  // Solo recargar si cambia de tab (no si vuelve al mismo)
   if(tab==='usuarios' && prevTab!=='usuarios') loadAdmUsuarios();
-  if(tab==='proyectos') loadAdmProyectos(); // Proyectos siempre recarga (datos de BD)
+  if(tab==='proyectos') loadAdmProyectos();
 }
 
 // ── Cargar usuarios ───────────────────────────────────────
@@ -4311,10 +4322,7 @@ async function updateProyUserRol(proyId, userId, rol){
 
 // ── Modal usuario admin ───────────────────────────────────
 async function openAdmUsrModal(modo, userId=null){
-  // Si ya estaba abierto con el mismo usuario, no resetear asignaciones
-  const sameUser = admCurUsrId===userId && userId!==null;
-  admCurUsrId=userId;
-  if(!sameUser) admCurUsrAsignaciones=[];
+  admCurUsrId=userId; admCurUsrAsignaciones=[];
   document.getElementById('adm-um-title').textContent=modo==='new'?'Nuevo usuario':'Editar usuario';
   document.getElementById('adm-um-nombre').value='';
   document.getElementById('adm-um-email').value='';
@@ -4419,10 +4427,7 @@ function openAdmAsignModal(){
 }
 function closeAdmAsignModal(){
   document.getElementById('adm-asign-modal-bg').classList.remove('on');
-  // Restaurar scroll del modal usuario si está abierto
-  if(document.getElementById('adm-usr-modal-bg').classList.contains('on')){
-    renderAdmUsrProyList();
-  }
+  renderAdmUsrProyList();
 }
 function renderAdmAsignProyList(){
   const el=document.getElementById('adm-asign-proy-list');
