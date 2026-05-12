@@ -533,8 +533,6 @@ input[type=file]{display:none}
         </div>
         <input type="file" id="insp-cam" accept="image/*" capture="environment" onchange="addInspPhotos(event)">
         <input type="file" id="insp-gal" accept="image/*" multiple onchange="addInspPhotos(event)">
-        <button class="btn-dark" onclick="pastePhoto('insp')" style="font-size:11px;padding:6px 14px;background:#2a2f40" title="Pegar imagen del portapapeles">📋 Pegar imagen</button>
-        <div style="font-size:9px;color:#aaa;margin-top:4px;font-family:monospace">Pegue una imagen con <strong style='color:#F7C600'>Ctrl+V</strong></div>
         <div id="insp-foto-warn" style="display:none;font-size:10px;color:#dc2626;margin-top:6px;font-family:monospace">⚠ Se requiere al menos 1 foto para guardar</div>
       </div>
 
@@ -914,6 +912,9 @@ const EQ = [
   {id:'e043',  n:'Filtro manga arroz a molienda (inf.) + desvíos tolva harina',p:'5',   g:'Filtración polvo',     z:'22'},
   {id:'e044',  n:'Succión polvos despedradora de arroz',                       p:'5',    g:'Aspiración',           z:'21'},
   {id:'e045',  n:'Elevador de capacho arroz (→ criba circular arroz)',         p:'5',    g:'Transporte',           z:'21'},
+  {id:'e104',  n:'Elevador de capachos malta procesada N°1 → P6 (BÜHLER) — P5',p:'5',  g:'Transporte',           z:'21'},
+  {id:'e105',  n:'Elevador de capachos malta procesada N°2 → P6 (BÜHLER) — P5',p:'5',  g:'Transporte',           z:'21'},
+  {id:'e106',  n:'Tornillo acondicionador / humectador BÜHLER',                p:'5',   g:'Acondicionamiento',    z:'22'},
 
   // ── SEXTO PISO ────────────────────────────────────────────
   {id:'e046',  n:'Filtro manga polvo tolva recepción (parte superior)',        p:'6',    g:'Filtración polvo',     z:'22'},
@@ -933,6 +934,8 @@ const EQ = [
   {id:'e060',  n:'Succión polvos preparación de carga malta',                  p:'6',    g:'Aspiración',           z:'21'},
   {id:'e061',  n:'Succión polvos descarga de malta a silos',                   p:'6',    g:'Aspiración',           z:'21'},
   {id:'e062',  n:'Succión polvos descarga de arroz a silos',                   p:'6',    g:'Aspiración',           z:'21'},
+  {id:'e107',  n:'Filtro de Aspiración de Alta Presión (Arroz)',               p:'6',    g:'Filtración polvo',     z:'22'},
+  {id:'e108',  n:'Ciclón Separador (Arroz)',                                   p:'6',    g:'Filtración polvo',     z:'21'},
 
   // ── SÉPTIMO PISO ──────────────────────────────────────────
   {id:'e063',  n:'Terminación elevador de malta a silos',                      p:'7',    g:'Transporte',           z:'21'},
@@ -940,7 +943,14 @@ const EQ = [
   {id:'e064',  n:'Terminación elevador de arroz',                              p:'7',    g:'Transporte',           z:'21'},
   {id:'e065',  n:'Balanza en línea malta (50 t/h)',                            p:'7',    g:'Pesaje',               z:'21'},
   {id:'e066',  n:'Balanza en línea arroz',                                     p:'7',    g:'Pesaje',               z:'21'},
-  {id:'e067',  n:'Silos de malta (6 silos — 600 t total)',                    p:'7',    g:'Almacenamiento',       z:'20'},
+  {id:'e067a', n:'Silo de Malta N°1',                                          p:'7',    g:'Almacenamiento',       z:'20'},
+  {id:'e067b', n:'Silo de Malta N°2',                                          p:'7',    g:'Almacenamiento',       z:'20'},
+  {id:'e067c', n:'Silo de Malta N°3',                                          p:'7',    g:'Almacenamiento',       z:'20'},
+  {id:'e067d', n:'Silo de Malta N°5',                                          p:'7',    g:'Almacenamiento',       z:'20'},
+  {id:'e067e', n:'Silo de Malta N°6',                                          p:'7',    g:'Almacenamiento',       z:'20'},
+  {id:'e067f', n:'Silo de Malta N°7',                                          p:'7',    g:'Almacenamiento',       z:'20'},
+  {id:'e067g', n:'Silo de Arroz N°4',                                          p:'7',    g:'Almacenamiento',       z:'20'},
+  {id:'e067h', n:'Silo de Arroz N°8',                                          p:'7',    g:'Almacenamiento',       z:'20'},
   {id:'e068',  n:'Sistema extracción polvo tolva recepción (terminación)',     p:'7',    g:'Aspiración',           z:'21'},
   {id:'e069',  n:'Succión polvos distribuidor malta a silos',                  p:'7',    g:'Aspiración',           z:'21'},
   {id:'e070',  n:'Succión polvos arroz a intersilos',                          p:'7',    g:'Aspiración',           z:'21'},
