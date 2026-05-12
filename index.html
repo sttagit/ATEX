@@ -376,7 +376,7 @@ input[type=file]{display:none}
     </div>
     <div style="display:flex;align-items:center;gap:10px">
       <span id="sel-user-lbl" style="font-family:monospace;font-size:10px;color:#888"></span>
-      <button id="sel-admin-btn" onclick="openAdminPanel()" style="display:none;background:none;border:1px solid #2a2f40;border-radius:4px;color:#a78bfa;font-size:10px;font-family:monospace;padding:4px 10px;cursor:pointer;align-items:center;gap:4px">&#9881; Admin</button>
+      <button id="sel-admin-btn" onclick="openAdminPanel()" style="display:none;background:none;border:1px solid #2a2f40;border-radius:4px;color:#a78bfa;font-size:10px;font-family:monospace;padding:4px 10px;cursor:pointer">&#9881; Admin</button>
       <button onclick="doLogout()" style="background:none;border:1px solid #2a2f40;border-radius:4px;color:#888;font-size:10px;font-family:monospace;padding:4px 10px;cursor:pointer">&#8592; Salir</button>
     </div>
   </div>
@@ -3746,8 +3746,8 @@ async function showProyectos(){
   // Cargar perfil si no está disponible aún
   if(!perfilActual && session){
     try {
-      profile = await must(sb.from('profiles').select('*').eq('id',session.user.id).single());
-      perfilActual = profile;
+      profile=await must(sb.from('profiles').select('*').eq('id',session.user.id).single());
+      perfilActual=profile;
     } catch(e){ perfilActual={rol:'inspector'}; }
   }
   try {
@@ -3777,7 +3777,6 @@ async function showProyectos(){
     const puedeCrear=['admin','supervisor','inspector'].includes(perfilActual?.rol);
     btnCrear.style.display=puedeCrear?'flex':'none';
   }
-  // Actualizar barra superior del selector
   const selUserLbl=document.getElementById('sel-user-lbl');
   if(selUserLbl) selUserLbl.textContent=perfilActual?.full_name||profile?.full_name||session?.user?.email||'';
   const selAdminBtn=document.getElementById('sel-admin-btn');
@@ -4181,7 +4180,6 @@ function closeAdminPanel(){
   document.body.style.overflow='';
 }
 function switchAdminTab(tab, el){
-  const prevTab=admCurTab;
   admCurTab=tab;
   document.querySelectorAll('.admin-nav-btn').forEach(b=>b.classList.remove('on'));
   el.classList.add('on');
@@ -4189,11 +4187,35 @@ function switchAdminTab(tab, el){
     const p=document.getElementById('adm-panel-'+t);
     if(p) p.style.display=t===tab?'block':'none';
   });
-  if(tab==='usuarios' && prevTab!=='usuarios') loadAdmUsuarios();
+  if(tab==='usuarios') loadAdmUsuarios();
   if(tab==='proyectos') loadAdmProyectos();
 }
 
 // ── Cargar usuarios ───────────────────────────────────────
+async function loadAdmUsuariosFresh(){
+  // Carga directa desde profiles + auth.users sin caché de vista
+  const tbody=document.getElementById('adm-usr-tbody');
+  if(!tbody) return;
+  try {
+    // Leer profiles directamente (más fresco que la vista)
+    const profs=await must(sb.from('profiles').select('id,full_name,rol'));
+    const pu=await must(sb.from('proyecto_usuarios').select('user_id'));
+    const puCount={};
+    (pu||[]).forEach(r=>{ puCount[r.user_id]=(puCount[r.user_id]||0)+1; });
+    // Combinar con datos existentes en admTodosUsuarios (para tener email y last_sign_in)
+    if(profs){
+      profs.forEach(p=>{
+        const existing=admTodosUsuarios.find(u=>u.id===p.id);
+        if(existing){ existing.full_name=p.full_name; existing.rol_global=p.rol; existing.proyectos_count=puCount[p.id]||0; }
+      });
+    }
+    renderAdmUsuariosTable(admTodosUsuarios);
+  } catch(e){
+    // Fallback: recargar vista completa
+    await loadAdmUsuarios();
+  }
+}
+
 async function loadAdmUsuarios(){
   const tbody=document.getElementById('adm-usr-tbody');
   if(!tbody) return;
@@ -4388,11 +4410,13 @@ async function saveAdmUsuario(){
   try {
     if(admCurUsrId){
       await must(sb.from('profiles').update({full_name:nombre,rol}).eq('id',admCurUsrId));
+      // Actualizar localmente de inmediato
       const u=admTodosUsuarios.find(u=>u.id===admCurUsrId);
       if(u){ u.full_name=nombre; u.rol_global=rol; }
       toast('Usuario actualizado ✓','ok');
-      renderAdmUsuariosTable(admTodosUsuarios);
       closeAdmUsrModal();
+      // Recargar desde BD para asegurar datos frescos (sin caché)
+      await loadAdmUsuariosFresh();
     } else {
       toast('Para crear usuarios usa Supabase → Authentication → Invite user. Luego asigna rol aqui.','ok');
     }
@@ -4404,7 +4428,7 @@ async function admDeactivateUser(){
   try {
     await must(sb.from('profiles').update({rol:'visita'}).eq('id',admCurUsrId));
     toast('Rol cambiado a Visita ✓','ok');
-    closeAdmUsrModal(); await loadAdmUsuarios();
+    closeAdmUsrModal(); await loadAdmUsuariosFresh();
   } catch(e){ toast('Error: '+e.message,'err'); }
 }
 
