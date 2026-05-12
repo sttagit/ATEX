@@ -284,6 +284,40 @@ input[type=file]{display:none}
 .sec-hd.piso-hd-over{color:#111!important;background:#F7C600!important;border-radius:3px;padding:4px 8px!important}
 .eq-drag-ghost{position:fixed;top:-200px;left:-200px;background:#0f1117;color:#F7C600;border:1px solid #F7C600;border-radius:5px;padding:6px 14px;font-size:11px;font-family:monospace;pointer-events:none;z-index:9999;white-space:nowrap;max-width:220px;overflow:hidden;text-overflow:ellipsis}
 
+
+/* ── PANEL USUARIOS ── */
+#tab-usuarios{display:none}
+.usr-table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #ddd9d0;border-radius:6px;overflow:hidden}
+.usr-table th{background:#0f1117;color:#ccc;font-family:monospace;font-size:9px;letter-spacing:.8px;text-transform:uppercase;padding:9px 14px;text-align:left;font-weight:600}
+.usr-table td{padding:10px 14px;border-bottom:1px solid #f0ece4;font-size:12px;vertical-align:middle}
+.usr-table tr:last-child td{border-bottom:none}
+.usr-table tr:hover td{background:#fafaf8}
+.rol-pill{font-family:monospace;font-size:9px;font-weight:700;padding:2px 8px;border-radius:3px;letter-spacing:.5px;display:inline-block}
+.rol-admin{background:#7c3aed;color:#fff}
+.rol-supervisor{background:#0284c7;color:#fff}
+.rol-inspector{background:#059669;color:#fff}
+.rol-cliente{background:#d97706;color:#fff}
+.rol-visita{background:#6b7280;color:#fff}
+.perm-chip{font-size:9px;padding:2px 7px;border-radius:2px;font-family:monospace;display:inline-block;margin:1px}
+.perm-on{background:#d1fae5;color:#065f46}
+.perm-off{background:#f3f4f6;color:#9ca3af}
+/* Modal usuario */
+#usr-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:250;padding:16px;overflow-y:auto;align-items:flex-start;justify-content:center}
+#usr-modal-bg.on{display:flex}
+/* Modal asignar proyecto */
+#asign-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:260;padding:16px;overflow-y:auto;align-items:flex-start;justify-content:center}
+#asign-modal-bg.on{display:flex}
+.asign-proy-row{display:flex;align-items:center;gap:10px;padding:8px 12px;border:1px solid #ddd9d0;border-radius:4px;margin-bottom:6px;background:#fff}
+.asign-proy-name{flex:1;font-size:13px;font-weight:500}
+/* Permisos visuales */
+.perm-matrix{display:grid;grid-template-columns:2fr repeat(5,1fr);gap:0;border:1px solid #ddd9d0;border-radius:6px;overflow:hidden;font-size:11px}
+.perm-matrix .ph{background:#0f1117;color:#ccc;font-family:monospace;font-size:8px;letter-spacing:.5px;text-transform:uppercase;padding:8px 6px;text-align:center;font-weight:600}
+.perm-matrix .ph:first-child{text-align:left;padding-left:12px}
+.perm-matrix .pr{padding:7px 12px;border-top:1px solid #f0ece4;font-size:11px;color:#374151;display:flex;align-items:center}
+.perm-matrix .pc{border-top:1px solid #f0ece4;text-align:center;display:flex;align-items:center;justify-content:center;font-size:13px}
+.perm-matrix .pr:nth-child(12n+1){background:#fafaf8}
+.perm-matrix .pc:nth-child(12n){background:#fafaf8}
+
 </style>
 </head>
 <body>
@@ -493,6 +527,7 @@ input[type=file]{display:none}
     <div class="nav-btn" onclick="goTab('rs',this)">📊 RESUMEN</div>
     <div class="nav-btn" onclick="goTab('inf',this)">📄 INFORME</div>
     <div class="nav-btn" onclick="goTab('ciclos',this)">📅 CICLOS</div>
+    <div class="nav-btn" id="nav-usuarios" onclick="goTab('usuarios',this)" style="display:none">&#128100; USUARIOS</div>
   </div>
 
   <!-- TAB EQUIPOS -->
@@ -754,6 +789,73 @@ input[type=file]{display:none}
   </div>
 </div>
 
+
+<!-- MODAL USUARIO -->
+<div id="usr-modal-bg">
+  <div class="modal" style="border-top-color:#7c3aed;max-width:520px">
+    <div class="modal-head" style="background:#1e1030">
+      <div style="flex:1">
+        <div style="font-size:11px;font-family:monospace;color:#a78bfa;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">USUARIO</div>
+        <div id="um-title" style="font-size:15px;font-weight:600">Invitar usuario</div>
+      </div>
+      <button onclick="closeUsrModal()" style="background:none;border:none;color:#666;font-size:20px;cursor:pointer">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <div><div class="field-lbl">Nombre completo</div><input class="field-input" id="um-nombre" placeholder="Nombre Apellido"></div>
+      <div><div class="field-lbl">Email</div><input class="field-input" id="um-email" type="email" placeholder="usuario@empresa.com" id="um-email"></div>
+      <div>
+        <div class="field-lbl">Rol global</div>
+        <select class="field-sel" id="um-rol">
+          <option value="inspector">Inspector</option>
+          <option value="supervisor">Supervisor</option>
+          <option value="cliente">Cliente</option>
+          <option value="visita">Visita</option>
+          <option value="admin">Administrador</option>
+        </select>
+        <div id="um-rol-desc" style="font-size:10px;color:#888;font-family:monospace;margin-top:5px;padding:6px 10px;background:#f5f3ee;border-radius:4px"></div>
+      </div>
+      <div id="um-proy-section">
+        <div class="field-lbl">Proyectos asignados</div>
+        <div id="um-proy-list" style="display:flex;flex-direction:column;gap:6px;margin-top:4px"></div>
+        <button onclick="openAsignModal()" class="btn-out" style="font-size:11px;margin-top:8px;padding:6px 14px">&#65291; Asignar proyectos</button>
+      </div>
+      <div id="um-prev" style="display:none;padding:8px 10px;background:#eceae3;border-radius:4px;font-size:10px;color:#6b7280;font-family:monospace"></div>
+      <div id="um-del-wrap" style="display:none">
+        <div class="del-section">
+          <div class="del-section-title">&#9888; Zona de eliminacion</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn-del" onclick="deactivateUser()">&#128274; Desactivar acceso</button>
+            <button class="btn-del" onclick="changeUserPwd()">&#128273; Resetear contrasena</button>
+          </div>
+          <div style="font-size:10px;color:#aaa;margin-top:6px;font-family:monospace">Desactivar impide el acceso sin eliminar datos</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-out" onclick="closeUsrModal()">Cancelar</button>
+      <button class="btn-save" onclick="saveUsuario()" id="um-sv" style="background:#7c3aed;color:#fff">GUARDAR</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ASIGNAR PROYECTOS -->
+<div id="asign-modal-bg">
+  <div class="modal" style="border-top-color:#F7C600;max-width:480px">
+    <div class="modal-head" style="background:#0f1117">
+      <div style="flex:1">
+        <div style="font-size:11px;font-family:monospace;color:#F7C600;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">ASIGNAR PROYECTOS</div>
+        <div id="asign-user-name" style="font-size:14px;font-weight:600"></div>
+      </div>
+      <button onclick="closeAsignModal()" style="background:none;border:none;color:#666;font-size:20px;cursor:pointer">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <div id="asign-proy-list" style="display:flex;flex-direction:column;gap:6px"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-out" onclick="closeAsignModal()">Cerrar</button>
+    </div>
+  </div>
+</div>
 <!-- MODAL EQUIPO -->
 <div id="modal-bg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;padding:16px;overflow-y:auto;align-items:flex-start;justify-content:center">
   <div class="modal">
@@ -1162,6 +1264,7 @@ const FL = {
 //  STATE
 let session, profile, recs={}, subRecs={}, curEq=null, curConf='', pendFiles=[], exPaths=[], floorF='all', allRaw=[], allSubRaw=[];
 let curProyecto=null, proyectos=[];
+let todosUsuarios=[], curUsrId=null, curUsrAsignaciones=[], perfilActual=null;
 let customPisos={}, proyUbicaciones=[], proyEquipos=[];
 let curUbIdNuevoEq=null;
 let _eqDragId=null, _eqDragGhost=null;
@@ -1195,6 +1298,10 @@ async function loadApp(){
   document.getElementById('user-lbl').textContent=name;
   document.getElementById('i-insp').value=name;
   document.getElementById('i-fecha').value=new Date().toISOString().slice(0,10);
+  // Guardar perfil global y mostrar tab usuarios si es admin
+  perfilActual = profile;
+  const navUsr=document.getElementById('nav-usuarios');
+  if(navUsr) navUsr.style.display=(profile?.rol==='admin')?'block':'none';
   const pill=document.getElementById('proy-pill-name');
   if(pill) pill.textContent=curProyecto.nombre;
   const tt=document.querySelector('.topbar-title');
@@ -1289,10 +1396,11 @@ async function doLogout(){
 function goTab(name,el){
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('on'));
   el.classList.add('on');
-  ['eq','rs','inf','ciclos'].forEach(t=>{ document.getElementById('tab-'+t).style.display=t===name?'block':'none'; });
+  ['eq','rs','inf','ciclos','usuarios'].forEach(t=>{ document.getElementById('tab-'+t).style.display=t===name?'block':'none'; });
   if(name==='rs') renderResumen();
   if(name==='inf') loadAndRenderInforme();
   if(name==='ciclos') loadCiclos();
+  if(name==='usuarios') loadUsuarios();
 }
 
 async function loadAndRenderInforme(){
@@ -1743,6 +1851,7 @@ function toggleDelSection(){
 
 async function deleteEqData(){
   if(!curEq) return;
+  if(!canDo('delete')){ toast('Sin permiso para eliminar datos','err'); return; }
   if(!confirm('¿Borrar todos los datos de inspección de este equipo?\n\nEsto elimina marca, fotos y conformidad.\nEl equipo seguirá visible en el listado.')) return;
   try {
     const r=recs[curEq]||{};
@@ -1769,6 +1878,7 @@ async function deleteEqData(){
 
 async function hideEq(){
   if(!curEq) return;
+  if(!canDo('delete')){ toast('Sin permiso para ocultar equipos','err'); return; }
   const nombre=eqName(curEq);
   if(!confirm(`¿Ocultar "${nombre}" del listado?\n\nPodrás restaurarlo desde Supabase eliminando la fila en equipos_ocultos.`)) return;
   try {
@@ -3451,17 +3561,27 @@ async function showProyectos(){
     const pe=await must(sb.from('proyecto_equipos').select('proyecto_id'));
     [...(sr||[]),...(sc||[]),...(pe||[])].forEach(r=>{statsMap[r.proyecto_id]=(statsMap[r.proyecto_id]||0)+1;});
   } catch(e){}
-  renderProyectoGrid(statsMap);
+  // Filtrar proyectos según asignación (admin ve todos)
+  let proysFiltrados = proyectos;
+  if(perfilActual?.rol !== 'admin'){
+    try {
+      const asign=await must(sb.from('proyecto_usuarios').select('proyecto_id').eq('user_id',session.user.id));
+      const ids=(asign||[]).map(a=>a.proyecto_id);
+      proysFiltrados=proyectos.filter(p=>ids.includes(p.id));
+    } catch(e){ proysFiltrados=[]; }
+  }
+  renderProyectoGrid(statsMap, proysFiltrados);
   document.getElementById('proyecto-selector').classList.add('on');
   loader(0);
 }
-function renderProyectoGrid(statsMap){
+function renderProyectoGrid(statsMap, lista=null){
+  const proyLista = lista||proyectos;
   const grid=document.getElementById('proy-grid');
-  if(!proyectos.length){
-    grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;color:#666;padding:40px;font-family:monospace;font-size:12px">No hay proyectos aún.<br><span style="color:#F7C600">Crea el primero con el botón de abajo.</span></div>`;
+  if(!proyLista.length){
+    grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;color:#666;padding:40px;font-family:monospace;font-size:12px">No hay proyectos asignados.<br><span style="color:#F7C600">Contacta al administrador.</span></div>`;
     return;
   }
-  grid.innerHTML=proyectos.map(p=>{
+  grid.innerHTML=proyLista.map(p=>{
     const count=statsMap[p.id]||0;
     const tipoLabel=p.tipo_ubicacion||'Piso';
     return `<div class="proy-card" onclick="selectProyecto('${p.id}')">
@@ -3479,6 +3599,14 @@ function renderProyectoGrid(statsMap){
 }
 async function selectProyecto(pid){
   curProyecto=proyectos.find(p=>p.id===pid)||null; if(!curProyecto) return;
+  // Guardar rol del usuario en este proyecto
+  try {
+    const asign=await must(sb.from('proyecto_usuarios').select('rol').eq('user_id',session.user.id).eq('proyecto_id',pid).maybeSingle());
+    if(asign && perfilActual?.rol!=='admin'){
+      // Usar el rol de proyecto si no es admin global
+      perfilActual={...perfilActual, rolEnProyecto:asign.rol};
+    }
+  } catch(e){}
   recs={}; subRecs={}; allRaw=[]; allSubRaw=[]; customNames={}; hiddenEqs=new Set(); equiposExtra=[];
   customPisos={}; proyUbicaciones=[]; proyEquipos=[];
   await loadApp();
@@ -3507,6 +3635,7 @@ function openNuevoProy(modo='new', proy=null){
 }
 function closeNuevoProy(){ document.getElementById('nuevo-proy-bg').classList.remove('on'); document.body.style.overflow=''; }
 async function saveNuevoProy(){
+  if(!canDo('editProyecto')){ toast('Sin permiso para crear proyectos','err'); return; }
   const nombre=document.getElementById('np-nombre').value.trim();
   if(!nombre){toast('El nombre es obligatorio','err');return;}
   const tipoUb=_tipoUbSel==='_custom'?(document.getElementById('np-tipo-custom').value.trim()||'Ubicación'):_tipoUbSel;
@@ -3533,6 +3662,296 @@ async function saveNuevoProy(){
     toast('Proyecto creado &#10003;','ok'); closeNuevoProy(); await showProyectos();
   } catch(e){toast('Error: '+e.message,'err');}
   btn.disabled=0; btn.textContent='CREAR PROYECTO';
+}
+
+// ═══════════════════════════════════════════════════════════
+//  SISTEMA DE PERMISOS
+// ═══════════════════════════════════════════════════════════
+const PERMISOS = {
+  admin:      {editProyecto:true, deleteProyecto:true, manageUsers:true, fillFicha:true, editEquipo:true, delete:true, viewInforme:true, exportar:true, comentar:true},
+  supervisor: {editProyecto:true, deleteProyecto:false,manageUsers:false,fillFicha:true, editEquipo:true, delete:true, viewInforme:true, exportar:true, comentar:true},
+  inspector:  {editProyecto:false,deleteProyecto:false,manageUsers:false,fillFicha:true, editEquipo:true, delete:false,viewInforme:true, exportar:true, comentar:true},
+  cliente:    {editProyecto:false,deleteProyecto:false,manageUsers:false,fillFicha:false,editEquipo:false,delete:false,viewInforme:true, exportar:true, comentar:true},
+  visita:     {editProyecto:false,deleteProyecto:false,manageUsers:false,fillFicha:false,editEquipo:false,delete:false,viewInforme:true, exportar:false,comentar:false},
+};
+function canDo(accion){
+  const rol = perfilActual?.rol || 'inspector';
+  return PERMISOS[rol]?.[accion] === true;
+}
+function rolLabel(r){ return {admin:'Admin',supervisor:'Supervisor',inspector:'Inspector',cliente:'Cliente',visita:'Visita'}[r]||r; }
+function rolClass(r){ return {admin:'rol-admin',supervisor:'rol-supervisor',inspector:'rol-inspector',cliente:'rol-cliente',visita:'rol-visita'}[r]||'rol-inspector'; }
+function rolDesc(r){
+  return {
+    admin:'Acceso completo. Ve y gestiona todos los proyectos y usuarios.',
+    supervisor:'Puede crear proyectos y editar equipos. No gestiona usuarios.',
+    inspector:'Puede llenar fichas y crear equipos. No puede eliminar.',
+    cliente:'Solo lectura y exportacion. Ideal para el cliente final.',
+    visita:'Solo lectura. Sin exportacion ni comentarios. Para auditorias.'
+  }[r]||'';
+}
+
+// ── Mostrar/ocultar controles segun rol ───────────────────
+function applyPermissions(){
+  const isEditor = canDo('fillFicha');
+  const isDeleter = canDo('delete');
+  // Ocultar botones de eliminar si no puede
+  document.querySelectorAll('.btn-del,.btn-del-section').forEach(el=>{
+    el.style.display = isDeleter ? '' : 'none';
+  });
+  // Ocultar botones de exportar si es visita
+  const canExport = canDo('exportar');
+  document.querySelectorAll('.btn-export-hide').forEach(el=>{
+    el.style.display = canExport ? '' : 'none';
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+//  CARGA Y RENDER DE USUARIOS
+// ═══════════════════════════════════════════════════════════
+async function loadUsuarios(){
+  const tbody = document.getElementById('usr-tbody');
+  if(!tbody) return;
+  tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:#aaa;padding:28px;font-family:monospace;font-size:11px">Cargando&#8230;</td></tr>';
+  try {
+    const data = await must(sb.from('usuarios_vista').select('*').order('created_at',{ascending:false}));
+    todosUsuarios = data||[];
+    renderUsuariosTable();
+  } catch(e){ 
+    tbody.innerHTML=`<tr><td colspan="6" style="text-align:center;color:#dc2626;padding:28px;font-size:11px">${esc(e.message)}</td></tr>`;
+  }
+}
+
+function renderUsuariosTable(){
+  const tbody = document.getElementById('usr-tbody');
+  if(!todosUsuarios.length){
+    tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:#aaa;padding:28px;font-family:monospace;font-size:11px">Sin usuarios registrados</td></tr>';
+    return;
+  }
+  tbody.innerHTML = todosUsuarios.map(u=>{
+    const rol = u.rol_global||'inspector';
+    const lastAccess = u.last_sign_in_at ? new Date(u.last_sign_in_at).toLocaleDateString('es-CL') : '—';
+    const isMe = u.id === session?.user?.id;
+    return `<tr>
+      <td>
+        <div style="font-weight:600">${esc(u.full_name||'Sin nombre')}${isMe?'<span style="font-family:monospace;font-size:8px;color:#F7C600;margin-left:6px;background:#1e2230;padding:1px 5px;border-radius:2px">TU</span>':''}</div>
+      </td>
+      <td style="font-family:monospace;font-size:11px;color:#6b7280">${esc(u.email||'—')}</td>
+      <td><span class="rol-pill ${rolClass(rol)}">${rolLabel(rol)}</span></td>
+      <td style="font-family:monospace;font-size:11px">${u.proyectos_count||0} proyecto${u.proyectos_count!==1?'s':''}</td>
+      <td style="font-family:monospace;font-size:10px;color:#aaa">${lastAccess}</td>
+      <td>
+        <div style="display:flex;gap:6px">
+          <button onclick="openUsrModal('edit','${u.id}')" style="background:none;border:1px solid #ddd9d0;border-radius:3px;padding:4px 10px;font-size:10px;font-family:monospace;cursor:pointer;color:#374151">&#9998; Editar</button>
+          <button onclick="openAsignFromTable('${u.id}','${escAttr(u.full_name||u.email)}')" style="background:none;border:1px solid #ddd9d0;border-radius:3px;padding:4px 10px;font-size:10px;font-family:monospace;cursor:pointer;color:#0284c7">&#128203; Proyectos</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function togglePermisos(){
+  const wrap = document.getElementById('perm-matrix-wrap');
+  const arrow = document.getElementById('perm-arrow');
+  if(!wrap) return;
+  const open = wrap.style.display !== 'none';
+  wrap.style.display = open ? 'none' : 'block';
+  if(arrow) arrow.style.transform = open ? 'rotate(0deg)' : 'rotate(180deg)';
+}
+
+// ═══════════════════════════════════════════════════════════
+//  MODAL USUARIO
+// ═══════════════════════════════════════════════════════════
+async function openUsrModal(modo, userId=null){
+  curUsrId = userId;
+  curUsrAsignaciones = [];
+  document.getElementById('um-title').textContent = modo==='new' ? 'Invitar usuario' : 'Editar usuario';
+  document.getElementById('um-nombre').value = '';
+  document.getElementById('um-email').value = '';
+  document.getElementById('um-rol').value = 'inspector';
+  document.getElementById('um-prev').style.display = 'none';
+  document.getElementById('um-del-wrap').style.display = 'none';
+  updateRolDesc();
+  document.getElementById('um-rol').onchange = updateRolDesc;
+
+  if(modo==='edit' && userId){
+    const u = todosUsuarios.find(u=>u.id===userId);
+    if(u){
+      document.getElementById('um-nombre').value = u.full_name||'';
+      document.getElementById('um-email').value = u.email||'';
+      document.getElementById('um-rol').value = u.rol_global||'inspector';
+      document.getElementById('um-prev').style.display='block';
+      document.getElementById('um-prev').textContent = `ID: ${u.id} · Registro: ${new Date(u.created_at).toLocaleDateString('es-CL')}`;
+      document.getElementById('um-del-wrap').style.display = 'block';
+      updateRolDesc();
+      // Cargar asignaciones del usuario
+      try {
+        const asign = await must(sb.from('proyecto_usuarios').select('*').eq('user_id',userId));
+        curUsrAsignaciones = asign||[];
+      } catch(e){ curUsrAsignaciones=[]; }
+      renderUsrProyList();
+    }
+  }
+  document.getElementById('usr-modal-bg').classList.add('on');
+  document.body.style.overflow='hidden';
+}
+
+function closeUsrModal(){ document.getElementById('usr-modal-bg').classList.remove('on'); document.body.style.overflow=''; }
+
+function updateRolDesc(){
+  const rol = document.getElementById('um-rol').value;
+  const desc = document.getElementById('um-rol-desc');
+  if(desc) desc.textContent = rolDesc(rol);
+}
+
+function renderUsrProyList(){
+  const el = document.getElementById('um-proy-list');
+  if(!el) return;
+  if(!curUsrAsignaciones.length){
+    el.innerHTML='<div style="font-size:11px;color:#aaa;font-family:monospace;padding:4px">Sin proyectos asignados</div>';
+    return;
+  }
+  el.innerHTML = curUsrAsignaciones.map(a=>{
+    const proy = proyectos.find(p=>p.id===a.proyecto_id);
+    return `<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:#f5f3ee;border-radius:4px;border:1px solid #ddd9d0">
+      <span style="flex:1;font-size:12px;font-weight:500">${esc(proy?.nombre||a.proyecto_id)}</span>
+      <span class="rol-pill ${rolClass(a.rol)}" style="font-size:8px">${rolLabel(a.rol)}</span>
+      <button onclick="removeAsignacion('${a.proyecto_id}')" style="background:none;border:none;cursor:pointer;color:#dc2626;font-size:12px">&#10005;</button>
+    </div>`;
+  }).join('');
+}
+
+async function saveUsuario(){
+  const nombre = document.getElementById('um-nombre').value.trim();
+  const email = document.getElementById('um-email').value.trim();
+  const rol = document.getElementById('um-rol').value;
+  if(!nombre){ toast('El nombre es obligatorio','err'); return; }
+  const btn = document.getElementById('um-sv'); btn.disabled=1; btn.textContent='Guardando&#8230;';
+  try {
+    if(curUsrId){
+      // Actualizar perfil existente
+      await must(sb.from('profiles').update({full_name:nombre, rol}).eq('id',curUsrId));
+      // Actualizar localmente
+      const u = todosUsuarios.find(u=>u.id===curUsrId);
+      if(u){ u.full_name=nombre; u.rol_global=rol; }
+      toast('Usuario actualizado ✓','ok');
+    } else {
+      // Invitar nuevo usuario vía Supabase Auth
+      if(!email){ toast('El email es obligatorio para invitar','err'); btn.disabled=0; btn.textContent='GUARDAR'; return; }
+      const {data,error} = await sb.auth.admin?.inviteUserByEmail
+        ? sb.auth.admin.inviteUserByEmail(email,{data:{full_name:nombre,rol}})
+        : {data:null,error:{message:'Usa el panel de Supabase para invitar usuarios'}};
+      if(error) throw error;
+      toast('Invitacion enviada a '+email+' ✓','ok');
+    }
+    renderUsuariosTable();
+    closeUsrModal();
+  } catch(e){ toast('Error: '+e.message,'err'); }
+  btn.disabled=0; btn.textContent='GUARDAR';
+}
+
+async function deactivateUser(){
+  if(!curUsrId||!confirm('¿Desactivar acceso de este usuario?')) return;
+  try {
+    await must(sb.from('profiles').update({rol:'visita'}).eq('id',curUsrId));
+    toast('Acceso restringido a Visita ✓','ok');
+    closeUsrModal(); await loadUsuarios();
+  } catch(e){ toast('Error: '+e.message,'err'); }
+}
+
+function changeUserPwd(){
+  toast('Para resetear contraseña usa el panel de autenticación en Supabase → Authentication → Users','ok');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  ASIGNACIÓN DE PROYECTOS
+// ═══════════════════════════════════════════════════════════
+async function openAsignFromTable(userId, userName){
+  curUsrId = userId;
+  try {
+    const asign = await must(sb.from('proyecto_usuarios').select('*').eq('user_id',userId));
+    curUsrAsignaciones = asign||[];
+  } catch(e){ curUsrAsignaciones=[]; }
+  document.getElementById('asign-user-name').textContent = userName;
+  renderAsignProyList();
+  document.getElementById('asign-modal-bg').classList.add('on');
+  document.body.style.overflow='hidden';
+}
+
+function openAsignModal(){
+  const nombre = document.getElementById('um-nombre').value || 'Usuario';
+  document.getElementById('asign-user-name').textContent = nombre;
+  renderAsignProyList();
+  document.getElementById('asign-modal-bg').classList.add('on');
+}
+
+function closeAsignModal(){
+  document.getElementById('asign-modal-bg').classList.remove('on');
+  if(!document.getElementById('usr-modal-bg').classList.contains('on')) document.body.style.overflow='';
+  renderUsrProyList();
+}
+
+function renderAsignProyList(){
+  const el = document.getElementById('asign-proy-list');
+  if(!el||!proyectos.length){
+    if(el) el.innerHTML='<div style="color:#aaa;font-size:12px;font-family:monospace">Sin proyectos disponibles</div>';
+    return;
+  }
+  el.innerHTML = proyectos.map(p=>{
+    const asign = curUsrAsignaciones.find(a=>a.proyecto_id===p.id);
+    return `<div class="asign-proy-row">
+      <div class="asign-proy-name">${esc(p.nombre)}<div style="font-size:10px;color:#aaa;font-family:monospace">${esc(p.cliente||'')}${p.planta?' · '+esc(p.planta):''}</div></div>
+      <select onchange="updateAsignRol('${p.id}',this.value)" style="font-size:11px;padding:4px 8px;border:1px solid #ddd9d0;border-radius:4px;background:#fff">
+        <option value="">— Sin acceso —</option>
+        <option value="inspector" ${asign?.rol==='inspector'?'selected':''}>Inspector</option>
+        <option value="supervisor" ${asign?.rol==='supervisor'?'selected':''}>Supervisor</option>
+        <option value="cliente" ${asign?.rol==='cliente'?'selected':''}>Cliente</option>
+        <option value="visita" ${asign?.rol==='visita'?'selected':''}>Visita</option>
+      </select>
+    </div>`;
+  }).join('');
+}
+
+async function updateAsignRol(proyId, rol){
+  if(!curUsrId) return;
+  try {
+    if(!rol){
+      // Quitar acceso
+      await must(sb.from('proyecto_usuarios').delete().eq('user_id',curUsrId).eq('proyecto_id',proyId));
+      curUsrAsignaciones = curUsrAsignaciones.filter(a=>a.proyecto_id!==proyId);
+      toast('Acceso removido ✓','ok');
+    } else {
+      // Asignar o actualizar
+      const saved = await must(sb.from('proyecto_usuarios').upsert({
+        user_id:curUsrId, proyecto_id:proyId, rol,
+        asignado_por:profile?.full_name||session.user.email
+      },{onConflict:'proyecto_id,user_id'}).select().single());
+      const idx = curUsrAsignaciones.findIndex(a=>a.proyecto_id===proyId);
+      if(idx>=0) curUsrAsignaciones[idx]=saved; else curUsrAsignaciones.push(saved);
+      toast('Acceso asignado ✓','ok');
+    }
+    renderUsrProyList();
+  } catch(e){ toast('Error: '+e.message,'err'); }
+}
+
+async function removeAsignacion(proyId){
+  if(!curUsrId) return;
+  try {
+    await must(sb.from('proyecto_usuarios').delete().eq('user_id',curUsrId).eq('proyecto_id',proyId));
+    curUsrAsignaciones = curUsrAsignaciones.filter(a=>a.proyecto_id!==proyId);
+    renderUsrProyList(); renderAsignProyList();
+    toast('Acceso removido ✓','ok');
+  } catch(e){ toast('Error: '+e.message,'err'); }
+}
+
+// ── Filtrar proyectos según asignación del usuario ────────
+async function loadProyectosParaUsuario(userId){
+  // Admin ve todos, resto solo los asignados
+  if(perfilActual?.rol==='admin') return proyectos;
+  try {
+    const asign = await must(sb.from('proyecto_usuarios').select('proyecto_id').eq('user_id',userId));
+    const ids = (asign||[]).map(a=>a.proyecto_id);
+    return proyectos.filter(p=>ids.includes(p.id));
+  } catch(e){ return []; }
 }
 </script>
 </body>
