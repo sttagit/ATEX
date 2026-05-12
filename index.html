@@ -358,6 +358,49 @@ input[type=file]{display:none}
 .admin-icon-btn{background:none;border:1px solid #2a2f40;border-radius:4px;color:#7c3aed;font-size:14px;cursor:pointer;padding:4px 8px;display:none;transition:all .15s}
 .admin-icon-btn:hover{background:#1e1030;border-color:#7c3aed}
 
+
+/* ── MÓDULO DOCUMENTOS ── */
+#tab-docs{display:none}
+.docs-layout{display:grid;grid-template-columns:220px 1fr;gap:16px;min-height:60vh}
+.docs-sidebar{background:#fff;border:1px solid #ddd9d0;border-radius:6px;padding:0;overflow:hidden;align-self:start}
+.docs-sidebar-hd{background:#0f1117;color:#F7C600;font-family:monospace;font-size:9px;font-weight:700;letter-spacing:1px;padding:10px 14px;text-transform:uppercase}
+.docs-cat{padding:9px 14px;font-size:12px;cursor:pointer;border-bottom:1px solid #f0ece4;display:flex;align-items:center;gap:8px;color:#374151;transition:background .1s}
+.docs-cat:hover{background:#f5f3ee}
+.docs-cat.on{background:#0f1117;color:#F7C600;font-weight:600}
+.docs-cat-count{margin-left:auto;font-family:monospace;font-size:10px;background:#eceae3;padding:1px 7px;border-radius:10px;color:#6b7280}
+.docs-cat.on .docs-cat-count{background:#1e2230;color:#888}
+.docs-main{display:flex;flex-direction:column;gap:12px}
+/* Barra búsqueda */
+.docs-search-bar{display:flex;gap:8px;align-items:center;background:#fff;border:1px solid #ddd9d0;border-radius:6px;padding:10px 14px}
+.docs-search-input{flex:1;border:none;outline:none;font-size:13px;color:#0f1117;background:none}
+/* Tarjeta documento */
+.doc-card{background:#fff;border:1px solid #ddd9d0;border-radius:6px;padding:12px 16px;display:flex;align-items:flex-start;gap:12px;transition:box-shadow .12s;cursor:pointer}
+.doc-card:hover{box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.doc-icon{font-size:28px;flex-shrink:0;width:40px;text-align:center;line-height:1}
+.doc-info{flex:1;min-width:0}
+.doc-name{font-size:13px;font-weight:600;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.doc-meta{font-family:monospace;font-size:10px;color:#aaa;display:flex;gap:8px;flex-wrap:wrap}
+.doc-desc{font-size:11px;color:#6b7280;margin-top:4px;line-height:1.4}
+.doc-match{font-size:10px;background:#fef3c7;border-left:2px solid #F7C600;padding:4px 8px;margin-top:6px;border-radius:0 3px 3px 0;color:#92400e;font-family:monospace}
+.doc-actions{display:flex;flex-direction:column;gap:5px;flex-shrink:0}
+.doc-btn{background:none;border:1px solid #ddd9d0;border-radius:3px;padding:4px 10px;font-size:10px;font-family:monospace;cursor:pointer;color:#374151;white-space:nowrap;transition:all .1s}
+.doc-btn:hover{border-color:#F7C600;color:#F7C600}
+.doc-btn.del{border-color:#fca5a5;color:#dc2626}
+.doc-btn.del:hover{background:#fee2e2}
+/* Upload zone */
+.doc-upload-zone{border:2px dashed #ddd9d0;border-radius:8px;padding:28px;text-align:center;cursor:pointer;transition:all .15s;background:#fafaf8}
+.doc-upload-zone:hover,.doc-upload-zone.dragover{border-color:#F7C600;background:#fffdf0}
+/* Preview modal */
+#doc-preview-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:500;padding:20px;align-items:center;justify-content:center}
+#doc-preview-bg.on{display:flex}
+.doc-preview-box{background:#fff;border-radius:8px;width:100%;max-width:900px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden}
+.doc-preview-hd{background:#0f1117;color:#f5f3ee;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.doc-preview-body{flex:1;overflow:auto;padding:0}
+/* Modal subir doc */
+#doc-upload-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;padding:16px;overflow-y:auto;align-items:flex-start;justify-content:center}
+#doc-upload-bg.on{display:flex}
+@media(max-width:640px){.docs-layout{grid-template-columns:1fr}.docs-sidebar{display:none}}
+
 </style>
 </head>
 <body>
@@ -1049,6 +1092,80 @@ input[type=file]{display:none}
     </div>
   </div>
 </div>
+
+<!-- MODAL SUBIR DOCUMENTO -->
+<div id="doc-upload-bg">
+  <div class="modal" style="border-top-color:#F7C600;max-width:560px">
+    <div class="modal-head" style="background:#0f1117">
+      <div style="flex:1">
+        <div style="font-size:11px;font-family:monospace;color:#F7C600;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">REPOSITORIO</div>
+        <div id="du-title" style="font-size:15px;font-weight:600">Subir documento</div>
+      </div>
+      <button onclick="closeDocUpload()" style="background:none;border:none;color:#666;font-size:20px;cursor:pointer">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <!-- Zona de arrastre -->
+      <div class="doc-upload-zone" id="du-zone"
+        ondragover="duDragOver(event)" ondragleave="duDragLeave(event)" ondrop="duDrop(event)"
+        onclick="document.getElementById('du-file').click()">
+        <div style="font-size:36px;margin-bottom:8px">&#128196;</div>
+        <div style="font-weight:600;margin-bottom:4px">Arrastra archivos aqu&#237; o haz clic para seleccionar</div>
+        <div style="font-size:11px;color:#aaa">PDF, Word, Excel, im&#225;genes &#183; M&#225;x. 20 MB</div>
+        <div id="du-file-name" style="margin-top:10px;font-family:monospace;font-size:11px;color:#F7C600;display:none"></div>
+      </div>
+      <input type="file" id="du-file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.png,.jpg,.jpeg,.webp,.txt,.csv" onchange="duFileSelected(event)" style="display:none">
+      <div><div class="field-lbl">Nombre del documento</div><input class="field-input" id="du-nombre" placeholder="Ej: Plano eléctrico zona 21, Certificado Ex motor..."></div>
+      <div><div class="field-lbl">Descripci&#243;n</div><textarea class="field-ta" id="du-desc" placeholder="Breve descripci&#243;n del contenido..." style="min-height:52px"></textarea></div>
+      <div>
+        <div class="field-lbl">Asociar a</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div>
+            <select class="field-sel" id="du-scope" onchange="updateDuScope()">
+              <option value="proyecto">Proyecto (general)</option>
+              <option value="equipo">Equipo espec&#237;fico</option>
+              <option value="componente">Componente espec&#237;fico</option>
+            </select>
+          </div>
+          <div id="du-equipo-wrap" style="display:none">
+            <select class="field-sel" id="du-equipo" onchange="updateDuComponentes()">
+              <option value="">&#8212; Seleccionar equipo &#8212;</option>
+            </select>
+          </div>
+        </div>
+        <div id="du-comp-wrap" style="display:none;margin-top:8px">
+          <select class="field-sel" id="du-comp">
+            <option value="">&#8212; Seleccionar componente &#8212;</option>
+          </select>
+        </div>
+      </div>
+      <div id="du-prev" style="display:none;padding:8px 10px;background:#eceae3;border-radius:4px;font-size:10px;color:#6b7280;font-family:monospace"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-out" onclick="closeDocUpload()">Cancelar</button>
+      <button class="btn-save" onclick="saveDocumento()" id="du-sv">SUBIR DOCUMENTO</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PREVIEW DOCUMENTO -->
+<div id="doc-preview-bg">
+  <div class="doc-preview-box">
+    <div class="doc-preview-hd">
+      <div style="flex:1;min-width:0">
+        <div id="dp-nombre" style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+        <div id="dp-meta" style="font-family:monospace;font-size:10px;color:#888;margin-top:2px"></div>
+      </div>
+      <div style="display:flex;gap:8px;flex-shrink:0;margin-left:12px">
+        <button id="dp-download" onclick="downloadDoc()" style="background:#F7C600;color:#111;border:none;border-radius:4px;padding:6px 14px;font-size:11px;font-family:monospace;cursor:pointer;font-weight:600">&#11015; Descargar</button>
+        <button onclick="closeDocPreview()" style="background:none;border:none;color:#666;font-size:22px;cursor:pointer">&#10005;</button>
+      </div>
+    </div>
+    <div class="doc-preview-body" id="dp-body">
+      <div style="display:flex;align-items:center;justify-content:center;padding:40px;color:#aaa">Cargando...</div>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL EQUIPO -->
 <div id="modal-bg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;padding:16px;overflow-y:auto;align-items:flex-start;justify-content:center">
   <div class="modal">
@@ -1457,6 +1574,7 @@ const FL = {
 //  STATE
 let session, profile, recs={}, subRecs={}, curEq=null, curConf='', pendFiles=[], exPaths=[], floorF='all', allRaw=[], allSubRaw=[];
 let curProyecto=null, proyectos=[];
+let todosDocumentos=[], docCatFiltro='all', docTipoFiltro='', docSearchQ='', curDocPreview=null, duPendFile=null;
 let todosUsuarios=[], curUsrId=null, curUsrAsignaciones=[], perfilActual=null;
 let customPisos={}, proyUbicaciones=[], proyEquipos=[];
 let curUbIdNuevoEq=null;
@@ -1589,10 +1707,11 @@ async function doLogout(){
 function goTab(name,el){
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('on'));
   el.classList.add('on');
-  ['eq','rs','inf','ciclos'].forEach(t=>{ document.getElementById('tab-'+t).style.display=t===name?'block':'none'; });
+  ['eq','rs','inf','ciclos','docs'].forEach(t=>{ document.getElementById('tab-'+t).style.display=t===name?'block':'none'; });
   if(name==='rs') renderResumen();
   if(name==='inf') loadAndRenderInforme();
   if(name==='ciclos') loadCiclos();
+  if(name==='docs') loadDocs();
 
 }
 
@@ -4484,6 +4603,354 @@ async function admUpdateAsignRol(proyId, rol){
       toast('Asignado ✓','ok');
     }
     renderAdmUsrProyList();
+  } catch(e){ toast('Error: '+e.message,'err'); }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  MÓDULO DOCUMENTOS
+// ═══════════════════════════════════════════════════════════
+
+function docIcon(mime){
+  if(!mime) return '&#128196;';
+  if(mime.includes('pdf')) return '&#128441;';
+  if(mime.includes('word')||mime.includes('document')) return '&#128196;';
+  if(mime.includes('sheet')||mime.includes('excel')) return '&#128202;';
+  if(mime.includes('presentation')||mime.includes('powerpoint')) return '&#128202;';
+  if(mime.includes('image')) return '&#128247;';
+  if(mime.includes('text')) return '&#128196;';
+  return '&#128196;';
+}
+
+function docTipoFromMime(mime){
+  if(!mime) return 'otro';
+  if(mime.includes('pdf')) return 'pdf';
+  if(mime.includes('word')||mime.includes('document')) return 'word';
+  if(mime.includes('sheet')||mime.includes('excel')) return 'excel';
+  if(mime.includes('image')) return 'imagen';
+  return 'otro';
+}
+
+function docScope(doc){
+  if(doc.componente_id) return 'componente';
+  if(doc.equipo_id) return 'equipo';
+  return 'proyecto';
+}
+
+function docScopeLabel(doc){
+  if(doc.componente_id){
+    const comps=allSubRaw.find(c=>c.id===doc.componente_id);
+    return 'Componente: '+(comps?.nombre_comp||comps?.tipo||doc.componente_id);
+  }
+  if(doc.equipo_id){
+    return 'Equipo: '+eqName(doc.equipo_id);
+  }
+  return 'Proyecto general';
+}
+
+function formatBytes(bytes){
+  if(!bytes) return '—';
+  if(bytes<1024) return bytes+'B';
+  if(bytes<1024*1024) return Math.round(bytes/1024)+'KB';
+  return (bytes/1024/1024).toFixed(1)+'MB';
+}
+
+// ── Carga principal ───────────────────────────────────────
+async function loadDocs(){
+  const pid=curProyecto?.id; if(!pid) return;
+  // Mostrar botón subir solo para admin/supervisor
+  const canUpload=canDo('fillFicha');
+  const btnSubir=document.getElementById('btn-subir-doc');
+  if(btnSubir) btnSubir.style.display=canUpload?'block':'none';
+
+  const el=document.getElementById('docs-list');
+  el.innerHTML='<div style="text-align:center;padding:40px;color:#aaa;font-family:monospace;font-size:11px">Cargando&#8230;</div>';
+  try {
+    const data=await must(sb.from('documentos').select('*').eq('proyecto_id',pid).order('created_at',{ascending:false}));
+    todosDocumentos=data||[];
+    updateDocCounts();
+    renderDocs();
+  } catch(e){
+    el.innerHTML=`<div style="text-align:center;padding:40px;color:#dc2626;font-size:12px">${esc(e.message)}</div>`;
+  }
+}
+
+function updateDocCounts(){
+  const all=todosDocumentos.length;
+  const proy=todosDocumentos.filter(d=>docScope(d)==='proyecto').length;
+  const eq=todosDocumentos.filter(d=>docScope(d)==='equipo').length;
+  const comp=todosDocumentos.filter(d=>docScope(d)==='componente').length;
+  const setC=(id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v; };
+  setC('dcat-count-all',all); setC('dcat-count-proyecto',proy);
+  setC('dcat-count-equipo',eq); setC('dcat-count-componente',comp);
+}
+
+function setDocCat(cat,el){
+  docCatFiltro=cat; docTipoFiltro='';
+  document.querySelectorAll('.docs-cat').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  renderDocs();
+}
+
+function setDocTipo(tipo,el){
+  docTipoFiltro=docTipoFiltro===tipo?'':tipo;
+  docCatFiltro='all';
+  document.querySelectorAll('.docs-cat').forEach(c=>c.classList.remove('on'));
+  if(docTipoFiltro) el.classList.add('on');
+  renderDocs();
+}
+
+function searchDocs(){
+  docSearchQ=(document.getElementById('docs-search')?.value||'').toLowerCase().trim();
+  const clearBtn=document.getElementById('docs-clear-btn');
+  if(clearBtn) clearBtn.style.display=docSearchQ?'block':'none';
+  renderDocs();
+}
+
+function clearDocSearch(){
+  const inp=document.getElementById('docs-search');
+  if(inp) inp.value='';
+  docSearchQ='';
+  const clearBtn=document.getElementById('docs-clear-btn');
+  if(clearBtn) clearBtn.style.display='none';
+  renderDocs();
+}
+
+function renderDocs(){
+  const el=document.getElementById('docs-list'); if(!el) return;
+  let docs=[...todosDocumentos];
+  // Filtro categoría
+  if(docCatFiltro!=='all') docs=docs.filter(d=>docScope(d)===docCatFiltro);
+  // Filtro tipo
+  if(docTipoFiltro) docs=docs.filter(d=>docTipoFromMime(d.mime_type)===docTipoFiltro);
+  // Filtro búsqueda
+  if(docSearchQ){
+    docs=docs.filter(d=>{
+      const haystack=(d.nombre+' '+(d.descripcion||'')+' '+(d.contenido_texto||'')).toLowerCase();
+      return haystack.includes(docSearchQ);
+    });
+  }
+  const cnt=document.getElementById('docs-search-cnt');
+  if(cnt) cnt.textContent=docSearchQ?`${docs.length} resultado${docs.length!==1?'s':''}`:docs.length+' doc'+( docs.length!==1?'s':'');
+
+  if(!docs.length){
+    el.innerHTML=`<div style="text-align:center;padding:40px;color:#aaa;background:#fff;border:1px solid #ddd9d0;border-radius:6px">
+      <div style="font-size:36px;margin-bottom:10px">&#128269;</div>
+      <div style="font-weight:600;margin-bottom:6px">${docSearchQ?'Sin resultados para "'+esc(docSearchQ)+'"':'Sin documentos en esta categor&#237;a'}</div>
+      <div style="font-size:12px">${docSearchQ?'Prueba con otras palabras':'Sube documentos usando el bot&#243;n superior'}</div>
+    </div>`;
+    return;
+  }
+
+  // Agrupar por scope si filtro es 'all'
+  let html='';
+  if(docCatFiltro==='all' && !docTipoFiltro && !docSearchQ){
+    const grupos={proyecto:'&#128203; Del proyecto',equipo:'&#9881; Por equipo',componente:'&#128279; Por componente'};
+    for(const [scope,label] of Object.entries(grupos)){
+      const gDocs=docs.filter(d=>docScope(d)===scope);
+      if(!gDocs.length) continue;
+      html+=`<div class="sec-hd" style="margin-top:8px">${label}</div>`;
+      html+=gDocs.map(d=>docCardHtml(d,docSearchQ)).join('');
+    }
+  } else {
+    html=docs.map(d=>docCardHtml(d,docSearchQ)).join('');
+  }
+  el.innerHTML=html;
+}
+
+function docCardHtml(doc, q=''){
+  const icon=docIcon(doc.mime_type);
+  const scope=docScopeLabel(doc);
+  const fecha=doc.created_at?new Date(doc.created_at).toLocaleDateString('es-CL'):'—';
+  const tam=formatBytes(doc.tamano);
+  const canDel=canDo('delete');
+  // Resaltar coincidencia en búsqueda
+  let matchHtml='';
+  if(q && doc.contenido_texto){
+    const idx=doc.contenido_texto.toLowerCase().indexOf(q);
+    if(idx>=0){
+      const start=Math.max(0,idx-40);
+      const end=Math.min(doc.contenido_texto.length,idx+q.length+40);
+      const snippet=doc.contenido_texto.slice(start,end);
+      matchHtml=`<div class="doc-match">&#8230;${esc(snippet)}&#8230;</div>`;
+    }
+  }
+  return `<div class="doc-card" onclick="openDocPreview('${doc.id}')">
+    <div class="doc-icon">${icon}</div>
+    <div class="doc-info">
+      <div class="doc-name">${esc(doc.nombre)}</div>
+      <div class="doc-meta">
+        <span>${scope}</span>
+        <span>&#183;</span><span>${tam}</span>
+        <span>&#183;</span><span>${fecha}</span>
+        <span>&#183;</span><span>${esc(doc.subido_por||'—')}</span>
+      </div>
+      ${doc.descripcion?`<div class="doc-desc">${esc(doc.descripcion)}</div>`:''}
+      ${matchHtml}
+    </div>
+    <div class="doc-actions" onclick="event.stopPropagation()">
+      <button class="doc-btn" onclick="openDocPreview('${doc.id}')">&#128065; Ver</button>
+      <button class="doc-btn" onclick="downloadDocById('${doc.id}')">&#11015; Descargar</button>
+      ${canDel?`<button class="doc-btn del" onclick="deleteDocumento('${doc.id}')">&#128465; Eliminar</button>`:''}
+    </div>
+  </div>`;
+}
+
+// ── Preview ───────────────────────────────────────────────
+async function openDocPreview(docId){
+  const doc=todosDocumentos.find(d=>d.id===docId); if(!doc) return;
+  curDocPreview=doc;
+  document.getElementById('dp-nombre').textContent=doc.nombre;
+  document.getElementById('dp-meta').textContent=docScopeLabel(doc)+' · '+formatBytes(doc.tamano)+' · '+new Date(doc.created_at).toLocaleDateString('es-CL');
+  document.getElementById('dp-body').innerHTML='<div style="display:flex;align-items:center;justify-content:center;padding:40px;color:#aaa">Cargando&#8230;</div>';
+  document.getElementById('doc-preview-bg').classList.add('on');
+  document.body.style.overflow='hidden';
+  try {
+    const {data}=await sb.storage.from('documentos').createSignedUrl(doc.storage_path,3600);
+    if(!data?.signedUrl) throw new Error('No se pudo obtener URL');
+    renderDocPreview(doc, data.signedUrl);
+  } catch(e){ document.getElementById('dp-body').innerHTML=`<div style="text-align:center;padding:40px;color:#dc2626">${esc(e.message)}</div>`; }
+}
+
+function renderDocPreview(doc, url){
+  const mime=doc.mime_type||'';
+  let body='';
+  if(mime.includes('pdf')){
+    body=`<iframe src="${url}" style="width:100%;height:75vh;border:none"></iframe>`;
+  } else if(mime.includes('image')){
+    body=`<div style="text-align:center;padding:20px;background:#f5f3ee"><img src="${url}" style="max-width:100%;max-height:70vh;border-radius:4px;box-shadow:0 4px 20px rgba(0,0,0,.15)"></div>`;
+  } else if(mime.includes('text')||mime.includes('csv')){
+    body=`<div style="padding:20px"><pre style="font-family:monospace;font-size:12px;white-space:pre-wrap;color:#374151">${esc(doc.contenido_texto||'Sin contenido de texto disponible')}</pre></div>`;
+  } else {
+    body=`<div style="text-align:center;padding:60px 40px">
+      <div style="font-size:64px;margin-bottom:16px">${docIcon(mime)}</div>
+      <div style="font-size:15px;font-weight:600;margin-bottom:8px">${esc(doc.nombre)}</div>
+      <div style="color:#6b7280;margin-bottom:20px">Este tipo de archivo no puede previsualizarse en el navegador.</div>
+      <button onclick="downloadDocById('${doc.id}')" class="btn-dark" style="padding:10px 24px">&#11015; Descargar archivo</button>
+    </div>`;
+  }
+  document.getElementById('dp-body').innerHTML=body;
+}
+
+function closeDocPreview(){ document.getElementById('doc-preview-bg').classList.remove('on'); document.body.style.overflow=''; curDocPreview=null; }
+
+async function downloadDoc(){
+  if(!curDocPreview) return;
+  await downloadDocById(curDocPreview.id);
+}
+
+async function downloadDocById(docId){
+  const doc=todosDocumentos.find(d=>d.id===docId); if(!doc) return;
+  try {
+    const {data}=await sb.storage.from('documentos').createSignedUrl(doc.storage_path,60);
+    if(!data?.signedUrl) throw new Error('No se pudo generar enlace');
+    const a=document.createElement('a'); a.href=data.signedUrl; a.download=doc.nombre; a.click();
+  } catch(e){ toast('Error al descargar: '+e.message,'err'); }
+}
+
+// ── Subir documento ───────────────────────────────────────
+function openDocUpload(){
+  duPendFile=null;
+  document.getElementById('du-nombre').value='';
+  document.getElementById('du-desc').value='';
+  document.getElementById('du-scope').value='proyecto';
+  document.getElementById('du-file-name').style.display='none';
+  document.getElementById('du-prev').style.display='none';
+  updateDuScope();
+  document.getElementById('doc-upload-bg').classList.add('on');
+  document.body.style.overflow='hidden';
+}
+function closeDocUpload(){ document.getElementById('doc-upload-bg').classList.remove('on'); document.body.style.overflow=''; }
+
+function duDragOver(e){ e.preventDefault(); document.getElementById('du-zone').classList.add('dragover'); }
+function duDragLeave(e){ document.getElementById('du-zone').classList.remove('dragover'); }
+function duDrop(e){
+  e.preventDefault(); document.getElementById('du-zone').classList.remove('dragover');
+  const file=e.dataTransfer.files[0]; if(file) setDuFile(file);
+}
+function duFileSelected(e){ const file=e.target.files[0]; if(file) setDuFile(file); }
+function setDuFile(file){
+  duPendFile=file;
+  const fnEl=document.getElementById('du-file-name');
+  fnEl.style.display='block'; fnEl.textContent=file.name+' ('+formatBytes(file.size)+')';
+  if(!document.getElementById('du-nombre').value) document.getElementById('du-nombre').value=file.name.replace(/\.[^.]+$/,'');
+}
+
+function updateDuScope(){
+  const scope=document.getElementById('du-scope').value;
+  const eqWrap=document.getElementById('du-equipo-wrap');
+  const compWrap=document.getElementById('du-comp-wrap');
+  eqWrap.style.display=scope==='equipo'||scope==='componente'?'block':'none';
+  compWrap.style.display=scope==='componente'?'block':'none';
+  if(scope==='equipo'||scope==='componente') populateDuEquipos();
+}
+
+function populateDuEquipos(){
+  const sel=document.getElementById('du-equipo');
+  const eqs=allEqs('all').slice(0,200);
+  sel.innerHTML='<option value="">&#8212; Seleccionar equipo &#8212;</option>'+
+    eqs.map(e=>`<option value="${e.id}">${esc(eqName(e.id))}</option>`).join('');
+}
+
+async function updateDuComponentes(){
+  const eqId=document.getElementById('du-equipo').value;
+  const sel=document.getElementById('du-comp');
+  sel.innerHTML='<option value="">&#8212; Seleccionar componente &#8212;</option>';
+  if(!eqId) return;
+  const comps=subRecs[eqId]||[];
+  sel.innerHTML+= comps.map(c=>`<option value="${c.id}">${esc(c.nombre_comp||c.tipo||'Componente')}</option>`).join('');
+}
+
+async function saveDocumento(){
+  if(!duPendFile){ toast('Selecciona un archivo primero','err'); return; }
+  const nombre=document.getElementById('du-nombre').value.trim();
+  if(!nombre){ toast('El nombre es obligatorio','err'); return; }
+  const btn=document.getElementById('du-sv'); btn.disabled=1; btn.textContent='Subiendo&#8230;';
+  try {
+    const pid=curProyecto.id;
+    const ext=duPendFile.name.split('.').pop()||'bin';
+    const path=`${pid}/${Date.now()}_${Math.random().toString(36).slice(2,6)}.${ext}`;
+    // Subir archivo
+    const {error:upErr}=await sb.storage.from('documentos').upload(path,duPendFile,{contentType:duPendFile.type});
+    if(upErr) throw upErr;
+    const scope=document.getElementById('du-scope').value;
+    const eqId=scope!=='proyecto'?document.getElementById('du-equipo').value||null:null;
+    const compId=scope==='componente'?document.getElementById('du-comp').value||null:null;
+    // Extraer texto si es PDF o texto plano (básico)
+    let contenidoTexto='';
+    if(duPendFile.type.includes('text')||duPendFile.type.includes('csv')){
+      try{ contenidoTexto=await duPendFile.text(); }catch(e){}
+    }
+    const payload={
+      proyecto_id:pid,
+      equipo_id:eqId||null,
+      componente_id:compId||null,
+      nombre,
+      descripcion:document.getElementById('du-desc').value.trim()||null,
+      storage_path:path,
+      mime_type:duPendFile.type,
+      tamano:duPendFile.size,
+      contenido_texto:contenidoTexto.slice(0,50000)||null,
+      subido_por:profile?.full_name||session.user.email,
+      subido_por_id:session.user.id,
+    };
+    const saved=await must(sb.from('documentos').insert(payload).select().single());
+    todosDocumentos.unshift(saved);
+    updateDocCounts(); renderDocs();
+    toast('Documento subido ✓','ok');
+    closeDocUpload();
+  } catch(e){ toast('Error: '+e.message,'err'); }
+  btn.disabled=0; btn.textContent='SUBIR DOCUMENTO';
+}
+
+async function deleteDocumento(docId){
+  const doc=todosDocumentos.find(d=>d.id===docId);
+  if(!doc||!confirm('&#191;Eliminar "'+doc.nombre+'"? Esta acci&#243;n no se puede deshacer.')) return;
+  try {
+    await sb.storage.from('documentos').remove([doc.storage_path]);
+    await must(sb.from('documentos').delete().eq('id',docId));
+    todosDocumentos=todosDocumentos.filter(d=>d.id!==docId);
+    updateDocCounts(); renderDocs();
+    toast('Documento eliminado ✓','ok');
   } catch(e){ toast('Error: '+e.message,'err'); }
 }
 </script>
