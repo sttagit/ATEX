@@ -369,7 +369,6 @@ input[type=file]{display:none}
 
 <!-- ══════════════ SELECTOR DE PROYECTOS ══════════════ -->
 <div id="proyecto-selector">
-  <!-- Barra superior -->
   <div style="position:fixed;top:0;left:0;right:0;height:50px;background:#0f1117;border-bottom:1px solid #1e2230;display:flex;align-items:center;justify-content:space-between;padding:0 20px;z-index:10">
     <div style="display:flex;align-items:center;gap:8px">
       <span style="font-size:15px;font-weight:900;color:#F7C600;letter-spacing:2px">SUSTENTA</span>
@@ -3771,11 +3770,6 @@ async function showProyectos(){
     const puedeCrear=['admin','supervisor','inspector'].includes(perfilActual?.rol);
     btnCrear.style.display=puedeCrear?'flex':'none';
   }
-  // Barra superior del selector
-  const selUserLbl=document.getElementById('sel-user-lbl');
-  if(selUserLbl) selUserLbl.textContent=profile?.full_name||session?.user?.email||'';
-  const selAdminBtn=document.getElementById('sel-admin-btn');
-  if(selAdminBtn) selAdminBtn.style.display=perfilActual?.rol==='admin'?'block':'none';
   document.getElementById('proyecto-selector').classList.add('on');
   loader(0);
 }
@@ -4175,6 +4169,7 @@ function closeAdminPanel(){
   document.body.style.overflow='';
 }
 function switchAdminTab(tab, el){
+  const prevTab=admCurTab;
   admCurTab=tab;
   document.querySelectorAll('.admin-nav-btn').forEach(b=>b.classList.remove('on'));
   el.classList.add('on');
@@ -4182,8 +4177,9 @@ function switchAdminTab(tab, el){
     const p=document.getElementById('adm-panel-'+t);
     if(p) p.style.display=t===tab?'block':'none';
   });
-  if(tab==='usuarios') loadAdmUsuarios();
-  if(tab==='proyectos') loadAdmProyectos();
+  // Solo recargar si cambia de tab (no si vuelve al mismo)
+  if(tab==='usuarios' && prevTab!=='usuarios') loadAdmUsuarios();
+  if(tab==='proyectos') loadAdmProyectos(); // Proyectos siempre recarga (datos de BD)
 }
 
 // ── Cargar usuarios ───────────────────────────────────────
@@ -4240,7 +4236,7 @@ async function loadAdmProyectos(){
   el.innerHTML='<div style="color:#666;font-family:monospace;font-size:11px;padding:20px">Cargando&#8230;</div>';
   try {
     // Cargar usuarios por proyecto
-    const pu=await must(sb.from('proyecto_usuarios').select('*, profiles(full_name,rol)'));
+    const pu=await must(sb.from('proyecto_usuarios_detalle').select('*'));
     const puMap={};
     (pu||[]).forEach(u=>{ if(!puMap[u.proyecto_id]) puMap[u.proyecto_id]=[]; puMap[u.proyecto_id].push(u); });
     el.innerHTML=proyectos.map(p=>{
@@ -4315,7 +4311,10 @@ async function updateProyUserRol(proyId, userId, rol){
 
 // ── Modal usuario admin ───────────────────────────────────
 async function openAdmUsrModal(modo, userId=null){
-  admCurUsrId=userId; admCurUsrAsignaciones=[];
+  // Si ya estaba abierto con el mismo usuario, no resetear asignaciones
+  const sameUser = admCurUsrId===userId && userId!==null;
+  admCurUsrId=userId;
+  if(!sameUser) admCurUsrAsignaciones=[];
   document.getElementById('adm-um-title').textContent=modo==='new'?'Nuevo usuario':'Editar usuario';
   document.getElementById('adm-um-nombre').value='';
   document.getElementById('adm-um-email').value='';
@@ -4420,7 +4419,10 @@ function openAdmAsignModal(){
 }
 function closeAdmAsignModal(){
   document.getElementById('adm-asign-modal-bg').classList.remove('on');
-  renderAdmUsrProyList();
+  // Restaurar scroll del modal usuario si está abierto
+  if(document.getElementById('adm-usr-modal-bg').classList.contains('on')){
+    renderAdmUsrProyList();
+  }
 }
 function renderAdmAsignProyList(){
   const el=document.getElementById('adm-asign-proy-list');
