@@ -239,6 +239,28 @@ input[type=file]{display:none}
 .zona-uso-opt.sel-20{border-color:#7c3aed;background:#ede9fe;color:#5b21b6}
 .zona-uso-opt.sel-21{border-color:#d97706;background:#fef3c7;color:#92400e}
 .zona-uso-opt.sel-22{border-color:#059669;background:#d1fae5;color:#065f46}
+
+/* ── SELECTOR DE PROYECTOS ── */
+#proyecto-selector{position:fixed;inset:0;background:#0a0d14;z-index:150;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+#proyecto-selector.on{display:flex}
+.proy-header{text-align:center;margin-bottom:32px}
+.proy-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;width:100%;max-width:860px;margin-bottom:24px}
+.proy-card{background:#1e2230;border:1px solid #2a2f40;border-radius:8px;padding:20px 22px;cursor:pointer;transition:all .15s;border-left:4px solid #F7C600;position:relative}
+.proy-card:hover{background:#252b3d;border-color:#F7C600;box-shadow:0 4px 20px rgba(247,198,0,.15);transform:translateY(-1px)}
+.proy-card-name{font-size:15px;font-weight:700;color:#f5f3ee;margin-bottom:4px}
+.proy-card-sub{font-size:11px;color:#888;font-family:monospace}
+.proy-card-badge{position:absolute;top:12px;right:12px;background:#F7C600;color:#111;font-size:8px;font-weight:800;padding:2px 7px;border-radius:2px;font-family:monospace;letter-spacing:.5px}
+.proy-card-meta{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap}
+.proy-card-stat{font-family:monospace;font-size:10px;color:#666;display:flex;align-items:center;gap:4px}
+.btn-nuevo-proy{display:flex;align-items:center;gap:8px;padding:10px 24px;background:none;border:1.5px dashed #2a2f40;border-radius:6px;color:#666;font-family:monospace;font-size:11px;cursor:pointer;transition:all .15s;margin-top:4px}
+.btn-nuevo-proy:hover{border-color:#F7C600;color:#F7C600}
+/* Modal nuevo proyecto */
+#nuevo-proy-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:400;padding:16px;overflow-y:auto;align-items:center;justify-content:center}
+#nuevo-proy-bg.on{display:flex}
+/* Topbar proyecto activo */
+.proy-active-pill{background:#1e2230;border:1px solid #2a2f40;border-radius:4px;padding:3px 10px;font-family:monospace;font-size:9px;color:#F7C600;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap}
+.proy-active-pill:hover{background:#252b3d;border-color:#F7C600}
+
 </style>
 </head>
 <body>
@@ -246,6 +268,49 @@ input[type=file]{display:none}
 <div id="loader"><div class="loader-box"><span class="spin"></span> Cargando…</div></div>
 <div id="toasts"></div>
 <div id="lb" onclick="closeLb()"><button id="lb-close" onclick="closeLb()">✕</button><img id="lb-img" src="" alt="foto"></div>
+
+
+<!-- ══════════════ SELECTOR DE PROYECTOS ══════════════ -->
+<div id="proyecto-selector">
+  <div class="proy-header">
+    <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px">
+      <span style="font-size:26px;font-weight:900;color:#F7C600;letter-spacing:3px">SUSTENTA</span>
+      <span style="background:#F7C600;color:#111;font-size:11px;font-weight:900;padding:3px 8px;border-radius:3px">Ex</span>
+    </div>
+    <div style="font-size:14px;color:#888;font-family:monospace;letter-spacing:1px">SELECCIONAR PROYECTO</div>
+  </div>
+  <div class="proy-grid" id="proy-grid"></div>
+  <button class="btn-nuevo-proy" onclick="openNuevoProy()">＋ Crear nuevo proyecto</button>
+</div>
+
+<!-- ══════════════ MODAL NUEVO PROYECTO ══════════════ -->
+<div id="nuevo-proy-bg">
+  <div class="modal" style="border-top-color:#F7C600;max-width:520px">
+    <div class="modal-head" style="background:#0f1117">
+      <div style="flex:1">
+        <div style="font-size:11px;font-family:monospace;color:#F7C600;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">NUEVO PROYECTO</div>
+        <div style="font-size:15px;font-weight:600">Crear proyecto ATEX</div>
+      </div>
+      <button onclick="closeNuevoProy()" style="background:none;border:none;color:#666;font-size:20px;cursor:pointer">✕</button>
+    </div>
+    <div class="modal-body">
+      <div><div class="field-lbl">Nombre del proyecto</div><input class="field-input" id="np-nombre" placeholder="Ej: Levantamiento ATEX — Planta X"></div>
+      <div class="two-col">
+        <div><div class="field-lbl">Cliente</div><input class="field-input" id="np-cliente" placeholder="Ej: CMPC, Copec…"></div>
+        <div><div class="field-lbl">Planta / Instalación</div><input class="field-input" id="np-planta" placeholder="Ej: Planta Santiago"></div>
+      </div>
+      <div><div class="field-lbl">Descripción</div><textarea class="field-ta" id="np-desc" placeholder="Norma aplicable, alcance…" style="min-height:60px"></textarea></div>
+      <div style="background:#1e2230;border-radius:6px;padding:12px 14px;font-size:11px;color:#888;font-family:monospace;line-height:1.6">
+        ⚠ El catálogo de equipos del nuevo proyecto comenzará vacío.<br>
+        Los equipos se agregan desde el tab <strong style="color:#F7C600">EQUIPOS</strong> usando la función <strong style="color:#F7C600">Duplicar</strong> o creando nuevas fichas.
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-out" onclick="closeNuevoProy()">Cancelar</button>
+      <button class="btn-save" onclick="saveNuevoProy()" id="np-sv">CREAR PROYECTO</button>
+    </div>
+  </div>
+</div>
 
 <!-- LOGIN -->
 <div id="login">
@@ -302,6 +367,7 @@ input[type=file]{display:none}
       <span class="topbar-title">Levantamiento Equipos Ex · CCU Temuco</span>
     </div>
     <div style="display:flex;align-items:center;gap:8px">
+      <span class="proy-active-pill" onclick="volverProyectos()" id="proy-pill" title="Cambiar proyecto">◈ <span id="proy-pill-name">—</span></span>
       <span id="user-lbl" style="font-family:monospace;font-size:10px;color:#888"></span>
       <button onclick="openSearch()" style="background:none;border:1px solid #2a2f40;color:#888;font-size:11px;cursor:pointer;border-radius:4px;padding:4px 10px;font-family:monospace;display:flex;align-items:center;gap:5px" title="Ctrl+K">
         🔍 <span style="display:none" id="srch-hint">Ctrl+K</span>
@@ -648,8 +714,8 @@ input[type=file]{display:none}
         </div>
         <input type="file" id="fin-cam" accept="image/*" capture="environment" onchange="addPhotos(event)">
         <input type="file" id="fin-gal" accept="image/*" multiple onchange="addPhotos(event)">
-        <button class="btn-dark" onclick="pastePhoto('eq')" style="font-size:11px;padding:6px 14px;background:#2a2f40" title="Pegar imagen del portapapeles">📋 Pegar imagen</button>
-        <div style="font-size:9px;color:#aaa;margin-top:6px;font-family:monospace">Fotografíe la placa · o pegue una imagen con <strong style='color:#F7C600'>Ctrl+V</strong></div>
+        <button class="btn-dark" onclick="pastePhoto('eq')" style="font-size:11px;padding:6px 14px;background:#2a2f40">📋 Pegar imagen</button>
+        <div style="font-size:9px;color:#aaa;margin-top:6px;font-family:monospace">Fotografíe la placa · o pegue con <strong style='color:#F7C600'>Ctrl+V</strong></div>
       </div>
       <div id="m-prev" style="display:none;padding:8px 10px;background:#eceae3;border-radius:4px;font-size:11px;color:#6b7280;font-family:monospace"></div>
       <div style="font-size:10px;font-weight:600;color:#7c3aed;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">
@@ -761,8 +827,8 @@ input[type=file]{display:none}
         </div>
         <input type="file" id="sm-cam" accept="image/*" capture="environment" onchange="addSubPhotos(event)">
         <input type="file" id="sm-gal" accept="image/*" multiple onchange="addSubPhotos(event)">
-        <button class="btn-dark" onclick="pastePhoto('comp')" style="font-size:11px;padding:6px 14px;background:#2a2f40" title="Pegar imagen del portapapeles">📋 Pegar imagen</button>
-        <div style="font-size:9px;color:#aaa;margin-top:6px;font-family:monospace">Fotografíe la placa · o pegue una imagen con <strong style='color:#7c3aed'>Ctrl+V</strong></div>
+        <button class="btn-dark" onclick="pastePhoto('comp')" style="font-size:11px;padding:6px 14px;background:#2a2f40">📋 Pegar imagen</button>
+        <div style="font-size:9px;color:#aaa;margin-top:6px;font-family:monospace">Fotografíe la placa · o pegue con <strong style='color:#7c3aed'>Ctrl+V</strong></div>
       </div>
       <div id="sm-prev" style="display:none;padding:8px 10px;background:#eceae3;border-radius:4px;font-size:11px;color:#6b7280;font-family:monospace"></div>
       <div id="sm-del-wrap" style="display:none">
@@ -999,6 +1065,9 @@ const FL = {
 //  STATE
 // ═══════════════════════════════════════════════════════════
 let session, profile, recs={}, subRecs={}, curEq=null, curConf='', pendFiles=[], exPaths=[], floorF='all', allRaw=[], allSubRaw=[];
+// Multi-proyecto
+let curProyecto=null; // { id, nombre, cliente, planta, descripcion }
+let proyectos=[];
 let curParentEq=null, curCompId=null, subConf='', subPendFiles=[], subExPaths=[];
 let customNames={}; // { eqId: nombrePersonalizado }
 let hiddenEqs=new Set(); // ids ocultos
@@ -1014,12 +1083,14 @@ let inspConf='', accionVerif='', inspPendFiles=[], inspExPaths=[];
 (async()=>{
   try {
     const {data} = await sb.auth.getSession();
-    if(data.session){ session=data.session; await loadApp(); }
+    if(data.session){ session=data.session; await showProyectos(); }
   } catch(e){ console.warn(e); }
 })();
 
 async function loadApp(){
+  if(!curProyecto){ await showProyectos(); return; }
   loader(1);
+  document.getElementById('proyecto-selector').classList.remove('on');
   document.getElementById('login').style.display='none';
   document.getElementById('app').style.display='flex';
   try {
@@ -1029,29 +1100,33 @@ async function loadApp(){
   document.getElementById('user-lbl').textContent=name;
   document.getElementById('i-insp').value=name;
   document.getElementById('i-fecha').value=new Date().toISOString().slice(0,10);
+  // Pill proyecto activo
+  const pill=document.getElementById('proy-pill-name');
+  if(pill) pill.textContent=curProyecto.nombre;
+  // Topbar title
+  const tt=document.querySelector('.topbar-title');
+  if(tt) tt.textContent=`${curProyecto.cliente||'ATEX'} · ${curProyecto.planta||curProyecto.nombre}`;
+  const pid=curProyecto.id;
   try {
-    const data = await must(sb.from('registros').select('*, profiles(full_name)').order('updated_at',{ascending:false}));
+    const data = await must(sb.from('registros').select('*, profiles(full_name)').eq('proyecto_id',pid).order('updated_at',{ascending:false}));
     if(data){ data.forEach(r=>{ recs[r.equipo_id]=r; }); allRaw=data; }
   } catch(e){ toast('Ejecuta el schema.sql en Supabase para activar la base de datos','err'); }
   try {
-    const sd=await must(sb.from('componentes').select('*, profiles(full_name)').order('created_at',{ascending:true}));
+    const sd=await must(sb.from('componentes').select('*, profiles(full_name)').eq('proyecto_id',pid).order('created_at',{ascending:true}));
     if(sd){ allSubRaw=sd; subRecs={}; sd.forEach(c=>{ if(!subRecs[c.equipo_id]) subRecs[c.equipo_id]=[]; subRecs[c.equipo_id].push(c); }); }
   } catch(e){ console.warn('componentes table not found'); }
-  // Cargar nombres personalizados
   try {
-    const cn=await must(sb.from('equipos_custom').select('id,nombre'));
+    const cn=await must(sb.from('equipos_custom').select('id,nombre').eq('proyecto_id',pid));
     if(cn){ cn.forEach(r=>{ customNames[r.id]=r.nombre; }); }
-  } catch(e){ console.warn('equipos_custom table not found — ejecuta el SQL indicado'); }
-  // Cargar equipos ocultos
+  } catch(e){ console.warn('equipos_custom not found'); }
   try {
-    const ho=await must(sb.from('equipos_ocultos').select('id'));
+    const ho=await must(sb.from('equipos_ocultos').select('id').eq('proyecto_id',pid));
     if(ho){ ho.forEach(r=>hiddenEqs.add(r.id)); }
-  } catch(e){ console.warn('equipos_ocultos table not found — ejecuta el SQL indicado'); }
-  // Cargar equipos extra (duplicados)
+  } catch(e){ console.warn('equipos_ocultos not found'); }
   try {
-    const ee=await must(sb.from('equipos_extra').select('*').order('created_at',{ascending:true}));
+    const ee=await must(sb.from('equipos_extra').select('*').eq('proyecto_id',pid).order('created_at',{ascending:true}));
     if(ee){ equiposExtra=ee; }
-  } catch(e){ console.warn('equipos_extra table not found — ejecuta el SQL indicado'); }
+  } catch(e){ console.warn('equipos_extra not found'); }
   renderEq();
   loader(0);
 }
@@ -1095,7 +1170,9 @@ async function doRegister(e){
 }
 async function doLogout(){
   await sb.auth.signOut();
+  curProyecto=null; proyectos=[];
   document.getElementById('app').style.display='none';
+  document.getElementById('proyecto-selector').classList.remove('on');
   document.getElementById('login').style.display='flex';
 }
 
@@ -1616,7 +1693,7 @@ async function saveEq(){
     const eq=getEqDef(curEq);
     if(!eq) throw new Error('Equipo no encontrado');
     const payload={
-      equipo_id:curEq, equipo_nombre:eqName(curEq), piso:eq.p, grupo:eq.g,
+      equipo_id:curEq, equipo_nombre:eqName(curEq), piso:eq.p, grupo:eq.g, proyecto_id:curProyecto?.id||'ccu-temuco-molino',
       marca:document.getElementById('f-marca').value.trim(),
       modelo:document.getElementById('f-modelo').value.trim(),
       serie:document.getElementById('f-serie').value.trim(),
@@ -2180,7 +2257,7 @@ async function saveComp(){
       return cb&&cb.checked;
     });
     const payload={
-      equipo_id:curParentEq, tipo, nombre_comp:nombre||tipo,
+      equipo_id:curParentEq, tipo, nombre_comp:nombre||tipo, proyecto_id:curProyecto?.id||'ccu-temuco-molino',
       marca:document.getElementById('sm-marca').value.trim(),
       modelo:document.getElementById('sm-modelo').value.trim(),
       serie:document.getElementById('sm-serie').value.trim(),
@@ -3075,62 +3152,100 @@ function openLb(url){ document.getElementById('lb-img').src=url; document.getEle
 function closeLb(){ document.getElementById('lb').classList.remove('on'); }
 
 // ═══════════════════════════════════════════════════════════
-//  PEGAR FOTO DESDE PORTAPAPELES
+//  MULTI-PROYECTO
 // ═══════════════════════════════════════════════════════════
-async function pastePhoto(target){
+async function showProyectos(){
+  loader(1);
+  document.getElementById('app').style.display='none';
+  document.getElementById('login').style.display='none';
   try {
-    const items = await navigator.clipboard.read();
-    let found = false;
-    for(const item of items){
-      const imgType = item.types.find(t => t.startsWith('image/'));
-      if(imgType){
-        const blob = await item.getType(imgType);
-        const ext = imgType.split('/')[1] || 'png';
-        const file = new File([blob], `pasted_${Date.now()}.${ext}`, {type: imgType});
-        _addFileToTarget(target, file);
-        found = true;
-        break;
-      }
-    }
-    if(!found) toast('No hay imagen en el portapapeles','err');
-  } catch(e){
-    toast('Sin permiso de portapapeles — usa Ctrl+V dentro del modal','err');
-  }
+    const data = await must(sb.from('proyectos').select('*').eq('activo',true).order('created_at',{ascending:true}));
+    proyectos = data||[];
+  } catch(e){ proyectos=[]; }
+  // Cargar stats por proyecto
+  let statsMap={};
+  try {
+    const sr = await must(sb.from('registros').select('proyecto_id'));
+    const sc = await must(sb.from('componentes').select('proyecto_id'));
+    const all=[...(sr||[]),...(sc||[])];
+    all.forEach(r=>{ statsMap[r.proyecto_id]=(statsMap[r.proyecto_id]||0)+1; });
+  } catch(e){}
+  renderProyectoGrid(statsMap);
+  document.getElementById('proyecto-selector').classList.add('on');
+  loader(0);
 }
 
-function _addFileToTarget(target, file){
-  if(target === 'eq'){
-    pendFiles.push(file); renderPhotos(); toast('Imagen pegada ✓','ok');
-  } else if(target === 'comp'){
-    subPendFiles.push(file); renderSubPhotos(); toast('Imagen pegada ✓','ok');
-  } else if(target === 'insp'){
-    inspPendFiles.push(file); renderInspPhotos(); toast('Imagen pegada ✓','ok');
+function renderProyectoGrid(statsMap){
+  const grid=document.getElementById('proy-grid');
+  if(!proyectos.length){
+    grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;color:#666;padding:40px;font-family:monospace;font-size:12px">
+      No hay proyectos aún.<br><span style="color:#F7C600">Crea el primero con el botón de abajo.</span>
+    </div>`;
+    return;
   }
+  grid.innerHTML=proyectos.map(p=>{
+    const count=statsMap[p.id]||0;
+    return `<div class="proy-card" onclick="selectProyecto('${p.id}')">
+      <div class="proy-card-badge">ATEX</div>
+      <div class="proy-card-name">${esc(p.nombre)}</div>
+      <div class="proy-card-sub">${esc(p.cliente||'')}${p.planta?' · '+esc(p.planta):''}</div>
+      ${p.descripcion?`<div style="font-size:10px;color:#666;margin-top:6px;line-height:1.5">${esc(p.descripcion)}</div>`:''}
+      <div class="proy-card-meta">
+        <span class="proy-card-stat">📋 ${count} registro${count!==1?'s':''}</span>
+        <span class="proy-card-stat" style="margin-left:auto;color:#444">${esc(p.id)}</span>
+      </div>
+    </div>`;
+  }).join('');
 }
 
-// Listener global Ctrl+V — detecta qué modal está abierto
-document.addEventListener('paste', function(e){
-  const items = e.clipboardData?.items;
-  if(!items) return;
-  for(const item of items){
-    if(item.type.startsWith('image/')){
-      const file = item.getAsFile();
-      if(!file) return;
-      const modalEqOpen   = document.getElementById('modal-bg')?.style.display !== 'none';
-      const modalCompOpen = document.getElementById('smodal-bg')?.style.display !== 'none';
-      const modalInspOpen = document.getElementById('insp-modal-bg')?.classList.contains('on');
-      if(modalCompOpen){
-        _addFileToTarget('comp', file);
-      } else if(modalEqOpen){
-        _addFileToTarget('eq', file);
-      } else if(modalInspOpen){
-        _addFileToTarget('insp', file);
-      } else { return; }
-      e.preventDefault();
-      break;
-    }
-  }
-});
+async function selectProyecto(pid){
+  curProyecto = proyectos.find(p=>p.id===pid)||null;
+  if(!curProyecto) return;
+  // Reset datos anteriores
+  recs={}; subRecs={}; allRaw=[]; allSubRaw=[]; customNames={}; hiddenEqs=new Set(); equiposExtra=[];
+  await loadApp();
+}
+
+function volverProyectos(){
+  if(!confirm('¿Volver al selector de proyectos?\nSe cerrará el proyecto actual.')) return;
+  curProyecto=null;
+  recs={}; subRecs={}; allRaw=[]; allSubRaw=[]; customNames={}; hiddenEqs=new Set(); equiposExtra=[];
+  document.getElementById('app').style.display='none';
+  showProyectos();
+}
+
+function openNuevoProy(){
+  document.getElementById('np-nombre').value='';
+  document.getElementById('np-cliente').value='';
+  document.getElementById('np-planta').value='';
+  document.getElementById('np-desc').value='';
+  document.getElementById('nuevo-proy-bg').classList.add('on');
+}
+function closeNuevoProy(){ document.getElementById('nuevo-proy-bg').classList.remove('on'); }
+
+async function saveNuevoProy(){
+  const nombre=document.getElementById('np-nombre').value.trim();
+  if(!nombre){ toast('El nombre es obligatorio','err'); return; }
+  const btn=document.getElementById('np-sv'); btn.disabled=1; btn.textContent='Creando…';
+  try {
+    // Generar ID desde nombre
+    const id='proy_'+nombre.toLowerCase().replace(/[^a-z0-9]/g,'_').replace(/_+/g,'_').slice(0,30)+'_'+Date.now().toString().slice(-4);
+    const payload={
+      id, nombre,
+      cliente:document.getElementById('np-cliente').value.trim()||null,
+      planta:document.getElementById('np-planta').value.trim()||null,
+      descripcion:document.getElementById('np-desc').value.trim()||null,
+      activo:true,
+      created_by:profile?.full_name||session.user.email
+    };
+    await must(sb.from('proyectos').insert(payload));
+    toast('Proyecto creado ✓','ok');
+    closeNuevoProy();
+    await showProyectos();
+  } catch(e){ toast('Error: '+e.message,'err'); }
+  btn.disabled=0; btn.textContent='CREAR PROYECTO';
+}
+
 </script>
 </body>
 </html>
