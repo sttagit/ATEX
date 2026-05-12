@@ -251,13 +251,22 @@ input[type=file]{display:none}
 .proy-card-sub{font-size:11px;color:#888;font-family:monospace}
 .proy-card-badge{position:absolute;top:12px;right:12px;background:#F7C600;color:#111;font-size:8px;font-weight:800;padding:2px 7px;border-radius:2px;font-family:monospace;letter-spacing:.5px}
 .proy-card-meta{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap}
-.proy-card-stat{font-family:monospace;font-size:10px;color:#666;display:flex;align-items:center;gap:4px}
+.proy-card-stat{font-family:monospace;font-size:10px;color:#666}
 .btn-nuevo-proy{display:flex;align-items:center;gap:8px;padding:10px 24px;background:none;border:1.5px dashed #2a2f40;border-radius:6px;color:#666;font-family:monospace;font-size:11px;cursor:pointer;transition:all .15s;margin-top:4px}
 .btn-nuevo-proy:hover{border-color:#F7C600;color:#F7C600}
 #nuevo-proy-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:400;padding:16px;overflow-y:auto;align-items:center;justify-content:center}
 #nuevo-proy-bg.on{display:flex}
 .proy-active-pill{background:#1e2230;border:1px solid #2a2f40;border-radius:4px;padding:3px 10px;font-family:monospace;font-size:9px;color:#F7C600;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap}
 .proy-active-pill:hover{background:#252b3d;border-color:#F7C600}
+/* ── DRAG & DROP EQUIPOS ENTRE PISOS ── */
+.eq-card[draggable]{cursor:grab}
+.eq-card[draggable]:active{cursor:grabbing}
+.eq-card.eq-dragging{opacity:.3;transform:scale(.97);border-style:dashed!important}
+.eq-grid.piso-drop-over{background:#fffdf0!important;border:2px dashed #F7C600!important;border-radius:6px;padding:6px!important;min-height:60px}
+.sec-hd.piso-hd-over{color:#fff!important;background:#F7C600!important;border-radius:3px;padding:4px 8px!important}
+.eq-drag-ghost{position:fixed;top:-200px;left:-200px;background:#0f1117;color:#F7C600;border:1px solid #F7C600;border-radius:5px;padding:6px 14px;font-size:11px;font-family:monospace;pointer-events:none;z-index:9999;white-space:nowrap;max-width:220px;overflow:hidden;text-overflow:ellipsis}
+.piso-drop-hint{font-size:9px;color:#F7C600;font-family:monospace;text-align:center;padding:6px;opacity:.7;border:1px dashed #F7C600;border-radius:4px;margin-bottom:6px;display:none}
+.eq-grid.piso-drop-over .piso-drop-hint{display:block}
 
 </style>
 </head>
@@ -280,7 +289,6 @@ input[type=file]{display:none}
   <div class="proy-grid" id="proy-grid"></div>
   <button class="btn-nuevo-proy" onclick="openNuevoProy()">＋ Crear nuevo proyecto</button>
 </div>
-
 <!-- ══════════════ MODAL NUEVO PROYECTO ══════════════ -->
 <div id="nuevo-proy-bg">
   <div class="modal" style="border-top-color:#F7C600;max-width:520px">
@@ -298,10 +306,6 @@ input[type=file]{display:none}
         <div><div class="field-lbl">Planta / Instalación</div><input class="field-input" id="np-planta" placeholder="Ej: Planta Santiago"></div>
       </div>
       <div><div class="field-lbl">Descripción</div><textarea class="field-ta" id="np-desc" placeholder="Norma aplicable, alcance…" style="min-height:60px"></textarea></div>
-      <div style="background:#1e2230;border-radius:6px;padding:12px 14px;font-size:11px;color:#888;font-family:monospace;line-height:1.6">
-        ⚠ El catálogo de equipos del nuevo proyecto comenzará vacío.<br>
-        Los equipos se agregan desde el tab <strong style="color:#F7C600">EQUIPOS</strong> usando la función <strong style="color:#F7C600">Duplicar</strong> o creando nuevas fichas.
-      </div>
     </div>
     <div class="modal-foot">
       <button class="btn-out" onclick="closeNuevoProy()">Cancelar</button>
@@ -1064,6 +1068,8 @@ const FL = {
 // ═══════════════════════════════════════════════════════════
 let session, profile, recs={}, subRecs={}, curEq=null, curConf='', pendFiles=[], exPaths=[], floorF='all', allRaw=[], allSubRaw=[];
 let curProyecto=null, proyectos=[];
+let customPisos={}; // {eqId: pisoCustom}
+let _eqDragId=null, _eqDragGhost=null;
 let curParentEq=null, curCompId=null, subConf='', subPendFiles=[], subExPaths=[];
 let customNames={}; // { eqId: nombrePersonalizado }
 let hiddenEqs=new Set(); // ids ocultos
@@ -1108,7 +1114,7 @@ async function loadApp(){
   try {
     const sd=await must(sb.from('componentes').select('*, profiles(full_name)').eq('proyecto_id',pid).order('created_at',{ascending:true}));
     if(sd){ allSubRaw=sd; subRecs={}; sd.forEach(c=>{ if(!subRecs[c.equipo_id]) subRecs[c.equipo_id]=[]; subRecs[c.equipo_id].push(c); }); }
-  } catch(e){ console.warn('componentes table not found'); }
+  } catch(e){ console.warn('componentes not found'); }
   try {
     const cn=await must(sb.from('equipos_custom').select('id,nombre').eq('proyecto_id',pid));
     if(cn){ cn.forEach(r=>{ customNames[r.id]=r.nombre; }); }
@@ -1121,6 +1127,11 @@ async function loadApp(){
     const ee=await must(sb.from('equipos_extra').select('*').eq('proyecto_id',pid).order('created_at',{ascending:true}));
     if(ee){ equiposExtra=ee; }
   } catch(e){ console.warn('equipos_extra not found'); }
+  // Cargar pisos personalizados
+  try {
+    const ep=await must(sb.from('equipos_piso').select('id,piso').eq('proyecto_id',pid));
+    if(ep){ customPisos={}; ep.forEach(r=>{ customPisos[r.id]=r.piso; }); }
+  } catch(e){ console.warn('equipos_piso not found'); }
   renderEq();
   loader(0);
 }
@@ -1164,7 +1175,7 @@ async function doRegister(e){
 }
 async function doLogout(){
   await sb.auth.signOut();
-  curProyecto=null; proyectos=[];
+  curProyecto=null; proyectos=[]; customPisos={};
   document.getElementById('app').style.display='none';
   document.getElementById('proyecto-selector').classList.remove('on');
   document.getElementById('login').style.display='flex';
@@ -1242,6 +1253,12 @@ function eqConf(eqId){
 }
 
 // Devuelve el nombre vigente de un equipo (custom o catálogo)
+function eqPiso(eqId){
+  return customPisos[eqId]
+    || (EQ.find(e=>e.id===eqId)||{}).p
+    || (equiposExtra.find(e=>e.id===eqId)||{}).piso
+    || '';
+}
 function eqName(eqId){
   return customNames[eqId]
     || (EQ.find(e=>e.id===eqId)||{}).n
@@ -1255,7 +1272,7 @@ function allEqs(floorFilter){
   const extra = equiposExtra.filter(e=>!hiddenEqs.has(e.id)).map(e=>({
     id:e.id, n:e.nombre, p:e.piso, g:e.grupo||'', z:e.zona||'', _extra:true
   }));
-  const combined = [...base, ...extra];
+  const combined = [...base, ...extra].map(e=>({...e, p:customPisos[e.id]||e.p}));
   return floorFilter==='all' ? combined : combined.filter(e=>e.p===floorFilter);
 }
 
@@ -1336,7 +1353,7 @@ function renderEq(){
       const nb=eqName(b.id).toLowerCase();
       return na.localeCompare(nb,'es');
     });
-    h+=`<div class="sec-hd">${esc(FL[fl]||fl)}</div><div class="eq-grid">`;
+    h+=`<div class="sec-hd" id="shd-${fl}" ondragover="onPisoDragOver(event,'${fl}')" ondragleave="onPisoDragLeave(event,'${fl}')">${esc(FL[fl]||fl)}</div><div class="eq-grid" id="egrid-${fl}" ondragover="onPisoDragOver(event,'${fl}')" ondragleave="onPisoDragLeave(event,'${fl}')" ondrop="onPisoDrop(event,'${fl}')">`;
     for(const eq of flItems){
       const r=recs[eq.id]||{};
       const z=r.zona||eq.z||'';
@@ -1347,7 +1364,7 @@ function renderEq(){
       const nombre=eqName(eq.id);
       const isCustom=!!customNames[eq.id];
       const isExtra=!!eq._extra;
-      h+=`<div class="eq-card${zClass} ${r.conformidad?'done':''}" id="card-${eq.id}">
+      h+=`<div class="eq-card${zClass} ${r.conformidad?'done':''}" id="card-${eq.id}" draggable="true" ondragstart="onEqDragStart(event,'${eq.id}')" ondragend="onEqDragEnd(event)">
         <div class="eq-name-wrap">
           <div style="flex:1">
             <span class="eq-name" id="eqn-${eq.id}" onclick="openModal('${eq.id}')">${esc(nombre)}</span>
@@ -1687,7 +1704,7 @@ async function saveEq(){
     const eq=getEqDef(curEq);
     if(!eq) throw new Error('Equipo no encontrado');
     const payload={
-      equipo_id:curEq, equipo_nombre:eqName(curEq), piso:eq.p, grupo:eq.g, proyecto_id:curProyecto?.id||'ccu-temuco-molino',
+      equipo_id:curEq, equipo_nombre:eqName(curEq), piso:eqPiso(curEq), grupo:eq.g, proyecto_id:curProyecto?.id||'ccu-temuco-molino',
       marca:document.getElementById('f-marca').value.trim(),
       modelo:document.getElementById('f-modelo').value.trim(),
       serie:document.getElementById('f-serie').value.trim(),
@@ -3158,8 +3175,7 @@ async function pastePhoto(target){
         const blob = await item.getType(imgType);
         const ext = imgType.split('/')[1] || 'png';
         const file = new File([blob], `pasted_${Date.now()}.${ext}`, {type: imgType});
-        _addFileToTarget(target, file);
-        found = true; break;
+        _addFileToTarget(target, file); found = true; break;
       }
     }
     if(!found) toast('No hay imagen en el portapapeles','err');
@@ -3186,6 +3202,63 @@ document.addEventListener('paste', function(e){
     }
   }
 });
+
+// ═══════════════════════════════════════════════════════════
+//  DRAG & DROP EQUIPOS ENTRE PISOS
+// ═══════════════════════════════════════════════════════════
+function onEqDragStart(e, eqId){
+  // No iniciar si está expandido o si se arrastra un componente interno
+  if(e.target.closest('.eq-expand')) { e.preventDefault(); return; }
+  _eqDragId = eqId;
+  e.dataTransfer.effectAllowed = 'move';
+  setTimeout(()=>{ document.getElementById('card-'+eqId)?.classList.add('eq-dragging'); }, 0);
+  // Ghost
+  _eqDragGhost = document.createElement('div');
+  _eqDragGhost.className = 'eq-drag-ghost';
+  _eqDragGhost.textContent = '⠿ ' + eqName(eqId);
+  document.body.appendChild(_eqDragGhost);
+  try { e.dataTransfer.setDragImage(_eqDragGhost, -10, -10); } catch(ex){}
+}
+function onEqDragEnd(e){
+  if(_eqDragId) document.getElementById('card-'+_eqDragId)?.classList.remove('eq-dragging');
+  document.querySelectorAll('.eq-grid.piso-drop-over').forEach(g=>g.classList.remove('piso-drop-over'));
+  document.querySelectorAll('.sec-hd.piso-hd-over').forEach(h=>h.classList.remove('piso-hd-over'));
+  if(_eqDragGhost){ _eqDragGhost.remove(); _eqDragGhost=null; }
+}
+function onPisoDragOver(e, piso){
+  if(!_eqDragId) return;
+  e.preventDefault(); e.dataTransfer.dropEffect='move';
+  document.querySelectorAll('.eq-grid.piso-drop-over').forEach(g=>{ if(g.id!=='egrid-'+piso) g.classList.remove('piso-drop-over'); });
+  document.querySelectorAll('.sec-hd.piso-hd-over').forEach(h=>{ if(h.id!=='shd-'+piso) h.classList.remove('piso-hd-over'); });
+  document.getElementById('egrid-'+piso)?.classList.add('piso-drop-over');
+  document.getElementById('shd-'+piso)?.classList.add('piso-hd-over');
+}
+function onPisoDragLeave(e, piso){
+  const grid = document.getElementById('egrid-'+piso);
+  const hd   = document.getElementById('shd-'+piso);
+  if(grid && !grid.contains(e.relatedTarget)) grid.classList.remove('piso-drop-over');
+  if(hd   && !hd.contains(e.relatedTarget))   hd.classList.remove('piso-hd-over');
+}
+async function onPisoDrop(e, toPiso){
+  e.preventDefault();
+  document.querySelectorAll('.eq-grid.piso-drop-over').forEach(g=>g.classList.remove('piso-drop-over'));
+  document.querySelectorAll('.sec-hd.piso-hd-over').forEach(h=>h.classList.remove('piso-hd-over'));
+  if(!_eqDragId) return;
+  const eqId = _eqDragId; _eqDragId = null;
+  const fromPiso = eqPiso(eqId);
+  if(fromPiso === toPiso) return;
+  try {
+    const pid = curProyecto?.id||'ccu-temuco-molino';
+    await must(sb.from('equipos_piso').upsert({
+      id: eqId, piso: toPiso, proyecto_id: pid,
+      updated_at: new Date().toISOString(),
+      updated_by: profile?.full_name||session.user.email
+    }, {onConflict:'id'}));
+    customPisos[eqId] = toPiso;
+    toast(`Movido a ${FL[toPiso]||toPiso} ✓`, 'ok');
+    renderEq();
+  } catch(err){ toast('Error al mover: '+err.message, 'err'); }
+}
 
 // ═══════════════════════════════════════════════════════════
 //  MULTI-PROYECTO
@@ -3223,7 +3296,7 @@ function renderProyectoGrid(statsMap){
       ${p.descripcion?`<div style="font-size:10px;color:#666;margin-top:6px;line-height:1.5">${esc(p.descripcion)}</div>`:''}
       <div class="proy-card-meta">
         <span class="proy-card-stat">📋 ${count} registro${count!==1?'s':''}</span>
-        <span class="proy-card-stat" style="margin-left:auto;color:#444">${esc(p.id)}</span>
+        <span class="proy-card-stat" style="margin-left:auto;color:#444;font-size:9px">${esc(p.id)}</span>
       </div>
     </div>`;
   }).join('');
@@ -3231,21 +3304,18 @@ function renderProyectoGrid(statsMap){
 async function selectProyecto(pid){
   curProyecto=proyectos.find(p=>p.id===pid)||null;
   if(!curProyecto) return;
-  recs={}; subRecs={}; allRaw=[]; allSubRaw=[]; customNames={}; hiddenEqs=new Set(); equiposExtra=[];
+  recs={}; subRecs={}; allRaw=[]; allSubRaw=[]; customNames={}; hiddenEqs=new Set(); equiposExtra={}; customPisos={};
   await loadApp();
 }
 function volverProyectos(){
   if(!confirm('¿Volver al selector de proyectos?\nSe cerrará el proyecto actual.')) return;
-  curProyecto=null;
+  curProyecto=null; customPisos={};
   recs={}; subRecs={}; allRaw=[]; allSubRaw=[]; customNames={}; hiddenEqs=new Set(); equiposExtra=[];
   document.getElementById('app').style.display='none';
   showProyectos();
 }
 function openNuevoProy(){
-  document.getElementById('np-nombre').value='';
-  document.getElementById('np-cliente').value='';
-  document.getElementById('np-planta').value='';
-  document.getElementById('np-desc').value='';
+  ['np-nombre','np-cliente','np-planta','np-desc'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
   document.getElementById('nuevo-proy-bg').classList.add('on');
 }
 function closeNuevoProy(){ document.getElementById('nuevo-proy-bg').classList.remove('on'); }
@@ -3255,7 +3325,13 @@ async function saveNuevoProy(){
   const btn=document.getElementById('np-sv'); btn.disabled=1; btn.textContent='Creando…';
   try {
     const id='proy_'+nombre.toLowerCase().replace(/[^a-z0-9]/g,'_').replace(/_+/g,'_').slice(0,30)+'_'+Date.now().toString().slice(-4);
-    await must(sb.from('proyectos').insert({id,nombre,cliente:document.getElementById('np-cliente').value.trim()||null,planta:document.getElementById('np-planta').value.trim()||null,descripcion:document.getElementById('np-desc').value.trim()||null,activo:true,created_by:profile?.full_name||session.user.email}));
+    await must(sb.from('proyectos').insert({
+      id, nombre,
+      cliente:document.getElementById('np-cliente').value.trim()||null,
+      planta:document.getElementById('np-planta').value.trim()||null,
+      descripcion:document.getElementById('np-desc').value.trim()||null,
+      activo:true, created_by:profile?.full_name||session.user.email
+    }));
     toast('Proyecto creado ✓','ok'); closeNuevoProy(); await showProyectos();
   } catch(e){ toast('Error: '+e.message,'err'); }
   btn.disabled=0; btn.textContent='CREAR PROYECTO';
