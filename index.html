@@ -240,33 +240,49 @@ input[type=file]{display:none}
 .zona-uso-opt.sel-21{border-color:#d97706;background:#fef3c7;color:#92400e}
 .zona-uso-opt.sel-22{border-color:#059669;background:#d1fae5;color:#065f46}
 
-/* ── SELECTOR DE PROYECTOS ── */
-#proyecto-selector{position:fixed;inset:0;background:#0a0d14;z-index:150;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+/* ── SELECTOR PROYECTOS ── */
+#proyecto-selector{position:fixed;inset:0;background:#0a0d14;z-index:150;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
 #proyecto-selector.on{display:flex}
-.proy-header{text-align:center;margin-bottom:32px}
-.proy-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;width:100%;max-width:860px;margin-bottom:24px}
+.proy-header{text-align:center;margin-bottom:32px;flex-shrink:0}
+.proy-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;width:100%;max-width:900px;margin-bottom:24px}
 .proy-card{background:#1e2230;border:1px solid #2a2f40;border-radius:8px;padding:20px 22px;cursor:pointer;transition:all .15s;border-left:4px solid #F7C600;position:relative}
-.proy-card:hover{background:#252b3d;border-color:#F7C600;box-shadow:0 4px 20px rgba(247,198,0,.15);transform:translateY(-1px)}
+.proy-card:hover{background:#252b3d;box-shadow:0 4px 20px rgba(247,198,0,.15);transform:translateY(-1px)}
 .proy-card-name{font-size:15px;font-weight:700;color:#f5f3ee;margin-bottom:4px}
 .proy-card-sub{font-size:11px;color:#888;font-family:monospace}
-.proy-card-badge{position:absolute;top:12px;right:12px;background:#F7C600;color:#111;font-size:8px;font-weight:800;padding:2px 7px;border-radius:2px;font-family:monospace;letter-spacing:.5px}
+.proy-card-badge{position:absolute;top:12px;right:12px;background:#F7C600;color:#111;font-size:8px;font-weight:800;padding:2px 7px;border-radius:2px;font-family:monospace}
 .proy-card-meta{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap}
 .proy-card-stat{font-family:monospace;font-size:10px;color:#666}
-.btn-nuevo-proy{display:flex;align-items:center;gap:8px;padding:10px 24px;background:none;border:1.5px dashed #2a2f40;border-radius:6px;color:#666;font-family:monospace;font-size:11px;cursor:pointer;transition:all .15s;margin-top:4px}
+.btn-nuevo-proy{display:flex;align-items:center;gap:8px;padding:10px 24px;background:none;border:1.5px dashed #2a2f40;border-radius:6px;color:#666;font-family:monospace;font-size:11px;cursor:pointer;transition:all .15s;margin-top:4px;flex-shrink:0}
 .btn-nuevo-proy:hover{border-color:#F7C600;color:#F7C600}
-#nuevo-proy-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:400;padding:16px;overflow-y:auto;align-items:center;justify-content:center}
+#nuevo-proy-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:400;padding:16px;overflow-y:auto;align-items:flex-start;justify-content:center}
 #nuevo-proy-bg.on{display:flex}
 .proy-active-pill{background:#1e2230;border:1px solid #2a2f40;border-radius:4px;padding:3px 10px;font-family:monospace;font-size:9px;color:#F7C600;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap}
 .proy-active-pill:hover{background:#252b3d;border-color:#F7C600}
-/* ── DRAG & DROP EQUIPOS ENTRE PISOS ── */
+/* ── TIPO UBICACIÓN SELECTOR ── */
+.tipo-ub-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}
+.tipo-ub-opt{border:1.5px solid #ddd9d0;border-radius:6px;padding:10px 8px;text-align:center;cursor:pointer;transition:all .12s;font-size:12px;font-weight:600}
+.tipo-ub-opt:hover{border-color:#0284c7;background:#eff6ff}
+.tipo-ub-opt.sel{border-color:#0284c7;background:#dbeafe;color:#1e40af}
+.tipo-ub-icon{font-size:20px;margin-bottom:4px}
+/* ── GESTIÓN UBICACIONES ── */
+#ub-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:250;padding:16px;overflow-y:auto;align-items:flex-start;justify-content:center}
+#ub-modal-bg.on{display:flex}
+.ub-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid #ddd9d0;border-radius:4px;background:#fff;margin-bottom:6px}
+.ub-row-name{flex:1;font-size:13px;font-weight:500}
+.ub-row-drag{cursor:grab;color:#ccc;font-size:14px;padding:0 4px}
+.ub-row-drag:active{cursor:grabbing}
+/* ── CREAR EQUIPO ── */
+#eq-nuevo-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:250;padding:16px;overflow-y:auto;align-items:flex-start;justify-content:center}
+#eq-nuevo-bg.on{display:flex}
+.btn-add-eq{display:flex;align-items:center;gap:6px;padding:7px 14px;background:none;border:1.5px dashed #ddd9d0;border-radius:4px;color:#aaa;font-size:11px;font-family:monospace;cursor:pointer;width:100%;justify-content:center;margin-top:8px;transition:all .12s}
+.btn-add-eq:hover{border-color:#F7C600;color:#F7C600;background:#fffdf0}
+/* ── DRAG EQ ENTRE UBICACIONES ── */
 .eq-card[draggable]{cursor:grab}
 .eq-card[draggable]:active{cursor:grabbing}
 .eq-card.eq-dragging{opacity:.3;transform:scale(.97);border-style:dashed!important}
-.eq-grid.piso-drop-over{background:#fffdf0!important;border:2px dashed #F7C600!important;border-radius:6px;padding:6px!important;min-height:60px}
-.sec-hd.piso-hd-over{color:#fff!important;background:#F7C600!important;border-radius:3px;padding:4px 8px!important}
+.eq-grid.piso-drop-over{background:#fffdf0!important;outline:2px dashed #F7C600;border-radius:6px;min-height:60px}
+.sec-hd.piso-hd-over{color:#111!important;background:#F7C600!important;border-radius:3px;padding:4px 8px!important}
 .eq-drag-ghost{position:fixed;top:-200px;left:-200px;background:#0f1117;color:#F7C600;border:1px solid #F7C600;border-radius:5px;padding:6px 14px;font-size:11px;font-family:monospace;pointer-events:none;z-index:9999;white-space:nowrap;max-width:220px;overflow:hidden;text-overflow:ellipsis}
-.piso-drop-hint{font-size:9px;color:#F7C600;font-family:monospace;text-align:center;padding:6px;opacity:.7;border:1px dashed #F7C600;border-radius:4px;margin-bottom:6px;display:none}
-.eq-grid.piso-drop-over .piso-drop-hint{display:block}
 
 </style>
 </head>
@@ -289,27 +305,122 @@ input[type=file]{display:none}
   <div class="proy-grid" id="proy-grid"></div>
   <button class="btn-nuevo-proy" onclick="openNuevoProy()">＋ Crear nuevo proyecto</button>
 </div>
+
 <!-- ══════════════ MODAL NUEVO PROYECTO ══════════════ -->
 <div id="nuevo-proy-bg">
-  <div class="modal" style="border-top-color:#F7C600;max-width:520px">
+  <div class="modal" style="border-top-color:#F7C600;max-width:560px">
     <div class="modal-head" style="background:#0f1117">
       <div style="flex:1">
         <div style="font-size:11px;font-family:monospace;color:#F7C600;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">NUEVO PROYECTO</div>
-        <div style="font-size:15px;font-weight:600">Crear proyecto ATEX</div>
+        <div id="np-title-lbl" style="font-size:15px;font-weight:600">Crear proyecto ATEX</div>
       </div>
       <button onclick="closeNuevoProy()" style="background:none;border:none;color:#666;font-size:20px;cursor:pointer">✕</button>
     </div>
     <div class="modal-body">
+      <!-- Datos básicos -->
       <div><div class="field-lbl">Nombre del proyecto</div><input class="field-input" id="np-nombre" placeholder="Ej: Levantamiento ATEX — Planta X"></div>
       <div class="two-col">
         <div><div class="field-lbl">Cliente</div><input class="field-input" id="np-cliente" placeholder="Ej: CMPC, Copec…"></div>
         <div><div class="field-lbl">Planta / Instalación</div><input class="field-input" id="np-planta" placeholder="Ej: Planta Santiago"></div>
       </div>
-      <div><div class="field-lbl">Descripción</div><textarea class="field-ta" id="np-desc" placeholder="Norma aplicable, alcance…" style="min-height:60px"></textarea></div>
+      <div><div class="field-lbl">Descripción</div><textarea class="field-ta" id="np-desc" placeholder="Norma aplicable, alcance…" style="min-height:52px"></textarea></div>
+      <!-- Tipo de ubicación -->
+      <div>
+        <div class="field-lbl">Tipo de agrupación de equipos</div>
+        <div class="tipo-ub-grid" id="tipo-ub-grid">
+          <div class="tipo-ub-opt sel" data-v="Piso" onclick="selectTipoUb(this)"><div class="tipo-ub-icon">🏢</div>Piso</div>
+          <div class="tipo-ub-opt" data-v="Área" onclick="selectTipoUb(this)"><div class="tipo-ub-icon">📐</div>Área</div>
+          <div class="tipo-ub-opt" data-v="Sector" onclick="selectTipoUb(this)"><div class="tipo-ub-icon">🗺</div>Sector</div>
+          <div class="tipo-ub-opt" data-v="Línea" onclick="selectTipoUb(this)"><div class="tipo-ub-icon">🏭</div>Línea</div>
+          <div class="tipo-ub-opt" data-v="Zona" onclick="selectTipoUb(this)"><div class="tipo-ub-icon">📍</div>Zona</div>
+          <div class="tipo-ub-opt" data-v="_custom" onclick="selectTipoUb(this)"><div class="tipo-ub-icon">✏️</div>Personalizado</div>
+        </div>
+        <input class="field-input" id="np-tipo-custom" placeholder="Nombre personalizado (ej: Nave, Módulo…)" style="display:none;margin-top:8px">
+      </div>
+      <!-- Ubicaciones iniciales -->
+      <div>
+        <div class="field-lbl">Ubicaciones iniciales <span style="color:#aaa;font-weight:400;text-transform:none;letter-spacing:0">(una por línea)</span></div>
+        <textarea class="field-ta" id="np-ubicaciones" placeholder="Ej:&#10;Subterráneo&#10;Primer piso&#10;Segundo piso&#10;Hangar" style="min-height:100px;font-family:monospace;font-size:12px"></textarea>
+        <div style="font-size:10px;color:#aaa;margin-top:4px;font-family:monospace">Podrás agregar, editar y reordenar ubicaciones después</div>
+      </div>
     </div>
     <div class="modal-foot">
+      <div style="margin-right:auto" id="np-del-wrap" style="display:none">
+        <button class="btn-del" onclick="deleteProyecto()" id="np-del-btn" style="display:none">🗑 Eliminar proyecto</button>
+      </div>
       <button class="btn-out" onclick="closeNuevoProy()">Cancelar</button>
       <button class="btn-save" onclick="saveNuevoProy()" id="np-sv">CREAR PROYECTO</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ MODAL GESTIÓN UBICACIONES ══════════════ -->
+<div id="ub-modal-bg">
+  <div class="modal" style="border-top-color:#0284c7;max-width:480px">
+    <div class="modal-head" style="background:#0a1628">
+      <div style="flex:1">
+        <div style="font-size:11px;font-family:monospace;color:#60a5fa;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">GESTIÓN DE UBICACIONES</div>
+        <div id="ub-modal-title" style="font-size:15px;font-weight:600">Pisos del proyecto</div>
+      </div>
+      <button onclick="closeUbModal()" style="background:none;border:none;color:#666;font-size:20px;cursor:pointer">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="ub-list" style="margin-bottom:10px"></div>
+      <div style="display:flex;gap:8px">
+        <input class="field-input" id="ub-nueva-input" placeholder="Nombre de nueva ubicación…" onkeydown="if(event.key==='Enter')addUbicacion()" style="flex:1">
+        <button class="btn-save" onclick="addUbicacion()" style="white-space:nowrap">＋ Agregar</button>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-out" onclick="closeUbModal()">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ MODAL CREAR EQUIPO ══════════════ -->
+<div id="eq-nuevo-bg">
+  <div class="modal" style="border-top-color:#F7C600;max-width:520px">
+    <div class="modal-head" style="background:#0f1117">
+      <div style="flex:1">
+        <div style="font-size:11px;font-family:monospace;color:#F7C600;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">NUEVO EQUIPO</div>
+        <div id="en-ub-lbl" style="font-size:14px;font-weight:600"></div>
+      </div>
+      <button onclick="closeEqNuevo()" style="background:none;border:none;color:#666;font-size:20px;cursor:pointer">✕</button>
+    </div>
+    <div class="modal-body">
+      <div><div class="field-lbl">Nombre del equipo</div><input class="field-input" id="en-nombre" placeholder="Ej: Motor ventilador, Sensor de nivel…"></div>
+      <div class="two-col">
+        <div>
+          <div class="field-lbl">Grupo / Tipo</div>
+          <input class="field-input" id="en-grupo" list="en-grupo-list" placeholder="Transporte, Motor, Sensor…">
+          <datalist id="en-grupo-list">
+            <option>Transporte</option><option>Molienda</option><option>Aspiración</option>
+            <option>Filtración polvo</option><option>Almacenamiento</option><option>Válvulas</option>
+            <option>Compresor</option><option>Ventilación</option><option>Pesaje</option>
+            <option>Limpieza grano</option><option>Acondicionamiento</option><option>Contenedor polvo</option>
+            <option>Transporte neumático</option><option>Servicios</option><option>Motor eléctrico</option>
+            <option>Sensor / Detector</option><option>Actuador</option><option>Cuadro eléctrico</option>
+          </datalist>
+        </div>
+        <div>
+          <div class="field-lbl">Zona ATEX</div>
+          <select class="field-sel" id="en-zona">
+            <option value="">— clasificar —</option>
+            <option value="20">Zona 20</option>
+            <option value="21">Zona 21</option>
+            <option value="22">Zona 22</option>
+            <option value="NG">No peligroso</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <div class="field-lbl">Cantidad <span style="color:#aaa;font-weight:400;text-transform:none;letter-spacing:0">(crea N equipos con nombre numerado)</span></div>
+        <input class="field-input" id="en-cantidad" type="number" min="1" max="20" value="1" style="width:100px">
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-out" onclick="closeEqNuevo()">Cancelar</button>
+      <button class="btn-save" onclick="saveEqNuevo()" id="en-sv">CREAR EQUIPO</button>
     </div>
   </div>
 </div>
@@ -399,7 +510,8 @@ input[type=file]{display:none}
         <span class="chip" onclick="setFloor('6',this)">P6</span>
         <span class="chip" onclick="setFloor('7',this)">P7</span>
         <span class="chip" onclick="setFloor('hangar',this)">HANGAR</span>
-        <span id="eq-cnt" style="margin-left:auto;font-size:10px;color:#aaa;font-family:monospace"></span>
+        <span id="eq-cnt" style="font-size:10px;color:#aaa;font-family:monospace"></span>
+        <button onclick="openUbModal()" id="btn-gest-ub" style="display:none;background:none;border:1px solid #ddd9d0;border-radius:4px;padding:4px 10px;font-size:10px;font-family:monospace;cursor:pointer;color:#6b7280;margin-left:auto">⚙ Gestionar ubicaciones</button>
       </div>
       <div id="eq-list"></div>
     </div>
@@ -1068,8 +1180,10 @@ const FL = {
 // ═══════════════════════════════════════════════════════════
 let session, profile, recs={}, subRecs={}, curEq=null, curConf='', pendFiles=[], exPaths=[], floorF='all', allRaw=[], allSubRaw=[];
 let curProyecto=null, proyectos=[];
-let customPisos={}; // {eqId: pisoCustom}
+let customPisos={}, proyUbicaciones=[], proyEquipos=[];
+let curUbIdNuevoEq=null;
 let _eqDragId=null, _eqDragGhost=null;
+let _tipoUbSel='Piso';
 let curParentEq=null, curCompId=null, subConf='', subPendFiles=[], subExPaths=[];
 let customNames={}; // { eqId: nombrePersonalizado }
 let hiddenEqs=new Set(); // ids ocultos
@@ -1096,9 +1210,9 @@ async function loadApp(){
   document.getElementById('login').style.display='none';
   document.getElementById('app').style.display='flex';
   try {
-    profile = await must(sb.from('profiles').select('*').eq('id',session.user.id).single());
+    profile=await must(sb.from('profiles').select('*').eq('id',session.user.id).single());
   } catch(e){ profile={full_name:session.user.email}; }
-  const name = profile?.full_name||session.user.email;
+  const name=profile?.full_name||session.user.email;
   document.getElementById('user-lbl').textContent=name;
   document.getElementById('i-insp').value=name;
   document.getElementById('i-fecha').value=new Date().toISOString().slice(0,10);
@@ -1107,10 +1221,24 @@ async function loadApp(){
   const tt=document.querySelector('.topbar-title');
   if(tt) tt.textContent=`${curProyecto.cliente||'ATEX'} · ${curProyecto.planta||curProyecto.nombre}`;
   const pid=curProyecto.id;
+  // Cargar ubicaciones del proyecto
+  try {
+    const ubs=await must(sb.from('proyecto_ubicaciones').select('*').eq('proyecto_id',pid).order('orden',{ascending:true}));
+    proyUbicaciones=ubs||[];
+  } catch(e){ proyUbicaciones=[]; }
+  // Cargar equipos dinámicos del proyecto
+  try {
+    const peqs=await must(sb.from('proyecto_equipos').select('*').eq('proyecto_id',pid).order('orden',{ascending:true}));
+    proyEquipos=peqs||[];
+  } catch(e){ proyEquipos=[]; }
+  // Mostrar u ocultar botón gestión ubicaciones
+  const btnGestUb=document.getElementById('btn-gest-ub');
+  if(btnGestUb) btnGestUb.style.display=proyUbicaciones.length?'block':'none';
+  // Datos inspección
   try {
     const data=await must(sb.from('registros').select('*, profiles(full_name)').eq('proyecto_id',pid).order('updated_at',{ascending:false}));
     if(data){ data.forEach(r=>{ recs[r.equipo_id]=r; }); allRaw=data; }
-  } catch(e){ toast('Ejecuta el schema.sql en Supabase para activar la base de datos','err'); }
+  } catch(e){ toast('Error cargando registros','err'); }
   try {
     const sd=await must(sb.from('componentes').select('*, profiles(full_name)').eq('proyecto_id',pid).order('created_at',{ascending:true}));
     if(sd){ allSubRaw=sd; subRecs={}; sd.forEach(c=>{ if(!subRecs[c.equipo_id]) subRecs[c.equipo_id]=[]; subRecs[c.equipo_id].push(c); }); }
@@ -1118,20 +1246,19 @@ async function loadApp(){
   try {
     const cn=await must(sb.from('equipos_custom').select('id,nombre').eq('proyecto_id',pid));
     if(cn){ cn.forEach(r=>{ customNames[r.id]=r.nombre; }); }
-  } catch(e){ console.warn('equipos_custom not found'); }
+  } catch(e){}
   try {
     const ho=await must(sb.from('equipos_ocultos').select('id').eq('proyecto_id',pid));
     if(ho){ ho.forEach(r=>hiddenEqs.add(r.id)); }
-  } catch(e){ console.warn('equipos_ocultos not found'); }
+  } catch(e){}
   try {
     const ee=await must(sb.from('equipos_extra').select('*').eq('proyecto_id',pid).order('created_at',{ascending:true}));
     if(ee){ equiposExtra=ee; }
-  } catch(e){ console.warn('equipos_extra not found'); }
-  // Cargar pisos personalizados
+  } catch(e){}
   try {
     const ep=await must(sb.from('equipos_piso').select('id,piso').eq('proyecto_id',pid));
     if(ep){ customPisos={}; ep.forEach(r=>{ customPisos[r.id]=r.piso; }); }
-  } catch(e){ console.warn('equipos_piso not found'); }
+  } catch(e){}
   renderEq();
   loader(0);
 }
@@ -1175,7 +1302,7 @@ async function doRegister(e){
 }
 async function doLogout(){
   await sb.auth.signOut();
-  curProyecto=null; proyectos=[]; customPisos={};
+  curProyecto=null; proyectos=[]; customPisos={}; proyUbicaciones=[]; proyEquipos=[];
   document.getElementById('app').style.display='none';
   document.getElementById('proyecto-selector').classList.remove('on');
   document.getElementById('login').style.display='flex';
@@ -1254,10 +1381,13 @@ function eqConf(eqId){
 
 // Devuelve el nombre vigente de un equipo (custom o catálogo)
 function eqPiso(eqId){
-  return customPisos[eqId]
-    || (EQ.find(e=>e.id===eqId)||{}).p
-    || (equiposExtra.find(e=>e.id===eqId)||{}).piso
-    || '';
+  if(customPisos[eqId]) return customPisos[eqId];
+  const dyn=proyEquipos.find(e=>e.id===eqId);
+  if(dyn){
+    const ub=proyUbicaciones.find(u=>u.id===dyn.ubicacion_id);
+    return ub?ub.id:dyn.ubicacion_id||'';
+  }
+  return (EQ.find(e=>e.id===eqId)||{}).p||(equiposExtra.find(e=>e.id===eqId)||{}).piso||'';
 }
 function eqName(eqId){
   return customNames[eqId]
@@ -1268,12 +1398,17 @@ function eqName(eqId){
 
 // Devuelve lista combinada EQ + equiposExtra filtrada por piso y ocultos
 function allEqs(floorFilter){
-  const base = EQ.filter(e=>!hiddenEqs.has(e.id));
-  const extra = equiposExtra.filter(e=>!hiddenEqs.has(e.id)).map(e=>({
-    id:e.id, n:e.nombre, p:e.piso, g:e.grupo||'', z:e.zona||'', _extra:true
-  }));
-  const combined = [...base, ...extra].map(e=>({...e, p:customPisos[e.id]||e.p}));
-  return floorFilter==='all' ? combined : combined.filter(e=>e.p===floorFilter);
+  const base=EQ.filter(e=>!hiddenEqs.has(e.id));
+  const extra=equiposExtra.filter(e=>!hiddenEqs.has(e.id)).map(e=>({id:e.id,n:e.nombre,p:e.piso,g:e.grupo||'',z:e.zona||'',_extra:true}));
+  // Equipos dinámicos (creados en proyecto)
+  const dyn=proyEquipos.filter(e=>!hiddenEqs.has(e.id)).map(e=>{
+    const ub=proyUbicaciones.find(u=>u.id===e.ubicacion_id);
+    return {id:e.id,n:e.nombre,p:ub?ub.id:'',g:e.grupo||'',z:e.zona||'',_dyn:true};
+  });
+  const combined=[...base,...extra,...dyn].map(e=>({...e,p:customPisos[e.id]||e.p}));
+  if(floorFilter==='all') return combined;
+  // Para equipos dinámicos el floorFilter es el uuid de la ubicación
+  return combined.filter(e=>e.p===floorFilter);
 }
 
 function inspectedEqIds(){
@@ -1345,7 +1480,16 @@ function renderEq(){
   const list=document.getElementById('eq-list');
   const items=allEqs(floorF);
   document.getElementById('eq-cnt').textContent=items.length+' equipos';
-  const floors=[...new Set(items.map(e=>e.p))];
+  let floors;
+  if(proyUbicaciones.length){
+    const ubIds=proyUbicaciones.map(u=>u.id);
+    const staticFloors=[...new Set(items.filter(e=>!e._dyn).map(e=>e.p))].filter(f=>!ubIds.includes(f));
+    floors=[...ubIds,...staticFloors].filter(f=>items.some(e=>e.p===f));
+    const extra2=[...new Set(items.map(e=>e.p))].filter(f=>!floors.includes(f));
+    floors=[...floors,...extra2];
+  } else {
+    floors=[...new Set(items.map(e=>e.p))];
+  }
   let h='';
   for(const fl of floors){
     const flItems=items.filter(e=>e.p===fl).sort((a,b)=>{
@@ -1353,7 +1497,9 @@ function renderEq(){
       const nb=eqName(b.id).toLowerCase();
       return na.localeCompare(nb,'es');
     });
-    h+=`<div class="sec-hd" id="shd-${fl}" ondragover="onPisoDragOver(event,'${fl}')" ondragleave="onPisoDragLeave(event,'${fl}')">${esc(FL[fl]||fl)}</div><div class="eq-grid" id="egrid-${fl}" ondragover="onPisoDragOver(event,'${fl}')" ondragleave="onPisoDragLeave(event,'${fl}')" ondrop="onPisoDrop(event,'${fl}')">`;
+    const flNombre=proyUbicaciones.find(u=>u.id===fl)?.nombre||FL[fl]||fl;
+    h+=`<div class="sec-hd" id="shd-${fl}" ondragover="onPisoDragOver(event,'${fl}')" ondragleave="onPisoDragLeave(event,'${fl}')">${esc(flNombre)}</div>`;
+    h+=`<div class="eq-grid" id="egrid-${fl}" ondragover="onPisoDragOver(event,'${fl}')" ondragleave="onPisoDragLeave(event,'${fl}')" ondrop="onPisoDrop(event,'${fl}')">`;
     for(const eq of flItems){
       const r=recs[eq.id]||{};
       const z=r.zona||eq.z||'';
@@ -1405,7 +1551,19 @@ function renderEq(){
         </div>
       </div>`;
     }
+    const ubObj2=proyUbicaciones.find(u=>u.id===fl);
+    if(ubObj2) h+=`<div class="btn-add-eq" onclick="openEqNuevo('${fl}','${esc(flNombre)}')">＋ Agregar equipo en ${esc(flNombre)}</div>`;
     h+='</div>';
+  }
+  if(proyUbicaciones.length){
+    proyUbicaciones.forEach(ub=>{
+      if(!floors.includes(ub.id)){
+        h+=`<div class="sec-hd" id="shd-${ub.id}" ondragover="onPisoDragOver(event,'${ub.id}')" ondragleave="onPisoDragLeave(event,'${ub.id}')">${esc(ub.nombre)}</div>`;
+        h+=`<div class="eq-grid" id="egrid-${ub.id}" ondragover="onPisoDragOver(event,'${ub.id}')" ondragleave="onPisoDragLeave(event,'${ub.id}')" ondrop="onPisoDrop(event,'${ub.id}')">`;
+        h+=`<div class="btn-add-eq" onclick="openEqNuevo('${ub.id}','${esc(ub.nombre)}')">＋ Agregar equipo en ${esc(ub.nombre)}</div>`;
+        h+='</div>';
+      }
+    });
   }
   list.innerHTML=h||'<div style="padding:40px;text-align:center;color:#6b7280">Sin equipos</div>';
 }
@@ -3167,33 +3325,31 @@ function closeLb(){ document.getElementById('lb').classList.remove('on'); }
 // ═══════════════════════════════════════════════════════════
 async function pastePhoto(target){
   try {
-    const items = await navigator.clipboard.read();
-    let found = false;
+    const items=await navigator.clipboard.read(); let found=false;
     for(const item of items){
-      const imgType = item.types.find(t => t.startsWith('image/'));
+      const imgType=item.types.find(t=>t.startsWith('image/'));
       if(imgType){
-        const blob = await item.getType(imgType);
-        const ext = imgType.split('/')[1] || 'png';
-        const file = new File([blob], `pasted_${Date.now()}.${ext}`, {type: imgType});
-        _addFileToTarget(target, file); found = true; break;
+        const blob=await item.getType(imgType);
+        const file=new File([blob],`pasted_${Date.now()}.${imgType.split('/')[1]||'png'}`,{type:imgType});
+        _addFileToTarget(target,file); found=true; break;
       }
     }
     if(!found) toast('No hay imagen en el portapapeles','err');
   } catch(e){ toast('Sin permiso — usa Ctrl+V dentro del modal','err'); }
 }
-function _addFileToTarget(target, file){
+function _addFileToTarget(target,file){
   if(target==='eq'){ pendFiles.push(file); renderPhotos(); toast('Imagen pegada ✓','ok'); }
   else if(target==='comp'){ subPendFiles.push(file); renderSubPhotos(); toast('Imagen pegada ✓','ok'); }
   else if(target==='insp'){ inspPendFiles.push(file); renderInspPhotos(); toast('Imagen pegada ✓','ok'); }
 }
-document.addEventListener('paste', function(e){
-  const items = e.clipboardData?.items; if(!items) return;
+document.addEventListener('paste',function(e){
+  const items=e.clipboardData?.items; if(!items) return;
   for(const item of items){
     if(item.type.startsWith('image/')){
-      const file = item.getAsFile(); if(!file) return;
-      const eqOpen   = document.getElementById('modal-bg')?.style.display !== 'none';
-      const compOpen = document.getElementById('smodal-bg')?.style.display !== 'none';
-      const inspOpen = document.getElementById('insp-modal-bg')?.classList.contains('on');
+      const file=item.getAsFile(); if(!file) return;
+      const eqOpen=document.getElementById('modal-bg')?.style.display!=='none';
+      const compOpen=document.getElementById('smodal-bg')?.style.display!=='none';
+      const inspOpen=document.getElementById('insp-modal-bg')?.classList.contains('on');
       if(compOpen) _addFileToTarget('comp',file);
       else if(eqOpen) _addFileToTarget('eq',file);
       else if(inspOpen) _addFileToTarget('insp',file);
@@ -3204,60 +3360,147 @@ document.addEventListener('paste', function(e){
 });
 
 // ═══════════════════════════════════════════════════════════
-//  DRAG & DROP EQUIPOS ENTRE PISOS
+//  DRAG & DROP EQUIPOS ENTRE UBICACIONES
 // ═══════════════════════════════════════════════════════════
-function onEqDragStart(e, eqId){
-  // No iniciar si está expandido o si se arrastra un componente interno
-  if(e.target.closest('.eq-expand')) { e.preventDefault(); return; }
-  _eqDragId = eqId;
-  e.dataTransfer.effectAllowed = 'move';
-  setTimeout(()=>{ document.getElementById('card-'+eqId)?.classList.add('eq-dragging'); }, 0);
-  // Ghost
-  _eqDragGhost = document.createElement('div');
-  _eqDragGhost.className = 'eq-drag-ghost';
-  _eqDragGhost.textContent = '⠿ ' + eqName(eqId);
-  document.body.appendChild(_eqDragGhost);
-  try { e.dataTransfer.setDragImage(_eqDragGhost, -10, -10); } catch(ex){}
+function onEqDragStart(e,eqId){
+  if(e.target.closest('.eq-expand')){e.preventDefault();return;}
+  _eqDragId=eqId; e.dataTransfer.effectAllowed='move';
+  setTimeout(()=>document.getElementById('card-'+eqId)?.classList.add('eq-dragging'),0);
+  _eqDragGhost=document.createElement('div'); _eqDragGhost.className='eq-drag-ghost';
+  _eqDragGhost.textContent='⠿ '+eqName(eqId); document.body.appendChild(_eqDragGhost);
+  try{e.dataTransfer.setDragImage(_eqDragGhost,-10,-10);}catch(ex){}
 }
 function onEqDragEnd(e){
   if(_eqDragId) document.getElementById('card-'+_eqDragId)?.classList.remove('eq-dragging');
   document.querySelectorAll('.eq-grid.piso-drop-over').forEach(g=>g.classList.remove('piso-drop-over'));
   document.querySelectorAll('.sec-hd.piso-hd-over').forEach(h=>h.classList.remove('piso-hd-over'));
-  if(_eqDragGhost){ _eqDragGhost.remove(); _eqDragGhost=null; }
+  if(_eqDragGhost){_eqDragGhost.remove();_eqDragGhost=null;}
+  _eqDragId=null;
 }
-function onPisoDragOver(e, piso){
-  if(!_eqDragId) return;
-  e.preventDefault(); e.dataTransfer.dropEffect='move';
-  document.querySelectorAll('.eq-grid.piso-drop-over').forEach(g=>{ if(g.id!=='egrid-'+piso) g.classList.remove('piso-drop-over'); });
-  document.querySelectorAll('.sec-hd.piso-hd-over').forEach(h=>{ if(h.id!=='shd-'+piso) h.classList.remove('piso-hd-over'); });
+function onPisoDragOver(e,piso){
+  if(!_eqDragId) return; e.preventDefault(); e.dataTransfer.dropEffect='move';
+  document.querySelectorAll('.eq-grid.piso-drop-over').forEach(g=>{if(g.id!=='egrid-'+piso)g.classList.remove('piso-drop-over');});
+  document.querySelectorAll('.sec-hd.piso-hd-over').forEach(h=>{if(h.id!=='shd-'+piso)h.classList.remove('piso-hd-over');});
   document.getElementById('egrid-'+piso)?.classList.add('piso-drop-over');
   document.getElementById('shd-'+piso)?.classList.add('piso-hd-over');
 }
-function onPisoDragLeave(e, piso){
-  const grid = document.getElementById('egrid-'+piso);
-  const hd   = document.getElementById('shd-'+piso);
-  if(grid && !grid.contains(e.relatedTarget)) grid.classList.remove('piso-drop-over');
-  if(hd   && !hd.contains(e.relatedTarget))   hd.classList.remove('piso-hd-over');
+function onPisoDragLeave(e,piso){
+  const grid=document.getElementById('egrid-'+piso); const hd=document.getElementById('shd-'+piso);
+  if(grid&&!grid.contains(e.relatedTarget)) grid.classList.remove('piso-drop-over');
+  if(hd&&!hd.contains(e.relatedTarget)) hd.classList.remove('piso-hd-over');
 }
-async function onPisoDrop(e, toPiso){
+async function onPisoDrop(e,toUbId){
   e.preventDefault();
   document.querySelectorAll('.eq-grid.piso-drop-over').forEach(g=>g.classList.remove('piso-drop-over'));
   document.querySelectorAll('.sec-hd.piso-hd-over').forEach(h=>h.classList.remove('piso-hd-over'));
   if(!_eqDragId) return;
-  const eqId = _eqDragId; _eqDragId = null;
-  const fromPiso = eqPiso(eqId);
-  if(fromPiso === toPiso) return;
+  const eqId=_eqDragId; _eqDragId=null;
+  const fromUb=eqPiso(eqId);
+  if(fromUb===toUbId) return;
+  const pid=curProyecto?.id||'ccu-temuco-molino';
   try {
-    const pid = curProyecto?.id||'ccu-temuco-molino';
-    await must(sb.from('equipos_piso').upsert({
-      id: eqId, piso: toPiso, proyecto_id: pid,
-      updated_at: new Date().toISOString(),
-      updated_by: profile?.full_name||session.user.email
-    }, {onConflict:'id'}));
-    customPisos[eqId] = toPiso;
-    toast(`Movido a ${FL[toPiso]||toPiso} ✓`, 'ok');
+    // Si es equipo dinámico, mover su ubicacion_id
+    const dyn=proyEquipos.find(eq=>eq.id===eqId);
+    if(dyn){
+      await must(sb.from('proyecto_equipos').update({ubicacion_id:toUbId}).eq('id',eqId));
+      dyn.ubicacion_id=toUbId;
+    } else {
+      // Equipo del catálogo → guardar en equipos_piso
+      await must(sb.from('equipos_piso').upsert({id:eqId,piso:toUbId,proyecto_id:pid,updated_at:new Date().toISOString(),updated_by:profile?.full_name||session.user.email},{onConflict:'id'}));
+      customPisos[eqId]=toUbId;
+    }
+    const toNombre=proyUbicaciones.find(u=>u.id===toUbId)?.nombre||FL[toUbId]||toUbId;
+    toast(`Movido a "${toNombre}" ✓`,'ok');
     renderEq();
-  } catch(err){ toast('Error al mover: '+err.message, 'err'); }
+  } catch(err){toast('Error al mover: '+err.message,'err');}
+}
+
+// ═══════════════════════════════════════════════════════════
+//  GESTIÓN UBICACIONES
+// ═══════════════════════════════════════════════════════════
+function openUbModal(){
+  const tipoUb=curProyecto?.tipo_ubicacion||'Piso';
+  document.getElementById('ub-modal-title').textContent=`${tipoUb}s del proyecto`;
+  renderUbList();
+  document.getElementById('ub-modal-bg').classList.add('on');
+  document.body.style.overflow='hidden';
+}
+function closeUbModal(){ document.getElementById('ub-modal-bg').classList.remove('on'); document.body.style.overflow=''; }
+function renderUbList(){
+  const el=document.getElementById('ub-list');
+  if(!proyUbicaciones.length){el.innerHTML='<div style="color:#aaa;font-size:12px;font-family:monospace;padding:8px">Sin ubicaciones aún</div>';return;}
+  el.innerHTML=proyUbicaciones.map((u,i)=>`
+    <div class="ub-row" id="ubrow-${u.id}">
+      <span class="ub-row-drag" title="Reordenar">⠿</span>
+      <span class="ub-row-name">${esc(u.nombre)}</span>
+      <button onclick="renameUb('${u.id}','${escAttr(u.nombre)}')" style="background:none;border:none;cursor:pointer;color:#aaa;font-size:12px" title="Renombrar">✎</button>
+      <button onclick="deleteUb('${u.id}')" style="background:none;border:none;cursor:pointer;color:#fca5a5;font-size:12px" title="Eliminar">🗑</button>
+    </div>`).join('');
+}
+async function addUbicacion(){
+  const inp=document.getElementById('ub-nueva-input'); const nombre=inp.value.trim();
+  if(!nombre){toast('Escribe el nombre de la ubicación','err');return;}
+  try {
+    const saved=await must(sb.from('proyecto_ubicaciones').insert({proyecto_id:curProyecto.id,nombre,orden:proyUbicaciones.length}).select().single());
+    proyUbicaciones.push(saved); inp.value=''; renderUbList(); renderEq();
+    document.getElementById('btn-gest-ub').style.display='block';
+    toast(`${nombre} agregado ✓`,'ok');
+  } catch(e){toast('Error: '+e.message,'err');}
+}
+async function renameUb(ubId,actual){
+  const nuevo=prompt('Nuevo nombre:',actual); if(!nuevo||nuevo===actual) return;
+  try {
+    await must(sb.from('proyecto_ubicaciones').update({nombre:nuevo}).eq('id',ubId));
+    const ub=proyUbicaciones.find(u=>u.id===ubId); if(ub) ub.nombre=nuevo;
+    renderUbList(); renderEq(); toast('Renombrado ✓','ok');
+  } catch(e){toast('Error: '+e.message,'err');}
+}
+async function deleteUb(ubId){
+  const ub=proyUbicaciones.find(u=>u.id===ubId);
+  const eqsEnUb=proyEquipos.filter(e=>e.ubicacion_id===ubId).length;
+  if(!confirm(`¿Eliminar "${ub?.nombre}"?${eqsEnUb?' Los ${eqsEnUb} equipos de esta ubicación quedarán sin asignar.':''}`)) return;
+  try {
+    await must(sb.from('proyecto_ubicaciones').delete().eq('id',ubId));
+    proyUbicaciones=proyUbicaciones.filter(u=>u.id!==ubId);
+    renderUbList(); renderEq(); toast('Eliminado ✓','ok');
+  } catch(e){toast('Error: '+e.message,'err');}
+}
+
+// ═══════════════════════════════════════════════════════════
+//  CREAR EQUIPO NUEVO
+// ═══════════════════════════════════════════════════════════
+function openEqNuevo(ubId,ubNombre){
+  curUbIdNuevoEq=ubId;
+  document.getElementById('en-ub-lbl').textContent=ubNombre||'Nueva ubicación';
+  document.getElementById('en-nombre').value='';
+  document.getElementById('en-grupo').value='';
+  document.getElementById('en-zona').value='';
+  document.getElementById('en-cantidad').value='1';
+  document.getElementById('eq-nuevo-bg').classList.add('on');
+  document.body.style.overflow='hidden';
+  setTimeout(()=>document.getElementById('en-nombre').focus(),100);
+}
+function closeEqNuevo(){ document.getElementById('eq-nuevo-bg').classList.remove('on'); document.body.style.overflow=''; curUbIdNuevoEq=null; }
+async function saveEqNuevo(){
+  const nombre=document.getElementById('en-nombre').value.trim();
+  if(!nombre){toast('El nombre es obligatorio','err');return;}
+  const grupo=document.getElementById('en-grupo').value.trim();
+  const zona=document.getElementById('en-zona').value;
+  const cantidad=Math.max(1,Math.min(20,parseInt(document.getElementById('en-cantidad').value)||1));
+  const btn=document.getElementById('en-sv'); btn.disabled=1; btn.textContent='Creando…';
+  try {
+    const rows=[];
+    for(let i=1;i<=cantidad;i++){
+      const id='deq_'+Date.now()+'_'+Math.random().toString(36).slice(2,6);
+      const nombreFinal=cantidad>1?`${nombre} N°${i}`:nombre;
+      rows.push({id,proyecto_id:curProyecto.id,ubicacion_id:curUbIdNuevoEq||null,nombre:nombreFinal,grupo,zona,orden:proyEquipos.length+i,created_by:profile?.full_name||session.user.email});
+    }
+    const saved=await must(sb.from('proyecto_equipos').insert(rows).select());
+    if(saved) proyEquipos.push(...saved);
+    toast(`${cantidad} equipo${cantidad>1?'s':''} creado${cantidad>1?'s':''} ✓`,'ok');
+    closeEqNuevo(); renderEq();
+  } catch(e){toast('Error: '+e.message,'err');}
+  btn.disabled=0; btn.textContent='CREAR EQUIPO';
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -3275,7 +3518,8 @@ async function showProyectos(){
   try {
     const sr=await must(sb.from('registros').select('proyecto_id'));
     const sc=await must(sb.from('componentes').select('proyecto_id'));
-    [...(sr||[]),...(sc||[])].forEach(r=>{ statsMap[r.proyecto_id]=(statsMap[r.proyecto_id]||0)+1; });
+    const pe=await must(sb.from('proyecto_equipos').select('proyecto_id'));
+    [...(sr||[]),...(sc||[]),...(pe||[])].forEach(r=>{statsMap[r.proyecto_id]=(statsMap[r.proyecto_id]||0)+1;});
   } catch(e){}
   renderProyectoGrid(statsMap);
   document.getElementById('proyecto-selector').classList.add('on');
@@ -3289,51 +3533,76 @@ function renderProyectoGrid(statsMap){
   }
   grid.innerHTML=proyectos.map(p=>{
     const count=statsMap[p.id]||0;
+    const tipoLabel=p.tipo_ubicacion||'Piso';
     return `<div class="proy-card" onclick="selectProyecto('${p.id}')">
       <div class="proy-card-badge">ATEX</div>
       <div class="proy-card-name">${esc(p.nombre)}</div>
       <div class="proy-card-sub">${esc(p.cliente||'')}${p.planta?' · '+esc(p.planta):''}</div>
-      ${p.descripcion?`<div style="font-size:10px;color:#666;margin-top:6px;line-height:1.5">${esc(p.descripcion)}</div>`:''}
+      ${p.descripcion?`<div style="font-size:10px;color:#666;margin-top:5px;line-height:1.5">${esc(p.descripcion)}</div>`:''}
       <div class="proy-card-meta">
-        <span class="proy-card-stat">📋 ${count} registro${count!==1?'s':''}</span>
-        <span class="proy-card-stat" style="margin-left:auto;color:#444;font-size:9px">${esc(p.id)}</span>
+        <span class="proy-card-stat">📋 ${count} ítem${count!==1?'s':''}</span>
+        <span class="proy-card-stat">📍 ${esc(tipoLabel)}s</span>
+        <span class="proy-card-stat" style="margin-left:auto;color:#333;font-size:9px">${esc(p.id)}</span>
       </div>
     </div>`;
   }).join('');
 }
 async function selectProyecto(pid){
-  curProyecto=proyectos.find(p=>p.id===pid)||null;
-  if(!curProyecto) return;
-  recs={}; subRecs={}; allRaw=[]; allSubRaw=[]; customNames={}; hiddenEqs=new Set(); equiposExtra={}; customPisos={};
+  curProyecto=proyectos.find(p=>p.id===pid)||null; if(!curProyecto) return;
+  recs={}; subRecs={}; allRaw=[]; allSubRaw=[]; customNames={}; hiddenEqs=new Set(); equiposExtra=[];
+  customPisos={}; proyUbicaciones=[]; proyEquipos=[];
   await loadApp();
 }
 function volverProyectos(){
-  if(!confirm('¿Volver al selector de proyectos?\nSe cerrará el proyecto actual.')) return;
-  curProyecto=null; customPisos={};
+  if(!confirm('¿Volver al selector de proyectos?')) return;
+  curProyecto=null; customPisos={}; proyUbicaciones=[]; proyEquipos=[];
   recs={}; subRecs={}; allRaw=[]; allSubRaw=[]; customNames={}; hiddenEqs=new Set(); equiposExtra=[];
   document.getElementById('app').style.display='none';
   showProyectos();
 }
-function openNuevoProy(){
-  ['np-nombre','np-cliente','np-planta','np-desc'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
-  document.getElementById('nuevo-proy-bg').classList.add('on');
+function selectTipoUb(el){
+  document.querySelectorAll('.tipo-ub-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel'); _tipoUbSel=el.dataset.v;
+  document.getElementById('np-tipo-custom').style.display=_tipoUbSel==='_custom'?'block':'none';
 }
-function closeNuevoProy(){ document.getElementById('nuevo-proy-bg').classList.remove('on'); }
+function openNuevoProy(modo='new', proy=null){
+  _tipoUbSel='Piso';
+  document.querySelectorAll('.tipo-ub-opt').forEach(o=>o.classList.toggle('sel',o.dataset.v==='Piso'));
+  document.getElementById('np-tipo-custom').style.display='none';
+  ['np-nombre','np-cliente','np-planta','np-desc','np-ubicaciones','np-tipo-custom'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('np-sv').textContent='CREAR PROYECTO';
+  document.getElementById('np-title-lbl').textContent='Crear proyecto ATEX';
+  document.getElementById('nuevo-proy-bg').classList.add('on');
+  document.body.style.overflow='hidden';
+}
+function closeNuevoProy(){ document.getElementById('nuevo-proy-bg').classList.remove('on'); document.body.style.overflow=''; }
 async function saveNuevoProy(){
   const nombre=document.getElementById('np-nombre').value.trim();
-  if(!nombre){ toast('El nombre es obligatorio','err'); return; }
+  if(!nombre){toast('El nombre es obligatorio','err');return;}
+  const tipoUb=_tipoUbSel==='_custom'?(document.getElementById('np-tipo-custom').value.trim()||'Ubicación'):_tipoUbSel;
   const btn=document.getElementById('np-sv'); btn.disabled=1; btn.textContent='Creando…';
   try {
-    const id='proy_'+nombre.toLowerCase().replace(/[^a-z0-9]/g,'_').replace(/_+/g,'_').slice(0,30)+'_'+Date.now().toString().slice(-4);
-    await must(sb.from('proyectos').insert({
-      id, nombre,
+    const id='proy_'+nombre.toLowerCase().replace(/[^a-z0-9]/g,'_').replace(/_+/g,'_').slice(0,28)+'_'+Date.now().toString().slice(-4);
+    const proy=await must(sb.from('proyectos').insert({
+      id,nombre,
       cliente:document.getElementById('np-cliente').value.trim()||null,
       planta:document.getElementById('np-planta').value.trim()||null,
       descripcion:document.getElementById('np-desc').value.trim()||null,
-      activo:true, created_by:profile?.full_name||session.user.email
-    }));
+      tipo_ubicacion:tipoUb, activo:true,
+      created_by:profile?.full_name||session.user.email
+    }).select().single());
+    // Crear ubicaciones iniciales
+    const ubText=document.getElementById('np-ubicaciones').value.trim();
+    if(ubText){
+      const lineas=ubText.split('
+').map(l=>l.trim()).filter(Boolean);
+      if(lineas.length){
+        const ubRows=lineas.map((nombre,i)=>({proyecto_id:id,nombre,orden:i}));
+        await must(sb.from('proyecto_ubicaciones').insert(ubRows));
+      }
+    }
     toast('Proyecto creado ✓','ok'); closeNuevoProy(); await showProyectos();
-  } catch(e){ toast('Error: '+e.message,'err'); }
+  } catch(e){toast('Error: '+e.message,'err');}
   btn.disabled=0; btn.textContent='CREAR PROYECTO';
 }
 </script>
