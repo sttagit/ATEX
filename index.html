@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SUSTENTA Ex — Levantamiento ATEX</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" charset="utf-8"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:sans-serif;background:#f5f3ee;color:#0f1117;min-height:100vh}
@@ -960,10 +960,8 @@ input[type=file]{display:none}
   </div>
 </div>
 
-<script>
-// ═══════════════════════════════════════════════════════════
+<script charset="utf-8">
 //  CONFIG
-// ═══════════════════════════════════════════════════════════
 const SUPA_URL = 'https://nyqqaaqxjdmedggpkxbj.supabase.co';
 const SUPA_KEY = 'sb_publishable_mtcCcCdVScjQQHtIQxUpYQ_awU9gt_j';
 const sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
@@ -1023,14 +1021,10 @@ function pctFrom(total){
   return Math.min(100,Math.round(total/eqTotalVisible()*100));
 }
 
-// ═══════════════════════════════════════════════════════════
-//  CATÁLOGO DE EQUIPOS — Manual TEM-ELA-MAN 006
-// ═══════════════════════════════════════════════════════════
+//  CATÁLOGO DE EQUIPOS - Manual TEM-ELA-MAN 006
 const EQ = [
-  // ── PISO SUBTERRÁNEO ──────────────────────────────────────
   {id:'e001',  n:'Redler pavo a elevadores (malta)',                           p:'1sub', g:'Transporte',           z:'21'},
 
-  // ── PRIMER PISO ───────────────────────────────────────────
   {id:'e002',  n:'Redler descarga silos de malta',                              p:'1',    g:'Transporte',           z:'21'},
   {id:'e003',  n:'Elevador de capachos recepción malta (50 t/h)',              p:'1sub', g:'Transporte',           z:'21'},
   {id:'e004',  n:'Elevador de capachos recepción arroz',                       p:'1',    g:'Transporte',           z:'21'},
@@ -1045,7 +1039,6 @@ const EQ = [
   {id:'e013',  n:'Pre-limpiadora de malta',                                    p:'1',    g:'Limpieza grano',       z:'21'},
   {id:'e014',  n:'Agua proceso al premacerador (válvula)',                     p:'1',    g:'Servicios',            z:'NG'},
 
-  // ── SEGUNDO PISO ──────────────────────────────────────────
   {id:'e015',  n:'Compresor tolva polvo recepción malta (→ silos orujo)',      p:'2',    g:'Compresor',            z:'22'},
   {id:'e016',  n:'Tolva de polvo (parte inferior)',                            p:'2',    g:'Contenedor polvo',     z:'20'},
   {id:'e017',  n:'Ciclón filtro manga recepción / descarga arroz',              p:'2',    g:'Filtración polvo',     z:'21'},
@@ -1057,14 +1050,12 @@ const EQ = [
   {id:'e088',  n:'Báscula automática de tolva 1',                              p:'2',    g:'Pesaje',               z:'21'},
   {id:'e089',  n:'Báscula automática de tolva 2',                              p:'2',    g:'Pesaje',               z:'21'},
 
-  // ── TERCER PISO ───────────────────────────────────────────
   {id:'e023',  n:'Compresor polvo sistema recepción arroz',                    p:'3',    g:'Compresor',            z:'22'},
   {id:'e024',  n:'Tolva de polvo / Tolva de malta (parte superior)',           p:'3',    g:'Contenedor polvo',     z:'20'},
   {id:'e025',  n:'Despedradora de malta (8 t/h)',                              p:'3',    g:'Limpieza grano',       z:'21'},
   {id:'e026',  n:'Ciclón tolva de arroz (parte superior)',                     p:'3',    g:'Almacenamiento',       z:'21'},
   {id:'e027',  n:'Compuerta silo batch (cadena regulable)',                    p:'3',    g:'Válvulas',             z:'21'},
   {id:'e031',  n:'Molino parte inferior — descarga a redler tolva arroz',      p:'3',    g:'Molienda',             z:'21'},
-  // ── NUEVOS EQUIPOS TERCER PISO ────────────────────────────
   {id:'e090',  n:'Salida Silo Bash Malta a Despedradora BÜHLER',              p:'3',    g:'Transporte',           z:'21'},
   {id:'e091',  n:'Salida Silo Bash Malta a Despedradora SEEGER',              p:'3',    g:'Transporte',           z:'21'},
   {id:'e092',  n:'Sobre Silo - Tolva Harina Malta BÜHLER',                    p:'3',    g:'Contenedor polvo',     z:'20'},
@@ -1075,14 +1066,12 @@ const EQ = [
   {id:'e097',  n:'Salida Molino Malta SEEGER - descarga redler',              p:'3',    g:'Molienda',             z:'21'},
   {id:'e098',  n:'Redler Harina Arroz sobre Silos arroz',                     p:'3',    g:'Transporte',           z:'21'},
 
-  // ── CUARTO PISO ───────────────────────────────────────────
   {id:'e032',  n:'Molino de malta (6 cilindros — 11 t/h)',                    p:'4',    g:'Molienda',             z:'21'},
   {id:'e033',  n:'Silo batch malta (parte inferior — 11,5 t)',                p:'4',    g:'Contenedor polvo',     z:'20'},
   {id:'e034',  n:'Molino de arroz (2 cilindros — 5 t/h)',                     p:'4',    g:'Molienda',             z:'21'},
   {id:'e035',  n:'Succión polvos molino de malta',                             p:'4',    g:'Aspiración',           z:'21'},
   {id:'e036',  n:'Succión polvos malta a humectación',                         p:'4',    g:'Aspiración',           z:'21'},
 
-  // ── QUINTO PISO ───────────────────────────────────────────
   {id:'e037',  n:'Filtro manga tolva recepción (parte inferior)',              p:'5',    g:'Filtración polvo',     z:'22'},
   {id:'e038',  n:'Tornillo acondicionador / humectador (11 t/h)',              p:'5',    g:'Acondicionamiento',    z:'22'},
   {id:'e039',  n:'Silo batch malta (parte superior)',                          p:'5',    g:'Contenedor polvo',     z:'20'},
@@ -1096,7 +1085,6 @@ const EQ = [
   {id:'e105',  n:'Elevador de capachos malta procesada N°2 → P6 (BÜHLER) — P5',p:'5',  g:'Transporte',           z:'21'},
   {id:'e106',  n:'Tornillo acondicionador / humectador BÜHLER',                p:'5',   g:'Acondicionamiento',    z:'22'},
 
-  // ── SEXTO PISO ────────────────────────────────────────────
   {id:'e046',  n:'Filtro manga polvo tolva recepción (parte superior)',        p:'6',    g:'Filtración polvo',     z:'22'},
   {id:'e047',  n:'Redlers alimentación criba circular malta',                  p:'6',    g:'Transporte',           z:'21'},
   {id:'e048',  n:'Criba circular de malta / limpiadora (20 t/h)',              p:'6',    g:'Limpieza grano',       z:'21'},
@@ -1117,7 +1105,6 @@ const EQ = [
   {id:'e107',  n:'Filtro de Aspiración de Alta Presión (Arroz)',               p:'6',    g:'Filtración polvo',     z:'22'},
   {id:'e108',  n:'Ciclón Separador (Arroz)',                                   p:'6',    g:'Filtración polvo',     z:'21'},
 
-  // ── SÉPTIMO PISO ──────────────────────────────────────────
   {id:'e063',  n:'Terminación elevador de malta a silos',                      p:'7',    g:'Transporte',           z:'21'},
   {id:'e087',  n:'Terminación elevador de malta preparación',                  p:'7',    g:'Transporte',           z:'21'},
   {id:'e064',  n:'Terminación elevador de arroz',                              p:'7',    g:'Transporte',           z:'21'},
@@ -1141,7 +1128,6 @@ const EQ = [
   {id:'e102',  n:'Redler Transportadora Arroz (a silos 4 y 8)',                p:'7',    g:'Transporte',           z:'21'},
   {id:'e103',  n:'Redler Transportadora Arroz (a silos exterior)',             p:'7',    g:'Transporte',           z:'21'},
 
-  // ── HANGAR / PATIO RECEPCIÓN ──────────────────────────────
   {id:'e072',  n:'Pavo de recepción de malta',                                 p:'hangar',g:'Contenedor polvo',    z:'21'},
   {id:'e073',  n:'Tolva de recepción malta (6 m³ — 2.300 kg)',                p:'hangar',g:'Contenedor polvo',    z:'21'},
   {id:'e074',  n:'Pre-limpiadora malta (hangar)',                              p:'hangar',g:'Limpieza grano',      z:'21'},
@@ -1152,13 +1138,11 @@ const EQ = [
   {id:'e079',  n:'Silos de arroz / intersilos (325 t)',                        p:'hangar',g:'Almacenamiento',      z:'20'},
   {id:'e080',  n:'Silo exterior de malta (150 t)',                             p:'hangar',g:'Almacenamiento',      z:'20'},
 
-  // ── PRIMER PISO (continuación) ───────────────────────────
   {id:'e081',  n:'Elevador de capachos pajillas a sacos',                      p:'1sub', g:'Transporte',           z:'21'},
   {id:'e082',  n:'Soplador preparación de arroz',                              p:'1',    g:'Transporte neumático',  z:'21'},
   {id:'e083',  n:'Aspiradora móvil sistema de limpieza',                       p:'1',    g:'Limpieza',              z:'21'},
   {id:'e086',  n:'Válvula rotatoria descarga arroz a elevador (ciclón P3 → elevador capachos)',p:'1', g:'Válvulas', z:'21'},
 
-  // ── SEGUNDO PISO (continuación) ───────────────────────────
   {id:'e084',  n:'Elevador de capachos malta procesada N°1 → P6 (BÜHLER)',    p:'1',    g:'Transporte',           z:'21'},
   {id:'e085',  n:'Elevador de capachos malta procesada N°2 → P6 (BÜHLER)',    p:'1',    g:'Transporte',           z:'21'},
 ];
@@ -1175,9 +1159,7 @@ const FL = {
   'hangar':'Hangar / Patio de recepción'
 };
 
-// ═══════════════════════════════════════════════════════════
 //  STATE
-// ═══════════════════════════════════════════════════════════
 let session, profile, recs={}, subRecs={}, curEq=null, curConf='', pendFiles=[], exPaths=[], floorF='all', allRaw=[], allSubRaw=[];
 let curProyecto=null, proyectos=[];
 let customPisos={}, proyUbicaciones=[], proyEquipos=[];
@@ -1189,13 +1171,10 @@ let customNames={}; // { eqId: nombrePersonalizado }
 let hiddenEqs=new Set(); // ids ocultos
 let equiposExtra=[]; // equipos duplicados guardados en Supabase
 let ncExpanded=false;
-// ── CICLOS ──
 let ciclos=[], curCiclo=null, curInspEqId=null, curInspId=null;
 let inspConf='', accionVerif='', inspPendFiles=[], inspExPaths=[];
 
-// ═══════════════════════════════════════════════════════════
 //  BOOT
-// ═══════════════════════════════════════════════════════════
 (async()=>{
   try {
     const {data} = await sb.auth.getSession();
@@ -1263,9 +1242,7 @@ async function loadApp(){
   loader(0);
 }
 
-// ═══════════════════════════════════════════════════════════
 //  AUTH
-// ═══════════════════════════════════════════════════════════
 function authTab(t){
   document.getElementById('tli').classList.toggle('on',t==='li');
   document.getElementById('trg').classList.toggle('on',t==='rg');
@@ -1308,9 +1285,7 @@ async function doLogout(){
   document.getElementById('login').style.display='flex';
 }
 
-// ═══════════════════════════════════════════════════════════
 //  NAVIGATION
-// ═══════════════════════════════════════════════════════════
 function goTab(name,el){
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('on'));
   el.classList.add('on');
@@ -1350,9 +1325,7 @@ async function loadAndRenderInforme(){
   loader(0);
 }
 
-// ═══════════════════════════════════════════════════════════
 //  EQUIPOS
-// ═══════════════════════════════════════════════════════════
 function zpillHtml(z){
   const cls={20:'z20p',21:'z21p',22:'z22p',NG:'zdp','':'zdp'}[z]||'zdp';
   return `<span class="zpill ${cls}">${z?'Z'+esc(z):'—'}</span>`;
@@ -1514,24 +1487,24 @@ function renderEq(){
         <div class="eq-name-wrap">
           <div style="flex:1">
             <span class="eq-name" id="eqn-${eq.id}" onclick="openModal('${eq.id}')">${esc(nombre)}</span>
-            ${isCustom?'<span style="font-family:monospace;font-size:8px;color:#F7C600;margin-left:4px" title="Nombre editado">✎</span>':''}
+            ${isCustom?'<span style="font-family:monospace;font-size:8px;color:#F7C600;margin-left:4px" title="Nombre editado">&#9998;</span>':''}
             ${isExtra?'<span style="font-family:monospace;font-size:8px;color:#059669;margin-left:4px;background:#d1fae5;padding:1px 4px;border-radius:2px" title="Equipo duplicado">copia</span>':''}
           </div>
-          <button class="eq-edit-btn" onclick="startEditName('${eq.id}')" title="Editar nombre">✎</button>
+          <button class="eq-edit-btn" onclick="startEditName('${eq.id}')" title="Editar nombre">&#9998;</button>
         </div>
         <div class="eq-name-input-wrap" id="enw-${eq.id}" style="display:none;margin-bottom:5px">
           <input class="eq-name-input on" id="eni-${eq.id}" value="${escAttr(nombre)}" onkeydown="if(event.key==='Enter')saveEqName('${eq.id}');if(event.key==='Escape')cancelEditName('${eq.id}')">
           <div class="eq-name-actions on" style="margin-top:4px">
-            <button class="eq-name-ok" onclick="saveEqName('${eq.id}')">✓ Guardar</button>
-            <button class="eq-name-cancel" onclick="cancelEditName('${eq.id}')">✕ Cancelar</button>
-            ${isCustom?`<button class="eq-name-cancel" onclick="resetEqName('${eq.id}')" style="color:#F7C600;border-color:#F7C600">↺ Original</button>`:''}
+            <button class="eq-name-ok" onclick="saveEqName('${eq.id}')">&#10003; Guardar</button>
+            <button class="eq-name-cancel" onclick="cancelEditName('${eq.id}')">&#10005; Cancelar</button>
+            ${isCustom?`<button class="eq-name-cancel" onclick="resetEqName('${eq.id}')" style="color:#F7C600;border-color:#F7C600">&#8634; Original</button>`:''}
           </div>
         </div>
         <div class="eq-meta">
           ${zpillHtml(z)}
           <span style="font-family:monospace;font-size:9px;color:#bbb">${esc(eq.g)}</span>
           <span class="dot d${dotClass(conf)}"></span>
-          <span class="eq-toggle" onclick="toggleExpand('${eq.id}',this)">${cc?cc+' comp ▾':'+ comp'}</span>
+          <span class="eq-toggle" onclick="toggleExpand('${eq.id}',this)">${cc?cc+' comp &#9662;':'+ comp'}</span>
         </div>
         ${r.marca?`<div style="font-family:monospace;font-size:9px;color:#aaa;margin-top:4px">${esc(r.marca)}${r.modelo?' · '+esc(r.modelo):''}${r.tag_planta?' · TAG: '+esc(r.tag_planta):r.serie?' · S/N: '+esc(r.serie):''}${r.fecha_fab?' · '+esc(r.fecha_fab):''}</div>`:''}
         <div class="eq-expand" id="exp-${eq.id}"
@@ -1547,12 +1520,12 @@ function renderEq(){
               <span class="comp-name">${esc(c.nombre_comp||c.tipo)}</span>
               <span class="dot d${dotClass(c.conformidad)}"></span>
             </div>`).join('')}
-          <div class="comp-add" onclick="openSubModal('new','${eq.id}')">＋ Agregar componente</div>
+          <div class="comp-add" onclick="openSubModal('new','${eq.id}')">&#65291; Agregar componente</div>
         </div>
       </div>`;
     }
     const ubObj2=proyUbicaciones.find(u=>u.id===fl);
-    if(ubObj2) h+=`<div class="btn-add-eq" onclick="openEqNuevo('${fl}','${esc(flNombre)}')">＋ Agregar equipo en ${esc(flNombre)}</div>`;
+    if(ubObj2) h+=`<div class="btn-add-eq" onclick="openEqNuevo('${fl}','${esc(flNombre)}')">&#65291; Agregar equipo en ${esc(flNombre)}</div>`;
     h+='</div>';
   }
   if(proyUbicaciones.length){
@@ -1560,7 +1533,7 @@ function renderEq(){
       if(!floors.includes(ub.id)){
         h+=`<div class="sec-hd" id="shd-${ub.id}" ondragover="onPisoDragOver(event,'${ub.id}')" ondragleave="onPisoDragLeave(event,'${ub.id}')">${esc(ub.nombre)}</div>`;
         h+=`<div class="eq-grid" id="egrid-${ub.id}" ondragover="onPisoDragOver(event,'${ub.id}')" ondragleave="onPisoDragLeave(event,'${ub.id}')" ondrop="onPisoDrop(event,'${ub.id}')">`;
-        h+=`<div class="btn-add-eq" onclick="openEqNuevo('${ub.id}','${esc(ub.nombre)}')">＋ Agregar equipo en ${esc(ub.nombre)}</div>`;
+        h+=`<div class="btn-add-eq" onclick="openEqNuevo('${ub.id}','${esc(ub.nombre)}')">&#65291; Agregar equipo en ${esc(ub.nombre)}</div>`;
         h+='</div>';
       }
     });
@@ -1568,7 +1541,6 @@ function renderEq(){
   list.innerHTML=h||'<div style="padding:40px;text-align:center;color:#6b7280">Sin equipos</div>';
 }
 
-// ── EDICIÓN NOMBRE EQUIPO ─────────────────────────────────
 function startEditName(eqId){
   const nameEl=document.getElementById('eqn-'+eqId);
   const wrapEl=document.getElementById('enw-'+eqId);
@@ -1599,7 +1571,7 @@ async function saveEqName(eqId){
     await must(sb.from('equipos_custom')
       .upsert(payload,{onConflict:'id'}));
     customNames[eqId]=nuevoNombre;
-    toast('Nombre guardado ✓','ok');
+    toast('Nombre guardado &#10003;','ok');
     renderEq();
   } catch(e){ toast('Error al guardar: '+e.message,'err'); }
 }
@@ -1608,7 +1580,7 @@ async function resetEqName(eqId){
   try {
     await must(sb.from('equipos_custom').delete().eq('id',eqId));
     delete customNames[eqId];
-    toast('Nombre restaurado ✓','ok');
+    toast('Nombre restaurado &#10003;','ok');
     renderEq();
   } catch(e){ toast('Error: '+e.message,'err'); }
 }
@@ -1621,7 +1593,7 @@ function toggleExpand(eqId,btn){
   exp.style.display=open?'none':'block';
   card.classList.toggle('expanded',!open);
   const cc=(subRecs[eqId]||[]).length;
-  btn.textContent=open?(cc?cc+' comp ▾':'+ comp'):(cc?cc+' comp ▴':'▴');
+  btn.textContent=open?(cc?cc+' comp &#9662;':'+ comp'):(cc?cc+' comp &#9652;':'&#9652;');
 }
 function setFloor(fl,el){
   floorF=fl;
@@ -1630,9 +1602,7 @@ function setFloor(fl,el){
   renderEq();
 }
 
-// ═══════════════════════════════════════════════════════════
 //  MODAL EQUIPO
-// ═══════════════════════════════════════════════════════════
 async function openModal(id){
   curEq=id; curConf=''; pendFiles=[]; exPaths=[];
   const eq = getEqDef(id);
@@ -1682,7 +1652,6 @@ function renderModalComps(eqId){
       <span class="dot d${dotClass(c.conformidad)}" style="margin-left:auto;flex-shrink:0"></span>
     </div>`).join('');
 }
-// ── DUPLICAR EQUIPO ───────────────────────────────────────
 async function duplicateEq(){
   if(!curEq) return;
   const copias = parseInt(prompt('¿Cuántas copias quieres crear? (1 o 2)', '1'));
@@ -1754,14 +1723,13 @@ async function duplicateEq(){
         inspector_nombre:profile?.full_name||session.user.email,
       }))));
     }
-    toast(`${copias} copia${copias>1?'s':''} creada${copias>1?'s':''} ✓`,'ok');
+    toast(`${copias} copia${copias>1?'s':''} creada${copias>1?'s':''} &#10003;`,'ok');
     closeModal();
     await reloadData();
   } catch(e){ toast('Error al duplicar: '+e.message,'err'); }
   loader(0);
 }
 
-// ── ELIMINACIÓN EQUIPO ────────────────────────────────────
 function toggleDelSection(){
   const sec=document.getElementById('m-del-section');
   const btn=document.getElementById('btn-del-toggle');
@@ -1770,7 +1738,7 @@ function toggleDelSection(){
   sec.style.display=visible?'none':'block';
   btn.style.color=visible?'#dc2626':'#6b7280';
   btn.style.borderColor=visible?'#fca5a5':'#ddd9d0';
-  btn.textContent=visible?'⚠ Eliminar':'✕ Cerrar';
+  btn.textContent=visible?'&#9888; Eliminar':'&#10005; Cerrar';
 }
 
 async function deleteEqData(){
@@ -1793,7 +1761,7 @@ async function deleteEqData(){
     }
     delete recs[curEq];
     allRaw=allRaw.filter(r=>r.equipo_id!==curEq);
-    toast('Datos de inspección eliminados ✓','ok');
+    toast('Datos de inspección eliminados &#10003;','ok');
     closeModal();
     await reloadData();
   } catch(e){ toast('Error: '+e.message,'err'); }
@@ -1810,7 +1778,7 @@ async function hideEq(){
       await must(sb.from('equipos_extra').delete().eq('id',curEq));
       await must(sb.from('registros').delete().eq('equipo_id',curEq));
       await must(sb.from('componentes').delete().eq('equipo_id',curEq));
-      toast(`"${nombre}" eliminado ✓`,'ok');
+      toast(`"${nombre}" eliminado &#10003;`,'ok');
     } else {
       await must(sb.from('equipos_ocultos').upsert({
         id:curEq,
@@ -1818,7 +1786,7 @@ async function hideEq(){
         hidden_by:profile?.full_name||session.user.email
       },{onConflict:'id'}));
       hiddenEqs.add(curEq);
-      toast(`"${nombre}" ocultado del listado ✓`,'ok');
+      toast(`"${nombre}" ocultado del listado &#10003;`,'ok');
     }
     closeModal();
     await reloadData();
@@ -1842,10 +1810,10 @@ async function renderPhotos(){
   ));
   let h='';
   signed.forEach(r=>{ h+=r.ok
-    ?`<div class="photo-wrap"><img src="${escAttr(r.url)}" onclick="openLb(${jsArg(r.url)})"><button class="photo-rm" onclick="exPaths.splice(${r.i},1);renderPhotos()">✕</button></div>`
+    ?`<div class="photo-wrap"><img src="${escAttr(r.url)}" onclick="openLb(${jsArg(r.url)})"><button class="photo-rm" onclick="exPaths.splice(${r.i},1);renderPhotos()">&#10005;</button></div>`
     :`<div style="aspect-ratio:1;background:#eee;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px">Error</div>`; });
   pendFiles.forEach((f,i)=>{ const u=URL.createObjectURL(f);
-    h+=`<div class="photo-wrap"><img src="${escAttr(u)}" onclick="openLb(${jsArg(u)})"><button class="photo-rm" onclick="pendFiles.splice(${i},1);renderPhotos()">✕</button></div>`; });
+    h+=`<div class="photo-wrap"><img src="${escAttr(u)}" onclick="openLb(${jsArg(u)})"><button class="photo-rm" onclick="pendFiles.splice(${i},1);renderPhotos()">&#10005;</button></div>`; });
   g.innerHTML=h;
 }
 async function saveEq(){
@@ -1885,14 +1853,13 @@ async function saveEq(){
     if(ex){ saved=await must(sb.from('registros').update(payload).eq('id',ex.id).select().single()); }
     else   { saved=await must(sb.from('registros').insert(payload).select().single()); }
     recs[curEq]={...saved,profiles:{full_name:profile?.full_name}};
-    toast('Equipo guardado ✓','ok');
+    toast('Equipo guardado &#10003;','ok');
     closeModal();
     await reloadData();
   } catch(err){ toast('Error: '+err.message,'err'); }
   btn.disabled=0; btn.textContent='GUARDAR EQUIPO';
 }
 
-// ── RELOAD DATA ───────────────────────────────────────────
 async function reloadData(){
   try {
     const data=await must(sb.from('registros').select('*, profiles(full_name)').order('updated_at',{ascending:false}));
@@ -1909,9 +1876,7 @@ async function reloadData(){
   renderEq();
 }
 
-// ═══════════════════════════════════════════════════════════
 //  RESUMEN
-// ═══════════════════════════════════════════════════════════
 async function renderResumen(){
   loader(1);
   try {
@@ -1954,14 +1919,12 @@ function renderGapRows(){
     </div>`).join('');
 }
 
-// ═══════════════════════════════════════════════════════════
 //  INFORME
-// ═══════════════════════════════════════════════════════════
 function fotosBtnHtml(fotos, rowId){
   if(!fotos||!fotos.length) return '';
   const safeId=safeDomId(rowId);
   const fotosJson=escAttr(JSON.stringify(fotos));
-  return `<button class="inf-foto-btn" onclick="toggleInfFotos('${safeId}',${fotosJson})">📷 ${fotos.length} foto${fotos.length>1?'s':''}</button>
+  return `<button class="inf-foto-btn" onclick="toggleInfFotos('${safeId}',${fotosJson})">&#128247; ${fotos.length} foto${fotos.length>1?'s':''}</button>
 <div class="inf-foto-panel" id="ifp-${safeId}"><span class="inf-spin">Cargando…</span></div>`;
 }
 
@@ -1983,19 +1946,18 @@ async function toggleInfFotos(rowId, fotos){
 }
 
 function renderFindings(){
-  // ── NC Summary ──────────────────────────────────────────
   const nc=reportRows().filter(r=>r.conformidad==='NC');
   const el=document.getElementById('nc-sum');
   if(!nc.length){
-    el.innerHTML='<div class="nc-head ok"><div class="nc-head-main">✓ Sin no conformidades.</div></div>';
+    el.innerHTML='<div class="nc-head ok"><div class="nc-head-main">&#10003; Sin no conformidades.</div></div>';
   } else {
     el.innerHTML=`<div class="nc-head">
-        <div class="nc-head-main"><span id="nc-arrow">${ncExpanded?'▼':'▶'}</span> ⚠ ${nc.length} no conformidad${nc.length>1?'es':''}</div>
+        <div class="nc-head-main"><span id="nc-arrow">${ncExpanded?'&#9660;':'&#9654;'}</span> &#9888; ${nc.length} no conformidad${nc.length>1?'es':''}</div>
         <button class="nc-toggle" id="nc-toggle-btn" onclick="toggleNC()">${ncExpanded?'Contraer':'Ver detalle'}</button>
       </div>
       <div id="nc-list" class="nc-list ${ncExpanded?'on':''}">`
       +nc.map(r=>`<div class="nc-item">
-        <div style="font-weight:500;font-size:13px;cursor:pointer;color:#F7C600" onclick="openFromInforme(${jsArg(r.equipo_id)})">${esc(r.tipo==='Componente'?r.principal+' · '+r.nombre:r.nombre)} ↗</div>
+        <div style="font-weight:500;font-size:13px;cursor:pointer;color:#F7C600" onclick="openFromInforme(${jsArg(r.equipo_id)})">${esc(r.tipo==='Componente'?r.principal+' · '+r.nombre:r.nombre)} &#8599;</div>
         <div style="font-size:10px;color:#aaa;font-family:monospace;margin-bottom:5px">${esc(r.tipo)} · ${esc(FL[r.piso]||r.piso)}</div>
         <div style="font-size:12px;margin-bottom:3px"><strong>Brechas / Obs.:</strong> ${esc(r.hallazgo||'—')}</div>
         <div style="font-size:12px;color:#6b7280"><strong>Acción:</strong> ${esc(r.accion||'—')}</div>
@@ -2003,7 +1965,6 @@ function renderFindings(){
       </div>`).join('')+'</div>';
   }
 
-  // ── Árbol Piso → Equipo → Componente ──────────────────
   const findEl=document.getElementById('findings');
   const pisoOrder=Object.keys(FL);
 
@@ -2032,8 +1993,8 @@ function renderFindings(){
   // Barra de controles globales
   h+=`<div style="padding:7px 14px;background:#2a2f40;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
     <span style="font-family:monospace;font-size:9px;color:#888">ÁRBOL</span>
-    <button onclick="toggleAllPisos(true)" style="background:none;border:1px solid #444;color:#aaa;border-radius:3px;padding:2px 8px;font-size:10px;font-family:monospace;cursor:pointer">▼ Expandir todo</button>
-    <button onclick="toggleAllPisos(false)" style="background:none;border:1px solid #444;color:#aaa;border-radius:3px;padding:2px 8px;font-size:10px;font-family:monospace;cursor:pointer">▶ Contraer todo</button>
+    <button onclick="toggleAllPisos(true)" style="background:none;border:1px solid #444;color:#aaa;border-radius:3px;padding:2px 8px;font-size:10px;font-family:monospace;cursor:pointer">&#9660; Expandir todo</button>
+    <button onclick="toggleAllPisos(false)" style="background:none;border:1px solid #444;color:#aaa;border-radius:3px;padding:2px 8px;font-size:10px;font-family:monospace;cursor:pointer">&#9654; Contraer todo</button>
     <span style="margin-left:auto;font-family:monospace;font-size:9px;color:#666">${eqIdsWithData.size} equipos · ${allSubRaw.length} componentes</span>
   </div>`;
 
@@ -2056,7 +2017,7 @@ function renderFindings(){
     const compCount=eqs.reduce((s,e)=>s+(allSubRaw.filter(c=>c.equipo_id===e.id).length),0);
 
     h+=`<div class="inf-piso-hd" onclick="togglePiso('${piso}')">
-      <span class="inf-piso-arrow" id="ipa-${piso}">▼</span>
+      <span class="inf-piso-arrow" id="ipa-${piso}">&#9660;</span>
       ${esc(FL[piso]||piso)}
       <span style="margin-left:auto;font-size:9px;color:#888;font-weight:400;text-transform:none;letter-spacing:0">${eqs.length} equipo${eqs.length!==1?'s':''} · ${compCount} comp.</span>
     </div>
@@ -2071,12 +2032,12 @@ function renderFindings(){
 
       h+=`<div id="iew-${eq.id}">
         <div class="inf-eq-row" onclick="toggleInfEq('${eq.id}')">
-          <div class="inf-eq-toggle" id="iet-${eq.id}" style="${!hasComps?'color:#ddd':''}">${hasComps?'▶':'·'}</div>
+          <div class="inf-eq-toggle" id="iet-${eq.id}" style="${!hasComps?'color:#ddd':''}">${hasComps?'&#9654;':'·'}</div>
           <div>
             <div style="font-weight:600;font-size:12px;color:#0f1117"
               onclick="event.stopPropagation();openFromInforme('${eq.id}')"
               onmouseover="this.style.color='#F7C600';this.style.cursor='pointer'" onmouseout="this.style.color='#0f1117'">
-              ${esc(nombre)} <span style="font-size:9px;color:#F7C600">↗</span>
+              ${esc(nombre)} <span style="font-size:9px;color:#F7C600">&#8599;</span>
             </div>
             ${r.marca?`<div style="font-family:monospace;font-size:9px;color:#aaa">${esc(r.marca)}${r.modelo?' · '+esc(r.modelo):''}</div>`:''}
             ${fotosBtnHtml(r.fotos||[],'eq-'+eq.id)}
@@ -2096,7 +2057,7 @@ function renderFindings(){
           h+=`<div class="inf-comp-row" onclick="openSubModal(null,'${eq.id}','${c.id}')">
             <div></div>
             <div>
-              <div style="font-size:11px;color:#5b21b6">↳ ${esc(c.nombre_comp||c.tipo)}</div>
+              <div style="font-size:11px;color:#5b21b6">&#8627; ${esc(c.nombre_comp||c.tipo)}</div>
               <div style="font-family:monospace;font-size:9px;color:#aaa">${esc(c.tipo||'')}${c.marca?' · '+esc(c.marca):''}${c.modelo?' '+esc(c.modelo):''}</div>
               ${fotosBtnHtml(c.fotos||[],'comp-'+c.id)}
             </div>
@@ -2126,10 +2087,9 @@ function toggleNC(){
   const arrow=document.getElementById('nc-arrow');
   if(panel) panel.classList.toggle('on',ncExpanded);
   if(btn) btn.textContent=ncExpanded?'Contraer':'Ver detalle';
-  if(arrow) arrow.textContent=ncExpanded?'▼':'▶';
+  if(arrow) arrow.textContent=ncExpanded?'&#9660;':'&#9654;';
 }
 
-// ── Árbol expand/collapse ─────────────────────────────────
 function togglePiso(piso){
   const body=document.getElementById('ipb-'+piso);
   const arrow=document.getElementById('ipa-'+piso);
@@ -2197,18 +2157,18 @@ function exportCSV(){
   const blob=new Blob(['\ufeff'+rows.map(r=>r.map(csvCell).join(',')).join('\n')],{type:'text/csv;charset=utf-8'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
   a.download=`ATEX_CCU_${new Date().toISOString().slice(0,10)}.csv`; a.click();
-  toast('CSV descargado ✓','ok');
+  toast('CSV descargado &#10003;','ok');
 }
 
 function copyMD(){
   let md=`# Informe ATEX — CCU Chile · Planta Temuco\n\n**Inspector:** ${document.getElementById('i-insp').value||'—'}  \n**Fecha:** ${document.getElementById('i-fecha').value||'—'}  \n**Norma:** UNE-EN 60079-10-2:2010\n\n`;
   md+=`| Tipo | Equipo / Componente | Piso | Zona | Fabricación | Marcado Ex | Estado | Hallazgo |\n|---|---|---|---|---|---|---|---|\n`;
   for(const r of reportRows()){
-    const tipo=r.tipo==='Equipo'?'**Equipo**':'↳ Comp.';
+    const tipo=r.tipo==='Equipo'?'**Equipo**':'&#8627; Comp.';
     const nombre=r.tipo==='Equipo'?`**${mdCell(r.nombre)}**`:mdCell(r.nombre);
     md+=`| ${tipo} | ${nombre} | ${mdCell(FL[r.piso]||r.piso)} | ${r.zona?'Z'+mdCell(r.zona):'—'} | ${mdCell(r.fecha_fab||'—')} | ${mdCell(r.marcado_ex||'—')} | ${mdCell(r.conformidad||'—')} | ${mdCell(r.hallazgo||'—')} |\n`;
   }
-  navigator.clipboard.writeText(md).then(()=>toast('Markdown copiado ✓','ok')).catch(()=>toast('Error al copiar','err'));
+  navigator.clipboard.writeText(md).then(()=>toast('Markdown copiado &#10003;','ok')).catch(()=>toast('Error al copiar','err'));
 }
 
 function printInforme(){
@@ -2342,9 +2302,7 @@ function printTableRowHtml(r){
   </tr>`;
 }
 
-// ═══════════════════════════════════════════════════════════
 //  SUBCOMPONENT MODAL
-// ═══════════════════════════════════════════════════════════
 async function openSubModal(mode, parentEqId, compId){
   curParentEq=parentEqId; curCompId=compId||null; subConf=''; subPendFiles=[]; subExPaths=[];
   const eq=getEqDef(parentEqId);
@@ -2400,10 +2358,10 @@ async function renderSubPhotos(){
   ));
   let h='';
   signed.forEach(r=>{ h+=r.ok
-    ?`<div class="photo-wrap"><img src="${escAttr(r.url)}" onclick="openLb(${jsArg(r.url)})"><button class="photo-rm" onclick="subExPaths.splice(${r.i},1);renderSubPhotos()">✕</button></div>`
+    ?`<div class="photo-wrap"><img src="${escAttr(r.url)}" onclick="openLb(${jsArg(r.url)})"><button class="photo-rm" onclick="subExPaths.splice(${r.i},1);renderSubPhotos()">&#10005;</button></div>`
     :`<div style="aspect-ratio:1;background:#eee;border-radius:4px"></div>`; });
   subPendFiles.forEach((f,i)=>{ const u=URL.createObjectURL(f);
-    h+=`<div class="photo-wrap"><img src="${escAttr(u)}" onclick="openLb(${jsArg(u)})"><button class="photo-rm" onclick="subPendFiles.splice(${i},1);renderSubPhotos()">✕</button></div>`; });
+    h+=`<div class="photo-wrap"><img src="${escAttr(u)}" onclick="openLb(${jsArg(u)})"><button class="photo-rm" onclick="subPendFiles.splice(${i},1);renderSubPhotos()">&#10005;</button></div>`; });
   g.innerHTML=h;
 }
 async function saveComp(){
@@ -2455,7 +2413,7 @@ async function saveComp(){
     const idx=subRecs[curParentEq].findIndex(c=>c.id===saved.id);
     if(idx>=0) subRecs[curParentEq][idx]={...saved};
     else subRecs[curParentEq].push({...saved});
-    toast('Componente guardado ✓','ok');
+    toast('Componente guardado &#10003;','ok');
     closeSubModal();
     await reloadData();
     if(curEq) renderModalComps(curEq);
@@ -2474,9 +2432,7 @@ async function deleteComp(){
   } catch(e){ toast('Error: '+e.message,'err'); }
 }
 
-// ═══════════════════════════════════════════════════════════
 //  DRAG & DROP COMPONENTES
-// ═══════════════════════════════════════════════════════════
 let dragCompId=null, dragFromEqId=null, _dragGhost=null;
 
 function onCompDragStart(e, compId, fromEqId){
@@ -2487,7 +2443,7 @@ function onCompDragStart(e, compId, fromEqId){
   _dragGhost=document.createElement('div');
   _dragGhost.className='drag-ghost';
   const name=e.currentTarget.querySelector('.comp-name')?.textContent||'componente';
-  _dragGhost.textContent='⠿ '+name;
+  _dragGhost.textContent='&#10303; '+name;
   document.body.appendChild(_dragGhost);
   try{ e.dataTransfer.setDragImage(_dragGhost,-10,-10); }catch(ex){}
 }
@@ -2532,27 +2488,22 @@ async function onExpandDrop(e, toEqId){
       allSubRaw=allSubRaw.map(c=>c.id===cId?{...c,equipo_id:toEqId}:c);
     }
     const fromName=eqName(fromId), toName=eqName(toEqId);
-    toast(`Movido a "${toName}" ✓`,'ok');
+    toast(`Movido a "${toName}" &#10003;`,'ok');
     renderEq();
   } catch(err){ toast('Error al mover: '+err.message,'err'); }
 }
 
-// ── ZONA USO EQUIPO checkboxes ────────────────────────────
 function updateZonaUso(cb, z){
   const opt=document.getElementById('zuo-'+z);
   if(opt) opt.classList.toggle('sel-'+z, cb.checked);
 }
 
-// ═══════════════════════════════════════════════════════════
 //  MÓDULO CICLOS DE INSPECCIÓN
-// ═══════════════════════════════════════════════════════════
 
-// ── Helpers rol ──────────────────────────────────────────
 function userRol(){ return profile?.rol||'inspector'; }
 function canEdit(){ return ['supervisor','admin'].includes(userRol()); }
 function isAdmin(){ return userRol()==='admin'; }
 
-// ── Cargar y renderizar lista de ciclos ──────────────────
 async function loadCiclos(){
   // Mostrar/ocultar botón según rol
   const btnNuevo=document.getElementById('btn-nuevo-ciclo');
@@ -2573,7 +2524,7 @@ function renderCiclosList(){
   const container=document.getElementById('ciclos-list');
   if(!ciclos.length){
     container.innerHTML=`<div style="padding:60px;text-align:center;color:#aaa">
-      <div style="font-size:32px;margin-bottom:12px">📅</div>
+      <div style="font-size:32px;margin-bottom:12px">&#128197;</div>
       <div style="font-family:monospace;font-size:12px">Sin ciclos de inspección aún</div>
       ${canEdit()?'<div style="font-size:11px;color:#bbb;margin-top:6px">Crea el primer ciclo con el botón superior</div>':''}
     </div>`;
@@ -2602,7 +2553,7 @@ function cicloCardHtml(c){
     if(canEdit()) acciones.push(`<button onclick="event.stopPropagation();cerrarCiclo('${c.id}')" style="background:none;border:1px solid #d97706;color:#d97706;border-radius:4px;padding:5px 12px;font-size:10px;font-family:monospace;cursor:pointer">Cerrar ciclo</button>`);
   } else if(c.estado==='cerrado'){
     acciones.push(`<button onclick="event.stopPropagation();openCicloDetalle('${c.id}')" style="background:#0f1117;color:#fff;border:none;border-radius:4px;padding:5px 12px;font-size:10px;font-family:monospace;cursor:pointer">Ver informe</button>`);
-    if(isAdmin()) acciones.push(`<button onclick="event.stopPropagation();aprobarCiclo('${c.id}')" style="background:#059669;color:#fff;border:none;border-radius:4px;padding:5px 12px;font-size:10px;font-family:monospace;cursor:pointer">✓ Aprobar</button>`);
+    if(isAdmin()) acciones.push(`<button onclick="event.stopPropagation();aprobarCiclo('${c.id}')" style="background:#059669;color:#fff;border:none;border-radius:4px;padding:5px 12px;font-size:10px;font-family:monospace;cursor:pointer">&#10003; Aprobar</button>`);
   } else {
     acciones.push(`<button onclick="event.stopPropagation();openCicloDetalle('${c.id}')" style="background:#6b7280;color:#fff;border:none;border-radius:4px;padding:5px 12px;font-size:10px;font-family:monospace;cursor:pointer">Ver informe</button>`);
   }
@@ -2617,7 +2568,7 @@ function cicloCardHtml(c){
         <div style="font-size:15px;font-weight:600;margin-bottom:3px">${esc(c.nombre)}</div>
         ${c.notas?`<div style="font-size:11px;color:#6b7280;margin-bottom:5px">${esc(c.notas)}</div>`:''}
         <div style="font-family:monospace;font-size:9px;color:#aaa">Creado por ${esc(c.creado_nombre||'—')}</div>
-        ${c.aprobado_nombre?`<div style="font-family:monospace;font-size:9px;color:#059669">✓ Aprobado por ${esc(c.aprobado_nombre)} · ${new Date(c.aprobado_at).toLocaleDateString('es-CL')}</div>`:''}
+        ${c.aprobado_nombre?`<div style="font-family:monospace;font-size:9px;color:#059669">&#10003; Aprobado por ${esc(c.aprobado_nombre)} · ${new Date(c.aprobado_at).toLocaleDateString('es-CL')}</div>`:''}
       </div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:flex-start">
         ${acciones.join('')}
@@ -2626,7 +2577,6 @@ function cicloCardHtml(c){
   </div>`;
 }
 
-// ── Nuevo ciclo ──────────────────────────────────────────
 function openNuevoCiclo(){
   document.getElementById('nc-nombre').value='';
   document.getElementById('nc-tipo').value='anual';
@@ -2680,14 +2630,13 @@ async function crearCiclo(){
       if(ie) throw ie;
     }
 
-    toast(`Ciclo "${nombre}" creado con ${inspRows.length} equipos ✓`,'ok');
+    toast(`Ciclo "${nombre}" creado con ${inspRows.length} equipos &#10003;`,'ok');
     closeNuevoCiclo();
     await loadCiclos();
   } catch(e){ toast('Error: '+e.message,'err'); }
   btn.disabled=0; btn.textContent='CREAR CICLO';
 }
 
-// ── Detalle ciclo (lista de inspecciones) ─────────────────
 async function openCicloDetalle(cicloId){
   curCiclo=ciclos.find(c=>c.id===cicloId);
   if(!curCiclo) return;
@@ -2790,7 +2739,6 @@ function filterInspList(f,el){
   });
 }
 
-// ── Modal inspección equipo ───────────────────────────────
 async function openInspModal(cicloId,inspId,eqId){
   curCiclo=ciclos.find(c=>c.id===cicloId)||curCiclo;
   curInspEqId=eqId; curInspId=inspId;
@@ -2874,10 +2822,10 @@ async function renderInspPhotos(){
   ));
   let h='';
   signed.forEach(r=>{ h+=r.ok
-    ?`<div class="photo-wrap"><img src="${escAttr(r.url)}" onclick="openLb(${jsArg(r.url)})"><button class="photo-rm" onclick="inspExPaths.splice(${r.i},1);renderInspPhotos()">✕</button></div>`
+    ?`<div class="photo-wrap"><img src="${escAttr(r.url)}" onclick="openLb(${jsArg(r.url)})"><button class="photo-rm" onclick="inspExPaths.splice(${r.i},1);renderInspPhotos()">&#10005;</button></div>`
     :`<div style="aspect-ratio:1;background:#eee;border-radius:4px"></div>`; });
   inspPendFiles.forEach((f,i)=>{ const u=URL.createObjectURL(f);
-    h+=`<div class="photo-wrap"><img src="${escAttr(u)}" onclick="openLb(${jsArg(u)})"><button class="photo-rm" onclick="inspPendFiles.splice(${i},1);renderInspPhotos()">✕</button></div>`; });
+    h+=`<div class="photo-wrap"><img src="${escAttr(u)}" onclick="openLb(${jsArg(u)})"><button class="photo-rm" onclick="inspPendFiles.splice(${i},1);renderInspPhotos()">&#10005;</button></div>`; });
   g.innerHTML=h;
 }
 
@@ -2948,14 +2896,13 @@ async function saveInspeccion(){
       updated_at:new Date().toISOString(),
     }).eq('id',curInspId));
 
-    toast('Inspección guardada ✓','ok');
+    toast('Inspección guardada &#10003;','ok');
     closeInspModal();
     await openCicloDetalle(curCiclo.id);
   } catch(e){ toast('Error: '+e.message,'err'); }
   btn.disabled=0; btn.textContent='GUARDAR INSPECCIÓN';
 }
 
-// ── Modal inspección componente (inline simplificado) ─────
 async function openInspCompModal(cicloId,inspId,eqId,compId){
   const comp=(subRecs[eqId]||[]).find(c=>c.id===compId);
   if(!comp) return;
@@ -2974,7 +2921,7 @@ async function openInspCompModal(cicloId,inspId,eqId,compId){
           <div style="font-size:10px;font-family:monospace;color:#a78bfa">COMPONENTE · ${esc(eqName(eqId))}</div>
           <div style="font-size:14px;font-weight:600">${esc(comp.nombre_comp||comp.tipo)}</div>
         </div>
-        <button onclick="document.getElementById('icomp-overlay').remove()" style="background:none;border:none;color:#666;font-size:18px;cursor:pointer">✕</button>
+        <button onclick="document.getElementById('icomp-overlay').remove()" style="background:none;border:none;color:#666;font-size:18px;cursor:pointer">&#10005;</button>
       </div>
       <div style="padding:16px;display:flex;flex-direction:column;gap:10px">
         <div style="background:#1e2230;border-radius:4px;padding:10px 12px;font-family:monospace;font-size:10px;color:#ccc">
@@ -2985,9 +2932,9 @@ async function openInspCompModal(cicloId,inspId,eqId,compId){
           <div class="field-lbl">Verificación acción anterior</div>
           <select class="field-sel" id="ic-av">
             <option value="">— seleccionar —</option>
-            <option value="si" ${ic?.accion_verificada?'selected':''}>✓ Implementada</option>
+            <option value="si" ${ic?.accion_verificada?'selected':''}>&#10003; Implementada</option>
             <option value="parcial">◐ Parcial</option>
-            <option value="no" ${ic&&!ic.accion_verificada&&ic.accion_resultado?'selected':''}>✕ No implementada</option>
+            <option value="no" ${ic&&!ic.accion_verificada&&ic.accion_resultado?'selected':''}>&#10005; No implementada</option>
             <option value="na">— No aplica</option>
           </select>
         </div>
@@ -3036,18 +2983,17 @@ async function saveInspComp(cicloId,inspId,eqId,compId,icId){
       await must(sb.from('inspecciones_comp').insert(payload));
     }
     document.getElementById('icomp-overlay')?.remove();
-    toast('Componente guardado ✓','ok');
+    toast('Componente guardado &#10003;','ok');
     await renderInspComps(cicloId,curInspId,eqId);
   } catch(e){ toast('Error: '+e.message,'err'); }
 }
 
-// ── Cerrar y aprobar ciclo ────────────────────────────────
 async function cerrarCiclo(cicloId){
   const c=ciclos.find(x=>x.id===cicloId);
   if(!confirm(`¿Cerrar el ciclo "${c?.nombre}"?\n\nUna vez cerrado no se podrán editar las inspecciones.\nEl ciclo quedará disponible para aprobación.`)) return;
   try {
     await must(sb.from('ciclos').update({estado:'cerrado'}).eq('id',cicloId));
-    toast('Ciclo cerrado ✓','ok');
+    toast('Ciclo cerrado &#10003;','ok');
     await loadCiclos();
   } catch(e){ toast('Error: '+e.message,'err'); }
 }
@@ -3062,12 +3008,11 @@ async function aprobarCiclo(cicloId){
       aprobado_nombre:profile?.full_name||session.user.email,
       aprobado_at:new Date().toISOString(),
     }).eq('id',cicloId));
-    toast('Ciclo aprobado ✓','ok');
+    toast('Ciclo aprobado &#10003;','ok');
     await loadCiclos();
   } catch(e){ toast('Error: '+e.message,'err'); }
 }
 
-// ── Export CSV ciclo ──────────────────────────────────────
 async function exportCicloCSV(cicloId){
   const {data}=await sb.from('inspecciones').select('*').eq('ciclo_id',cicloId).order('piso').order('equipo_nombre');
   const c=ciclos.find(x=>x.id===cicloId);
@@ -3081,10 +3026,9 @@ async function exportCicloCSV(cicloId){
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
   a.download=`CICLO_${(c?.nombre||cicloId).replace(/\s+/g,'_')}_${new Date().toISOString().slice(0,10)}.csv`;
   a.click();
-  toast('CSV descargado ✓','ok');
+  toast('CSV descargado &#10003;','ok');
 }
 
-// ── Print comparativo ciclo ───────────────────────────────
 async function printCicloInforme(cicloId){
   const {data}=await sb.from('inspecciones').select('*').eq('ciclo_id',cicloId).order('piso').order('equipo_nombre');
   const c=ciclos.find(x=>x.id===cicloId)||{};
@@ -3103,7 +3047,7 @@ async function printCicloInforme(cicloId){
       <td>${esc(FL[r.piso]||r.piso||'—')}</td>
       <td><span class="badge b${confClass(r.base_conformidad)||''}">${esc(r.base_conformidad||'—')}</span></td>
       <td><span class="badge b${confClass(r.conformidad)||''}">${esc(r.conformidad||'—')}</span></td>
-      <td>${r.accion_verificada?'<span style="color:#059669">✓ Sí</span>':'<span style="color:#dc2626">✕ No</span>'}</td>
+      <td>${r.accion_verificada?'<span style="color:#059669">&#10003; Sí</span>':'<span style="color:#dc2626">&#10005; No</span>'}</td>
       <td>${esc(r.hallazgo||'—')}</td>
       <td>${esc(r.accion||'—')}</td>
       <td>${esc(r.inspector_nombre||'—')}</td>
@@ -3144,9 +3088,7 @@ async function printCicloInforme(cicloId){
   win.document.close(); win.focus(); setTimeout(()=>win.print(),350);
 }
 
-// ═══════════════════════════════════════════════════════════
 //  BÚSQUEDA GLOBAL
-// ═══════════════════════════════════════════════════════════
 let sfFilter='all';
 let _srIdx=-1;
 
@@ -3224,7 +3166,7 @@ function runSearch(){
   else if(sfFilter==='comp') items=items.filter(it=>it.tipo==='comp');
   else if(['NC','OBS','C'].includes(sfFilter)) items=items.filter(it=>it.conformidad===sfFilter);
 
-  // Filtro texto — todas las palabras deben aparecer
+  // Filtro texto - todas las palabras deben aparecer
   if(q){
     const words=q.split(/\s+/).filter(Boolean);
     items=items.filter(it=>{
@@ -3258,11 +3200,11 @@ function runSearch(){
     if(it.marca)  meta.push(esc(it.marca)+(it.modelo?' · '+esc(it.modelo):''));
     if(it.zona)   meta.push('Z'+esc(it.zona));
     if(it.marcado_ex) meta.push(esc(it.marcado_ex));
-    if(it.tipo==='comp'&&it.parentNombre) meta.push('↳ '+esc(it.parentNombre));
+    if(it.tipo==='comp'&&it.parentNombre) meta.push('&#8627; '+esc(it.parentNombre));
 
     const nameHtml=hlText(it.nombre,q);
     const iconCls=it.tipo==='eq'?'eq':'comp';
-    const iconLbl=it.tipo==='eq'?'⚙':'⬡';
+    const iconLbl=it.tipo==='eq'?'&#9881;':'⬡';
     const conf=it.conformidad;
     const onclick=it.tipo==='eq'
       ?`srOpenEq(${jsArg(it.id)})`
@@ -3309,9 +3251,7 @@ async function srOpenComp(parentId,compId){
   await openSubModal(null,parentId,compId);
 }
 
-// ═══════════════════════════════════════════════════════════
 //  UTILS
-// ═══════════════════════════════════════════════════════════
 function loader(v){ document.getElementById('loader').classList.toggle('on',!!v); }
 function toast(msg,type=''){
   const el=document.createElement('div'); el.className='toast '+(type||''); el.textContent=msg;
@@ -3320,9 +3260,7 @@ function toast(msg,type=''){
 function openLb(url){ document.getElementById('lb-img').src=url; document.getElementById('lb').classList.add('on'); }
 function closeLb(){ document.getElementById('lb').classList.remove('on'); }
 
-// ═══════════════════════════════════════════════════════════
 //  PEGAR FOTO DESDE PORTAPAPELES
-// ═══════════════════════════════════════════════════════════
 async function pastePhoto(target){
   try {
     const items=await navigator.clipboard.read(); let found=false;
@@ -3338,9 +3276,9 @@ async function pastePhoto(target){
   } catch(e){ toast('Sin permiso — usa Ctrl+V dentro del modal','err'); }
 }
 function _addFileToTarget(target,file){
-  if(target==='eq'){ pendFiles.push(file); renderPhotos(); toast('Imagen pegada ✓','ok'); }
-  else if(target==='comp'){ subPendFiles.push(file); renderSubPhotos(); toast('Imagen pegada ✓','ok'); }
-  else if(target==='insp'){ inspPendFiles.push(file); renderInspPhotos(); toast('Imagen pegada ✓','ok'); }
+  if(target==='eq'){ pendFiles.push(file); renderPhotos(); toast('Imagen pegada &#10003;','ok'); }
+  else if(target==='comp'){ subPendFiles.push(file); renderSubPhotos(); toast('Imagen pegada &#10003;','ok'); }
+  else if(target==='insp'){ inspPendFiles.push(file); renderInspPhotos(); toast('Imagen pegada &#10003;','ok'); }
 }
 document.addEventListener('paste',function(e){
   const items=e.clipboardData?.items; if(!items) return;
@@ -3359,15 +3297,13 @@ document.addEventListener('paste',function(e){
   }
 });
 
-// ═══════════════════════════════════════════════════════════
 //  DRAG & DROP EQUIPOS ENTRE UBICACIONES
-// ═══════════════════════════════════════════════════════════
 function onEqDragStart(e,eqId){
   if(e.target.closest('.eq-expand')){e.preventDefault();return;}
   _eqDragId=eqId; e.dataTransfer.effectAllowed='move';
   setTimeout(()=>document.getElementById('card-'+eqId)?.classList.add('eq-dragging'),0);
   _eqDragGhost=document.createElement('div'); _eqDragGhost.className='eq-drag-ghost';
-  _eqDragGhost.textContent='⠿ '+eqName(eqId); document.body.appendChild(_eqDragGhost);
+  _eqDragGhost.textContent='&#10303; '+eqName(eqId); document.body.appendChild(_eqDragGhost);
   try{e.dataTransfer.setDragImage(_eqDragGhost,-10,-10);}catch(ex){}
 }
 function onEqDragEnd(e){
@@ -3410,14 +3346,12 @@ async function onPisoDrop(e,toUbId){
       customPisos[eqId]=toUbId;
     }
     const toNombre=proyUbicaciones.find(u=>u.id===toUbId)?.nombre||FL[toUbId]||toUbId;
-    toast(`Movido a "${toNombre}" ✓`,'ok');
+    toast(`Movido a "${toNombre}" &#10003;`,'ok');
     renderEq();
   } catch(err){toast('Error al mover: '+err.message,'err');}
 }
 
-// ═══════════════════════════════════════════════════════════
 //  GESTIÓN UBICACIONES
-// ═══════════════════════════════════════════════════════════
 function openUbModal(){
   const tipoUb=curProyecto?.tipo_ubicacion||'Piso';
   document.getElementById('ub-modal-title').textContent=`${tipoUb}s del proyecto`;
@@ -3431,10 +3365,10 @@ function renderUbList(){
   if(!proyUbicaciones.length){el.innerHTML='<div style="color:#aaa;font-size:12px;font-family:monospace;padding:8px">Sin ubicaciones aún</div>';return;}
   el.innerHTML=proyUbicaciones.map((u,i)=>`
     <div class="ub-row" id="ubrow-${u.id}">
-      <span class="ub-row-drag" title="Reordenar">⠿</span>
+      <span class="ub-row-drag" title="Reordenar">&#10303;</span>
       <span class="ub-row-name">${esc(u.nombre)}</span>
-      <button onclick="renameUb('${u.id}','${escAttr(u.nombre)}')" style="background:none;border:none;cursor:pointer;color:#aaa;font-size:12px" title="Renombrar">✎</button>
-      <button onclick="deleteUb('${u.id}')" style="background:none;border:none;cursor:pointer;color:#fca5a5;font-size:12px" title="Eliminar">🗑</button>
+      <button onclick="renameUb('${u.id}','${escAttr(u.nombre)}')" style="background:none;border:none;cursor:pointer;color:#aaa;font-size:12px" title="Renombrar">&#9998;</button>
+      <button onclick="deleteUb('${u.id}')" style="background:none;border:none;cursor:pointer;color:#fca5a5;font-size:12px" title="Eliminar">&#128465;</button>
     </div>`).join('');
 }
 async function addUbicacion(){
@@ -3444,7 +3378,7 @@ async function addUbicacion(){
     const saved=await must(sb.from('proyecto_ubicaciones').insert({proyecto_id:curProyecto.id,nombre,orden:proyUbicaciones.length}).select().single());
     proyUbicaciones.push(saved); inp.value=''; renderUbList(); renderEq();
     document.getElementById('btn-gest-ub').style.display='block';
-    toast(`${nombre} agregado ✓`,'ok');
+    toast(`${nombre} agregado &#10003;`,'ok');
   } catch(e){toast('Error: '+e.message,'err');}
 }
 async function renameUb(ubId,actual){
@@ -3452,7 +3386,7 @@ async function renameUb(ubId,actual){
   try {
     await must(sb.from('proyecto_ubicaciones').update({nombre:nuevo}).eq('id',ubId));
     const ub=proyUbicaciones.find(u=>u.id===ubId); if(ub) ub.nombre=nuevo;
-    renderUbList(); renderEq(); toast('Renombrado ✓','ok');
+    renderUbList(); renderEq(); toast('Renombrado &#10003;','ok');
   } catch(e){toast('Error: '+e.message,'err');}
 }
 async function deleteUb(ubId){
@@ -3462,13 +3396,11 @@ async function deleteUb(ubId){
   try {
     await must(sb.from('proyecto_ubicaciones').delete().eq('id',ubId));
     proyUbicaciones=proyUbicaciones.filter(u=>u.id!==ubId);
-    renderUbList(); renderEq(); toast('Eliminado ✓','ok');
+    renderUbList(); renderEq(); toast('Eliminado &#10003;','ok');
   } catch(e){toast('Error: '+e.message,'err');}
 }
 
-// ═══════════════════════════════════════════════════════════
 //  CREAR EQUIPO NUEVO
-// ═══════════════════════════════════════════════════════════
 function openEqNuevo(ubId,ubNombre){
   curUbIdNuevoEq=ubId;
   document.getElementById('en-ub-lbl').textContent=ubNombre||'Nueva ubicación';
@@ -3497,15 +3429,13 @@ async function saveEqNuevo(){
     }
     const saved=await must(sb.from('proyecto_equipos').insert(rows).select());
     if(saved) proyEquipos.push(...saved);
-    toast(`${cantidad} equipo${cantidad>1?'s':''} creado${cantidad>1?'s':''} ✓`,'ok');
+    toast(`${cantidad} equipo${cantidad>1?'s':''} creado${cantidad>1?'s':''} &#10003;`,'ok');
     closeEqNuevo(); renderEq();
   } catch(e){toast('Error: '+e.message,'err');}
   btn.disabled=0; btn.textContent='CREAR EQUIPO';
 }
 
-// ═══════════════════════════════════════════════════════════
 //  MULTI-PROYECTO
-// ═══════════════════════════════════════════════════════════
 async function showProyectos(){
   loader(1);
   document.getElementById('app').style.display='none';
@@ -3540,8 +3470,8 @@ function renderProyectoGrid(statsMap){
       <div class="proy-card-sub">${esc(p.cliente||'')}${p.planta?' · '+esc(p.planta):''}</div>
       ${p.descripcion?`<div style="font-size:10px;color:#666;margin-top:5px;line-height:1.5">${esc(p.descripcion)}</div>`:''}
       <div class="proy-card-meta">
-        <span class="proy-card-stat">📋 ${count} ítem${count!==1?'s':''}</span>
-        <span class="proy-card-stat">📍 ${esc(tipoLabel)}s</span>
+        <span class="proy-card-stat">&#128203; ${count} ítem${count!==1?'s':''}</span>
+        <span class="proy-card-stat">&#128205; ${esc(tipoLabel)}s</span>
         <span class="proy-card-stat" style="margin-left:auto;color:#333;font-size:9px">${esc(p.id)}</span>
       </div>
     </div>`;
@@ -3594,14 +3524,13 @@ async function saveNuevoProy(){
     // Crear ubicaciones iniciales
     const ubText=document.getElementById('np-ubicaciones').value.trim();
     if(ubText){
-      const lineas=ubText.split('
-').map(l=>l.trim()).filter(Boolean);
+      const lineas=ubText.split('\n').map(l=>l.trim()).filter(Boolean);
       if(lineas.length){
         const ubRows=lineas.map((nombre,i)=>({proyecto_id:id,nombre,orden:i}));
         await must(sb.from('proyecto_ubicaciones').insert(ubRows));
       }
     }
-    toast('Proyecto creado ✓','ok'); closeNuevoProy(); await showProyectos();
+    toast('Proyecto creado &#10003;','ok'); closeNuevoProy(); await showProyectos();
   } catch(e){toast('Error: '+e.message,'err');}
   btn.disabled=0; btn.textContent='CREAR PROYECTO';
 }
