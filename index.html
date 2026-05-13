@@ -249,10 +249,10 @@ input[type=file]{display:none}
 .proy-card{background:#1e2230;border:1px solid #2a2f40;border-radius:8px;padding:20px 22px;cursor:pointer;transition:all .15s;border-left:4px solid #F7C600;position:relative}
 .proy-card:hover{background:#252b3d;box-shadow:0 4px 20px rgba(247,198,0,.15);transform:translateY(-1px)}
 .proy-card-name{font-size:15px;font-weight:700;color:#f5f3ee;margin-bottom:4px}
-.proy-card-sub{font-size:11px;color:#888;font-family:monospace}
+.proy-card-sub{font-size:11px;color:#b0b8c8;font-family:monospace}
 .proy-card-badge{position:absolute;top:12px;right:12px;background:#F7C600;color:#111;font-size:8px;font-weight:800;padding:2px 7px;border-radius:2px;font-family:monospace}
 .proy-card-meta{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap}
-.proy-card-stat{font-family:monospace;font-size:10px;color:#666}
+.proy-card-stat{font-family:monospace;font-size:10px;color:#9db0c8}
 .btn-nuevo-proy{display:flex;align-items:center;gap:8px;padding:10px 24px;background:none;border:1.5px dashed #2a2f40;border-radius:6px;color:#666;font-family:monospace;font-size:11px;cursor:pointer;transition:all .15s;margin-top:4px;flex-shrink:0}
 .btn-nuevo-proy:hover{border-color:#F7C600;color:#F7C600}
 #nuevo-proy-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:400;padding:16px;overflow-y:auto;align-items:flex-start;justify-content:center}
@@ -325,7 +325,7 @@ input[type=file]{display:none}
 #admin-panel.on{display:flex;flex-direction:column}
 .admin-topbar{background:#0f1117;border-bottom:2px solid #7c3aed;padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;flex-shrink:0}
 .admin-nav{display:flex;background:#111;border-bottom:1px solid #1e2230;flex-shrink:0}
-.admin-nav-btn{padding:11px 20px;font-size:11px;font-weight:700;color:#666;cursor:pointer;border-bottom:2px solid transparent;font-family:monospace;letter-spacing:.5px;white-space:nowrap;transition:color .15s}
+.admin-nav-btn{padding:11px 20px;font-size:11px;font-weight:700;color:#9db0c8;cursor:pointer;border-bottom:2px solid transparent;font-family:monospace;letter-spacing:.5px;white-space:nowrap;transition:color .15s}
 .admin-nav-btn.on{color:#a78bfa;border-bottom-color:#7c3aed}
 .admin-nav-btn:hover:not(.on){color:#9aa3b8}
 .admin-content{flex:1;padding:28px;max-width:1000px;margin:0 auto;width:100%}
@@ -409,7 +409,7 @@ input[type=file]{display:none}
       <span style="background:#F7C600;color:#111;font-size:9px;font-weight:900;padding:2px 6px;border-radius:3px">Ex</span>
     </div>
     <div style="display:flex;align-items:center;gap:10px">
-      <span id="sel-user-lbl" style="font-family:monospace;font-size:10px;color:#888"></span>
+      <span id="sel-user-lbl" style="font-family:monospace;font-size:10px;color:#b0b8c8"></span>
       <button id="sel-admin-btn" onclick="openAdminPanel()" style="display:none;background:none;border:1px solid #2a2f40;border-radius:4px;color:#a78bfa;font-size:10px;font-family:monospace;padding:4px 10px;cursor:pointer">&#9881; Admin</button>
       <button onclick="doLogout()" style="background:none;border:1px solid #2a2f40;border-radius:4px;color:#888;font-size:10px;font-family:monospace;padding:4px 10px;cursor:pointer">&#8592; Salir</button>
     </div>
@@ -420,7 +420,7 @@ input[type=file]{display:none}
       <span style="font-size:26px;font-weight:900;color:#F7C600;letter-spacing:3px">SUSTENTA</span>
       <span style="background:#F7C600;color:#111;font-size:11px;font-weight:900;padding:3px 8px;border-radius:3px">Ex</span>
     </div>
-    <div style="font-size:14px;color:#888;font-family:monospace;letter-spacing:1px">SELECCIONAR PROYECTO</div>
+    <div style="font-size:14px;color:#b0b8c8;font-family:monospace;letter-spacing:1px">SELECCIONAR PROYECTO</div>
   </div>
   <div class="proy-grid" id="proy-grid"></div>
   <button class="btn-nuevo-proy" id="btn-crear-proy" onclick="openNuevoProy()">＋ Crear nuevo proyecto</button>
@@ -556,7 +556,7 @@ input[type=file]{display:none}
       <span style="font-family:monospace;font-size:11px;font-weight:700;color:#a78bfa;letter-spacing:1px">PANEL DE ADMINISTRACI&#211;N</span>
     </div>
     <div style="display:flex;align-items:center;gap:10px">
-      <span id="adm-user-lbl" style="font-family:monospace;font-size:10px;color:#666"></span>
+      <span id="adm-user-lbl" style="font-family:monospace;font-size:10px;color:#9db0c8"></span>
       <button onclick="closeAdminPanel()" style="background:none;border:1px solid #2a2f40;border-radius:4px;color:#888;font-size:11px;font-family:monospace;padding:5px 12px;cursor:pointer">&#8592; Volver</button>
     </div>
   </div>
@@ -572,7 +572,7 @@ input[type=file]{display:none}
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:20px">
         <div>
           <div style="font-size:18px;font-weight:700;color:#f5f3ee;margin-bottom:3px">Usuarios del sistema</div>
-          <div style="font-size:11px;color:#666;font-family:monospace">Gestiona accesos, roles y asignaciones por proyecto</div>
+          <div style="font-size:11px;color:#9db0c8;font-family:monospace">Gestiona accesos, roles y asignaciones por proyecto</div>
         </div>
         <div style="display:flex;gap:8px">
           <input id="adm-usr-search" placeholder="Buscar usuario&#8230;" oninput="filterUsuariosTable()" style="padding:7px 12px;border:1px solid #2a2f40;border-radius:4px;font-size:12px;background:#1e2230;color:#e5e7eb;width:200px">
@@ -594,7 +594,7 @@ input[type=file]{display:none}
     <!-- Panel Proyectos -->
     <div id="adm-panel-proyectos" style="display:none">
       <div style="font-size:18px;font-weight:700;color:#f5f3ee;margin-bottom:3px">Proyectos activos</div>
-      <div style="font-size:11px;color:#666;font-family:monospace;margin-bottom:20px">Administra todos los proyectos y sus usuarios asignados</div>
+      <div style="font-size:11px;color:#9db0c8;font-family:monospace;margin-bottom:20px">Administra todos los proyectos y sus usuarios asignados</div>
       <div id="adm-proy-list"></div>
     </div>
 
@@ -4001,11 +4001,11 @@ function renderProyectoGrid(statsMap, lista=null){
       <div class="proy-card-badge">ATEX</div>
       <div class="proy-card-name">${esc(p.nombre)}</div>
       <div class="proy-card-sub">${esc(p.cliente||'')}${p.planta?' · '+esc(p.planta):''}</div>
-      ${p.descripcion?`<div style="font-size:10px;color:#666;margin-top:5px;line-height:1.5">${esc(p.descripcion)}</div>`:''}
+      ${p.descripcion?`<div style="font-size:10px;color:#b0b8c8;margin-top:5px;line-height:1.5">${esc(p.descripcion)}</div>`:''}
       <div class="proy-card-meta">
         <span class="proy-card-stat">&#128203; ${count} ítem${count!==1?'s':''}</span>
         <span class="proy-card-stat">&#128205; ${esc(tipoLabel)}s</span>
-        <span class="proy-card-stat" style="margin-left:auto;color:#333;font-size:9px">${esc(p.id)}</span>
+        <span class="proy-card-stat" style="margin-left:auto;color:#8899bb;font-size:9px">${esc(p.id)}</span>
       </div>
     </div>`;
   }).join('');
@@ -4493,11 +4493,11 @@ async function loadAdmProyectos(){
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px">
           <div>
             <div style="font-size:15px;font-weight:700;color:#f5f3ee;margin-bottom:3px">${esc(p.nombre)}</div>
-            <div style="font-family:monospace;font-size:10px;color:#666">${esc(p.cliente||'')}${p.planta?' · '+esc(p.planta):''} · <span style="color:#4b5563">${esc(p.tipo_ubicacion||'Piso')}s</span></div>
+            <div style="font-family:monospace;font-size:10px;color:#9db0c8">${esc(p.cliente||'')}${p.planta?' · '+esc(p.planta):''} · <span style="color:#b0bfd4">${esc(p.tipo_ubicacion||'Piso')}s</span></div>
           </div>
-          <span style="font-family:monospace;font-size:9px;color:#374151;background:#111;padding:2px 8px;border-radius:2px">${esc(p.id)}</span>
+          <span style="font-family:monospace;font-size:9px;color:#9db0c8;background:#111;padding:2px 8px;border-radius:2px">${esc(p.id)}</span>
         </div>
-        <div style="font-size:11px;color:#6b7280;margin-bottom:8px;font-family:monospace">
+        <div style="font-size:11px;color:#9db0c8;margin-bottom:8px;font-family:monospace">
           ${users.length} usuario${users.length!==1?'s':''} asignado${users.length!==1?'s':''}
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:6px">
@@ -4506,7 +4506,7 @@ async function loadAdmProyectos(){
             <span class="rol-pill ${rolClass(u.rol)}" style="font-size:8px">${rolLabel(u.rol)}</span>
             <button onclick="removeProyUser('${p.id}','${u.user_id}')" style="background:none;border:none;cursor:pointer;color:#dc2626;font-size:11px;padding:0 2px" title="Quitar acceso">&#10005;</button>
           </div>`).join('')}
-          <button onclick="openAdmAsignProy('${p.id}','${escAttr(p.nombre)}')" style="background:none;border:1px dashed #2a2f40;border-radius:4px;padding:4px 10px;font-size:10px;font-family:monospace;cursor:pointer;color:#666">&#65291; Agregar usuario</button>
+          <button onclick="openAdmAsignProy('${p.id}','${escAttr(p.nombre)}')" style="background:none;border:1px dashed #2a2f40;border-radius:4px;padding:4px 10px;font-size:10px;font-family:monospace;cursor:pointer;color:#9db0c8">&#65291; Agregar usuario</button>
         </div>
       </div>`;
     }).join('');
