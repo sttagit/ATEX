@@ -859,7 +859,7 @@ input[type=file]{display:none}
     </div>
 
   <!-- TAB DOCUMENTOS -->
-  <div id="tab-docs" style="display:none">
+  <div id="tab-docs" style="display:none;flex:1;min-height:400px">
     <div class="page-wrap">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:18px">
         <div>
@@ -4733,7 +4733,7 @@ function fmtBytes(b){
 }
 
 async function loadDocs(){
-  const pid=curProyecto?.id; if(!pid) return;
+  const pid=projectId(); if(!pid) return;
   const btn=document.getElementById('btn-subir-doc');
   if(btn) btn.style.display=canDo('fillFicha')?'block':'none';
   const el=document.getElementById('docs-list'); if(!el) return;
