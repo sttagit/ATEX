@@ -25,6 +25,7 @@ input{width:100%;padding:8px 10px;border:1px solid #ddd9d0;border-radius:4px;fon
 .tab.on{background:#0f1117;color:#fff}
 /* ── APP ── */
 #app{display:none;flex-direction:column;min-height:100vh}
+#tab-docs{min-height:calc(100vh - 100px);background:#f5f3ee}
 .topbar{background:#0f1117;border-bottom:2px solid #F7C600;padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
 .logo{background:#F7C600;color:#fff;font-size:11px;font-weight:600;padding:3px 9px;border-radius:2px;letter-spacing:1px}
 .topbar-title{color:#f5f3ee;font-size:13px;font-weight:500;margin-left:10px}
@@ -857,6 +858,7 @@ input[type=file]{display:none}
       <div id="ciclos-list"><div style="padding:40px;text-align:center;color:#aaa;font-family:monospace">Cargando ciclos…</div></div>
 
     </div>
+  </div>
 
   <!-- TAB DOCUMENTOS -->
   <div id="tab-docs" style="display:none;flex:1;min-height:400px">
@@ -4773,7 +4775,7 @@ function renderDocs(){
   const cnt=document.getElementById('docs-search-cnt');
   if(cnt) cnt.textContent=docs.length+' doc'+(docs.length!==1?'s':'');
   if(!docs.length){
-    el.innerHTML='<div style="text-align:center;padding:40px;color:#aaa;background:#fff;border:1px solid #ddd9d0;border-radius:6px"><div style="font-size:32px;margin-bottom:8px">&#128193;</div><div style="font-weight:600;margin-bottom:4px">'+(docSearchQ?'Sin resultados para "'+esc(docSearchQ)+'"':'Sin documentos')+'</div><div style="font-size:12px">'+(docSearchQ?'Intenta con otras palabras':'Sube el primer documento')+'</div></div>';
+    el.innerHTML='<div style="text-align:center;padding:40px;color:#374151;background:#fff;border:1px solid #ddd9d0;border-radius:6px"><div style="font-size:32px;margin-bottom:8px">📁</div><div style="font-weight:600;margin-bottom:4px;font-size:14px">'+(docSearchQ?'Sin resultados para "'+esc(docSearchQ)+'"':'Sin documentos')+'</div><div style="font-size:12px;color:#6b7280">'+(docSearchQ?'Intenta con otras palabras':'Sube el primer documento con el botón superior')+'</div></div>';
     return;
   }
   let h='';
