@@ -4402,7 +4402,7 @@ function switchAdminTab(tab, el){
     const p=document.getElementById('adm-panel-'+t);
     if(p) p.style.display=t===tab?'block':'none';
   });
-  if(tab==='usuarios') loadAdmUsuarios();
+  if(tab==='usuarios') admTodosUsuarios.length ? loadAdmUsuariosFresh() : loadAdmUsuarios();
   if(tab==='proyectos') loadAdmProyectos();
 }
 
