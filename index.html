@@ -359,48 +359,39 @@ input[type=file]{display:none}
 .admin-icon-btn:hover{background:#1e1030;border-color:#7c3aed}
 
 
-/* ── MÓDULO DOCUMENTOS ── */
+/* ══ MÓDULO DOCUMENTOS ══ */
 #tab-docs{display:none}
-.docs-layout{display:grid;grid-template-columns:220px 1fr;gap:16px;min-height:60vh}
-.docs-sidebar{background:#fff;border:1px solid #ddd9d0;border-radius:6px;padding:0;overflow:hidden;align-self:start}
-.docs-sidebar-hd{background:#0f1117;color:#F7C600;font-family:monospace;font-size:9px;font-weight:700;letter-spacing:1px;padding:10px 14px;text-transform:uppercase}
+.docs-layout{display:grid;grid-template-columns:200px 1fr;gap:16px}
+.docs-sidebar{background:#fff;border:1px solid #ddd9d0;border-radius:6px;overflow:hidden;align-self:start}
+.docs-sidebar-hd{background:#0f1117;color:#F7C600;font-family:monospace;font-size:9px;font-weight:700;letter-spacing:1px;padding:9px 14px;text-transform:uppercase}
 .docs-cat{padding:9px 14px;font-size:12px;cursor:pointer;border-bottom:1px solid #f0ece4;display:flex;align-items:center;gap:8px;color:#374151;transition:background .1s}
 .docs-cat:hover{background:#f5f3ee}
 .docs-cat.on{background:#0f1117;color:#F7C600;font-weight:600}
-.docs-cat-count{margin-left:auto;font-family:monospace;font-size:10px;background:#eceae3;padding:1px 7px;border-radius:10px;color:#6b7280}
-.docs-cat.on .docs-cat-count{background:#1e2230;color:#888}
-.docs-main{display:flex;flex-direction:column;gap:12px}
-/* Barra búsqueda */
-.docs-search-bar{display:flex;gap:8px;align-items:center;background:#fff;border:1px solid #ddd9d0;border-radius:6px;padding:10px 14px}
-.docs-search-input{flex:1;border:none;outline:none;font-size:13px;color:#0f1117;background:none}
-/* Tarjeta documento */
-.doc-card{background:#fff;border:1px solid #ddd9d0;border-radius:6px;padding:12px 16px;display:flex;align-items:flex-start;gap:12px;transition:box-shadow .12s;cursor:pointer}
+.docs-cat-badge{margin-left:auto;font-family:monospace;font-size:10px;background:#eceae3;padding:1px 6px;border-radius:10px;color:#6b7280}
+.docs-cat.on .docs-cat-badge{background:#1e2230;color:#888}
+.doc-card{background:#fff;border:1px solid #ddd9d0;border-radius:6px;padding:12px 16px;display:flex;align-items:flex-start;gap:12px;margin-bottom:8px;cursor:pointer;transition:box-shadow .12s}
 .doc-card:hover{box-shadow:0 2px 10px rgba(0,0,0,.08)}
-.doc-icon{font-size:28px;flex-shrink:0;width:40px;text-align:center;line-height:1}
+.doc-icon{font-size:26px;flex-shrink:0;width:36px;text-align:center;line-height:1.2}
 .doc-info{flex:1;min-width:0}
 .doc-name{font-size:13px;font-weight:600;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .doc-meta{font-family:monospace;font-size:10px;color:#aaa;display:flex;gap:8px;flex-wrap:wrap}
 .doc-desc{font-size:11px;color:#6b7280;margin-top:4px;line-height:1.4}
-.doc-match{font-size:10px;background:#fef3c7;border-left:2px solid #F7C600;padding:4px 8px;margin-top:6px;border-radius:0 3px 3px 0;color:#92400e;font-family:monospace}
-.doc-actions{display:flex;flex-direction:column;gap:5px;flex-shrink:0}
-.doc-btn{background:none;border:1px solid #ddd9d0;border-radius:3px;padding:4px 10px;font-size:10px;font-family:monospace;cursor:pointer;color:#374151;white-space:nowrap;transition:all .1s}
+.doc-match{font-size:10px;background:#fef3c7;border-left:2px solid #F7C600;padding:4px 8px;margin-top:5px;border-radius:0 3px 3px 0;color:#92400e;font-family:monospace}
+.doc-actions{display:flex;flex-direction:column;gap:4px;flex-shrink:0}
+.doc-btn{background:none;border:1px solid #ddd9d0;border-radius:3px;padding:4px 10px;font-size:10px;font-family:monospace;cursor:pointer;color:#374151;white-space:nowrap}
 .doc-btn:hover{border-color:#F7C600;color:#F7C600}
-.doc-btn.del{border-color:#fca5a5;color:#dc2626}
-.doc-btn.del:hover{background:#fee2e2}
-/* Upload zone */
-.doc-upload-zone{border:2px dashed #ddd9d0;border-radius:8px;padding:28px;text-align:center;cursor:pointer;transition:all .15s;background:#fafaf8}
+.doc-btn.danger{border-color:#fca5a5;color:#dc2626}
+.doc-btn.danger:hover{background:#fee2e2}
+.doc-upload-zone{border:2px dashed #ddd9d0;border-radius:8px;padding:24px;text-align:center;cursor:pointer;transition:all .15s;background:#fafaf8}
 .doc-upload-zone:hover,.doc-upload-zone.dragover{border-color:#F7C600;background:#fffdf0}
-/* Preview modal */
-#doc-preview-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:500;padding:20px;align-items:center;justify-content:center}
+#doc-preview-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:500;padding:16px;align-items:center;justify-content:center}
 #doc-preview-bg.on{display:flex}
-.doc-preview-box{background:#fff;border-radius:8px;width:100%;max-width:900px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden}
+.doc-preview-box{background:#fff;border-radius:8px;width:100%;max-width:900px;max-height:92vh;display:flex;flex-direction:column;overflow:hidden}
 .doc-preview-hd{background:#0f1117;color:#f5f3ee;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
-.doc-preview-body{flex:1;overflow:auto;padding:0}
-/* Modal subir doc */
-#doc-upload-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;padding:16px;overflow-y:auto;align-items:flex-start;justify-content:center}
-#doc-upload-bg.on{display:flex}
+.doc-preview-body{flex:1;overflow:auto}
+#doc-upload-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;padding:16px;overflow-y:auto;align-items:flex-start;justify-content:center}
+#doc-upload-modal-bg.on{display:flex}
 @media(max-width:640px){.docs-layout{grid-template-columns:1fr}.docs-sidebar{display:none}}
-
 </style>
 </head>
 <body>
@@ -630,6 +621,127 @@ input[type=file]{display:none}
   </div>
 </div>
 
+
+  <!-- TAB DOCUMENTOS -->
+  <div id="tab-docs">
+    <div class="page-wrap">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:18px">
+        <div>
+          <div style="font-size:16px;font-weight:700;margin-bottom:2px">Repositorio de Documentos</div>
+          <div style="font-size:11px;color:#888;font-family:monospace">Planos, normas, certificados y manuales del proyecto</div>
+        </div>
+        <button id="btn-subir-doc" onclick="openDocUpload()" class="btn-dark" style="padding:9px 18px;display:none">&#128196; Subir documento</button>
+      </div>
+      <!-- Buscador -->
+      <div style="display:flex;gap:8px;align-items:center;background:#fff;border:1px solid #ddd9d0;border-radius:6px;padding:10px 14px;margin-bottom:14px">
+        <span style="color:#aaa">&#128269;</span>
+        <input id="docs-search-input" placeholder="Buscar por nombre, descripción o contenido&#8230;" oninput="searchDocs()" style="flex:1;border:none;outline:none;font-size:13px">
+        <span id="docs-search-cnt" style="font-family:monospace;font-size:10px;color:#aaa"></span>
+        <button id="docs-clear-btn" onclick="clearDocSearch()" style="display:none;background:none;border:none;color:#aaa;cursor:pointer">&#10005;</button>
+      </div>
+      <div class="docs-layout">
+        <!-- Sidebar -->
+        <div class="docs-sidebar">
+          <div class="docs-sidebar-hd">Filtrar</div>
+          <div class="docs-cat on" onclick="setDocFiltro('all',this)">&#128193; Todos <span class="docs-cat-badge" id="dcnt-all">0</span></div>
+          <div class="docs-cat" onclick="setDocFiltro('proyecto',this)">&#128203; Proyecto <span class="docs-cat-badge" id="dcnt-proyecto">0</span></div>
+          <div class="docs-cat" onclick="setDocFiltro('equipo',this)">&#9881; Equipo <span class="docs-cat-badge" id="dcnt-equipo">0</span></div>
+          <div class="docs-cat" onclick="setDocFiltro('componente',this)">&#128279; Componente <span class="docs-cat-badge" id="dcnt-componente">0</span></div>
+          <div style="padding:7px 14px;font-size:9px;color:#aaa;font-family:monospace;text-transform:uppercase;letter-spacing:1px;border-top:1px solid #f0ece4;margin-top:4px">Tipo</div>
+          <div class="docs-cat" onclick="setDocTipoFiltro('pdf',this)">&#128441; PDF</div>
+          <div class="docs-cat" onclick="setDocTipoFiltro('word',this)">&#128196; Word</div>
+          <div class="docs-cat" onclick="setDocTipoFiltro('excel',this)">&#128202; Excel</div>
+          <div class="docs-cat" onclick="setDocTipoFiltro('imagen',this)">&#128247; Imágenes</div>
+          <div class="docs-cat" onclick="setDocTipoFiltro('otro',this)">&#128196; Otros</div>
+        </div>
+        <!-- Lista -->
+        <div>
+          <div id="docs-list">
+            <div style="text-align:center;padding:40px;color:#aaa;background:#fff;border:1px solid #ddd9d0;border-radius:6px">
+              <div style="font-size:36px;margin-bottom:8px">&#128193;</div>
+              <div style="font-weight:600;margin-bottom:4px">Sin documentos</div>
+              <div style="font-size:12px">Sube el primer documento con el botón superior</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+<!-- MODAL SUBIR DOCUMENTO -->
+<div id="doc-upload-modal-bg">
+  <div class="modal" style="border-top-color:#F7C600;max-width:540px">
+    <div class="modal-head" style="background:#0f1117">
+      <div style="flex:1">
+        <div style="font-size:11px;font-family:monospace;color:#F7C600;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">REPOSITORIO</div>
+        <div style="font-size:15px;font-weight:600">Subir documento</div>
+      </div>
+      <button onclick="closeDocUpload()" style="background:none;border:none;color:#666;font-size:20px;cursor:pointer">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <div class="doc-upload-zone" id="du-dropzone"
+        ondragover="event.preventDefault();this.classList.add('dragover')"
+        ondragleave="this.classList.remove('dragover')"
+        ondrop="duHandleDrop(event)"
+        onclick="document.getElementById('du-file-inp').click()">
+        <div style="font-size:32px;margin-bottom:8px">&#128196;</div>
+        <div style="font-weight:600;margin-bottom:4px">Arrastra o haz clic para seleccionar</div>
+        <div style="font-size:11px;color:#aaa">PDF, Word, Excel, imágenes · Máx. 20MB</div>
+        <div id="du-filename" style="display:none;margin-top:8px;font-family:monospace;font-size:11px;color:#F7C600;font-weight:600"></div>
+      </div>
+      <input type="file" id="du-file-inp" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.png,.jpg,.jpeg,.webp,.txt,.csv" onchange="duFileChosen(event)" style="display:none">
+      <div><div class="field-lbl">Nombre del documento</div><input class="field-input" id="du-nombre" placeholder="Ej: Plano eléctrico zona 21, Certificado Ex motor&#8230;"></div>
+      <div><div class="field-lbl">Descripción (opcional)</div><textarea class="field-ta" id="du-desc" placeholder="Breve descripción del contenido&#8230;" style="min-height:48px"></textarea></div>
+      <div>
+        <div class="field-lbl">Asociar a</div>
+        <select class="field-sel" id="du-scope" onchange="duScopeChanged()">
+          <option value="proyecto">Proyecto (general)</option>
+          <option value="equipo">Equipo específico</option>
+          <option value="componente">Componente específico</option>
+        </select>
+      </div>
+      <div id="du-eq-wrap" style="display:none">
+        <div class="field-lbl">Equipo</div>
+        <select class="field-sel" id="du-eq-sel" onchange="duEqChanged()">
+          <option value="">— Seleccionar equipo —</option>
+        </select>
+      </div>
+      <div id="du-comp-wrap" style="display:none">
+        <div class="field-lbl">Componente</div>
+        <select class="field-sel" id="du-comp-sel">
+          <option value="">— Seleccionar componente —</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-out" onclick="closeDocUpload()">Cancelar</button>
+      <button class="btn-save" onclick="saveDocumento()" id="du-save-btn">SUBIR DOCUMENTO</button>
+    </div>
+  </div>
+</div>
+
+<!-- PREVIEW DOCUMENTO -->
+<div id="doc-preview-bg">
+  <div class="doc-preview-box">
+    <div class="doc-preview-hd">
+      <div style="flex:1;min-width:0">
+        <div id="dp-title" style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+        <div id="dp-meta" style="font-family:monospace;font-size:10px;color:#888;margin-top:2px"></div>
+      </div>
+      <div style="display:flex;gap:8px;flex-shrink:0;margin-left:12px">
+        <button onclick="downloadCurDoc()" style="background:#F7C600;color:#111;border:none;border-radius:4px;padding:6px 14px;font-size:11px;font-family:monospace;cursor:pointer;font-weight:600">&#11015; Descargar</button>
+        <button onclick="closeDocPreview()" style="background:none;border:none;color:#888;font-size:22px;cursor:pointer;line-height:1">&#10005;</button>
+      </div>
+    </div>
+    <div class="doc-preview-body" id="dp-body" style="min-height:300px;display:flex;align-items:center;justify-content:center">
+      <span style="color:#aaa;font-family:monospace">Cargando&#8230;</span>
+    </div>
+  </div>
+</div>
+
+
 <!-- MODAL USUARIO (Admin) -->
 <div id="adm-usr-modal-bg">
   <div class="modal" style="border-top-color:#7c3aed;max-width:520px">
@@ -764,6 +876,7 @@ input[type=file]{display:none}
     <div class="nav-btn" onclick="goTab('rs',this)">📊 RESUMEN</div>
     <div class="nav-btn" onclick="goTab('inf',this)">📄 INFORME</div>
     <div class="nav-btn" onclick="goTab('ciclos',this)">📅 CICLOS</div>
+    <div class="nav-btn" onclick="goTab('docs',this)">📁 DOCUMENTOS</div>
   </div>
 
   <!-- TAB EQUIPOS -->
@@ -1038,7 +1151,7 @@ input[type=file]{display:none}
     </div>
     <div class="modal-body">
       <div><div class="field-lbl">Nombre completo</div><input class="field-input" id="um-nombre" placeholder="Nombre Apellido"></div>
-      <div><div class="field-lbl">Email</div><input class="field-input" id="um-email" type="email" placeholder="usuario@empresa.com" id="um-email"></div>
+      <div><div class="field-lbl">Email</div><input class="field-input" id="um-email" type="email" placeholder="usuario@empresa.com"></div>
       <div>
         <div class="field-lbl">Rol global</div>
         <select class="field-sel" id="um-rol">
@@ -1092,80 +1205,6 @@ input[type=file]{display:none}
     </div>
   </div>
 </div>
-
-<!-- MODAL SUBIR DOCUMENTO -->
-<div id="doc-upload-bg">
-  <div class="modal" style="border-top-color:#F7C600;max-width:560px">
-    <div class="modal-head" style="background:#0f1117">
-      <div style="flex:1">
-        <div style="font-size:11px;font-family:monospace;color:#F7C600;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">REPOSITORIO</div>
-        <div id="du-title" style="font-size:15px;font-weight:600">Subir documento</div>
-      </div>
-      <button onclick="closeDocUpload()" style="background:none;border:none;color:#666;font-size:20px;cursor:pointer">&#10005;</button>
-    </div>
-    <div class="modal-body">
-      <!-- Zona de arrastre -->
-      <div class="doc-upload-zone" id="du-zone"
-        ondragover="duDragOver(event)" ondragleave="duDragLeave(event)" ondrop="duDrop(event)"
-        onclick="document.getElementById('du-file').click()">
-        <div style="font-size:36px;margin-bottom:8px">&#128196;</div>
-        <div style="font-weight:600;margin-bottom:4px">Arrastra archivos aqu&#237; o haz clic para seleccionar</div>
-        <div style="font-size:11px;color:#aaa">PDF, Word, Excel, im&#225;genes &#183; M&#225;x. 20 MB</div>
-        <div id="du-file-name" style="margin-top:10px;font-family:monospace;font-size:11px;color:#F7C600;display:none"></div>
-      </div>
-      <input type="file" id="du-file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.png,.jpg,.jpeg,.webp,.txt,.csv" onchange="duFileSelected(event)" style="display:none">
-      <div><div class="field-lbl">Nombre del documento</div><input class="field-input" id="du-nombre" placeholder="Ej: Plano eléctrico zona 21, Certificado Ex motor..."></div>
-      <div><div class="field-lbl">Descripci&#243;n</div><textarea class="field-ta" id="du-desc" placeholder="Breve descripci&#243;n del contenido..." style="min-height:52px"></textarea></div>
-      <div>
-        <div class="field-lbl">Asociar a</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <div>
-            <select class="field-sel" id="du-scope" onchange="updateDuScope()">
-              <option value="proyecto">Proyecto (general)</option>
-              <option value="equipo">Equipo espec&#237;fico</option>
-              <option value="componente">Componente espec&#237;fico</option>
-            </select>
-          </div>
-          <div id="du-equipo-wrap" style="display:none">
-            <select class="field-sel" id="du-equipo" onchange="updateDuComponentes()">
-              <option value="">&#8212; Seleccionar equipo &#8212;</option>
-            </select>
-          </div>
-        </div>
-        <div id="du-comp-wrap" style="display:none;margin-top:8px">
-          <select class="field-sel" id="du-comp">
-            <option value="">&#8212; Seleccionar componente &#8212;</option>
-          </select>
-        </div>
-      </div>
-      <div id="du-prev" style="display:none;padding:8px 10px;background:#eceae3;border-radius:4px;font-size:10px;color:#6b7280;font-family:monospace"></div>
-    </div>
-    <div class="modal-foot">
-      <button class="btn-out" onclick="closeDocUpload()">Cancelar</button>
-      <button class="btn-save" onclick="saveDocumento()" id="du-sv">SUBIR DOCUMENTO</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL PREVIEW DOCUMENTO -->
-<div id="doc-preview-bg">
-  <div class="doc-preview-box">
-    <div class="doc-preview-hd">
-      <div style="flex:1;min-width:0">
-        <div id="dp-nombre" style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
-        <div id="dp-meta" style="font-family:monospace;font-size:10px;color:#888;margin-top:2px"></div>
-      </div>
-      <div style="display:flex;gap:8px;flex-shrink:0;margin-left:12px">
-        <button id="dp-download" onclick="downloadDoc()" style="background:#F7C600;color:#111;border:none;border-radius:4px;padding:6px 14px;font-size:11px;font-family:monospace;cursor:pointer;font-weight:600">&#11015; Descargar</button>
-        <button onclick="closeDocPreview()" style="background:none;border:none;color:#666;font-size:22px;cursor:pointer">&#10005;</button>
-      </div>
-    </div>
-    <div class="doc-preview-body" id="dp-body">
-      <div style="display:flex;align-items:center;justify-content:center;padding:40px;color:#aaa">Cargando...</div>
-    </div>
-  </div>
-</div>
-
 <!-- MODAL EQUIPO -->
 <div id="modal-bg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;padding:16px;overflow-y:auto;align-items:flex-start;justify-content:center">
   <div class="modal">
@@ -1420,8 +1459,11 @@ function mdCell(v){
 function getEqDef(id){
   const base=EQ.find(e=>e.id===id);
   const extra=equiposExtra.find(e=>e.id===id);
+  const dyn=proyEquipos.find(e=>e.id===id);
   return base || (extra ? {
     id:extra.id,n:extra.nombre,p:extra.piso,g:extra.grupo||'',z:extra.zona||'',_extra:true
+  } : null) || (dyn ? {
+    id:dyn.id,n:dyn.nombre,p:customPisos[dyn.id]||dyn.ubicacion_id||'',g:dyn.grupo||'',z:dyn.zona||'',_dyn:true
   } : null);
 }
 
@@ -1431,6 +1473,22 @@ function eqTotalVisible(){
 
 function pctFrom(total){
   return Math.min(100,Math.round(total/eqTotalVisible()*100));
+}
+
+function projectId(){
+  return curProyecto?.id || 'ccu-temuco-molino';
+}
+
+function pisoLabel(piso){
+  return proyUbicaciones.find(u=>u.id===piso)?.nombre || FL[piso] || piso || '—';
+}
+
+function pisoOrderIds(extraIds=[]){
+  const ids=proyUbicaciones.length ? proyUbicaciones.map(u=>u.id) : Object.keys(FL);
+  for(const id of extraIds){
+    if(id && !ids.includes(id)) ids.push(id);
+  }
+  return ids;
 }
 
 //  CATÁLOGO DE EQUIPOS - Manual TEM-ELA-MAN 006
@@ -1574,7 +1632,7 @@ const FL = {
 //  STATE
 let session, profile, recs={}, subRecs={}, curEq=null, curConf='', pendFiles=[], exPaths=[], floorF='all', allRaw=[], allSubRaw=[];
 let curProyecto=null, proyectos=[];
-let todosDocumentos=[], docCatFiltro='all', docTipoFiltro='', docSearchQ='', curDocPreview=null, duPendFile=null;
+let todosDocumentos=[], docFiltro='all', docTipoFiltro='', docSearchQ='', curDocPreview=null, duFile=null;
 let todosUsuarios=[], curUsrId=null, curUsrAsignaciones=[], perfilActual=null;
 let customPisos={}, proyUbicaciones=[], proyEquipos=[];
 let curUbIdNuevoEq=null;
@@ -1657,6 +1715,7 @@ async function loadApp(){
     if(ep){ customPisos={}; ep.forEach(r=>{ customPisos[r.id]=r.piso; }); }
   } catch(e){}
   renderEq();
+  applyPermissions();
   loader(0);
 }
 
@@ -1717,10 +1776,11 @@ function goTab(name,el){
 
 async function loadAndRenderInforme(){
   loader(1);
+  const pid=projectId();
   try {
     const [r1, r2] = await Promise.all([
-      sb.from('registros').select('*, profiles(full_name)').order('updated_at',{ascending:false}),
-      sb.from('componentes').select('*, profiles(full_name)').order('created_at',{ascending:true})
+      sb.from('registros').select('*, profiles(full_name)').eq('proyecto_id',pid).order('updated_at',{ascending:false}),
+      sb.from('componentes').select('*, profiles(full_name)').eq('proyecto_id',pid).order('created_at',{ascending:true})
     ]);
     if(r1.error) throw r1.error;
     if(r2.error) throw r2.error;
@@ -1786,6 +1846,7 @@ function eqName(eqId){
   return customNames[eqId]
     || (EQ.find(e=>e.id===eqId)||{}).n
     || (equiposExtra.find(e=>e.id===eqId)||{}).nombre
+    || (proyEquipos.find(e=>e.id===eqId)||{}).nombre
     || eqId;
 }
 
@@ -1890,7 +1951,7 @@ function renderEq(){
       const nb=eqName(b.id).toLowerCase();
       return na.localeCompare(nb,'es');
     });
-    const flNombre=proyUbicaciones.find(u=>u.id===fl)?.nombre||FL[fl]||fl;
+    const flNombre=pisoLabel(fl);
     h+=`<div class="sec-hd" id="shd-${fl}" ondragover="onPisoDragOver(event,'${fl}')" ondragleave="onPisoDragLeave(event,'${fl}')">${esc(flNombre)}</div>`;
     h+=`<div class="eq-grid" id="egrid-${fl}" ondragover="onPisoDragOver(event,'${fl}')" ondragleave="onPisoDragLeave(event,'${fl}')" ondrop="onPisoDrop(event,'${fl}')">`;
     for(const eq of flItems){
@@ -1945,7 +2006,7 @@ function renderEq(){
       </div>`;
     }
     const ubObj2=proyUbicaciones.find(u=>u.id===fl);
-    if(ubObj2) h+=`<div class="btn-add-eq" onclick="openEqNuevo('${fl}','${esc(flNombre)}')">&#65291; Agregar equipo en ${esc(flNombre)}</div>`;
+    if(ubObj2) h+=`<div class="btn-add-eq" onclick="openEqNuevo(${jsArg(fl)},${jsArg(flNombre)})">&#65291; Agregar equipo en ${esc(flNombre)}</div>`;
     h+='</div>';
   }
   if(proyUbicaciones.length){
@@ -1953,7 +2014,7 @@ function renderEq(){
       if(!floors.includes(ub.id)){
         h+=`<div class="sec-hd" id="shd-${ub.id}" ondragover="onPisoDragOver(event,'${ub.id}')" ondragleave="onPisoDragLeave(event,'${ub.id}')">${esc(ub.nombre)}</div>`;
         h+=`<div class="eq-grid" id="egrid-${ub.id}" ondragover="onPisoDragOver(event,'${ub.id}')" ondragleave="onPisoDragLeave(event,'${ub.id}')" ondrop="onPisoDrop(event,'${ub.id}')">`;
-        h+=`<div class="btn-add-eq" onclick="openEqNuevo('${ub.id}','${esc(ub.nombre)}')">&#65291; Agregar equipo en ${esc(ub.nombre)}</div>`;
+        h+=`<div class="btn-add-eq" onclick="openEqNuevo(${jsArg(ub.id)},${jsArg(ub.nombre)})">&#65291; Agregar equipo en ${esc(ub.nombre)}</div>`;
         h+='</div>';
       }
     });
@@ -1981,15 +2042,17 @@ async function saveEqName(eqId){
   if(!inp) return;
   const nuevoNombre=inp.value.trim();
   if(!nuevoNombre){ toast('El nombre no puede estar vacío','err'); return; }
+  const pid=projectId();
   try {
     const payload={
       id:eqId,
+      proyecto_id:pid,
       nombre:nuevoNombre,
       updated_at:new Date().toISOString(),
       updated_by:profile?.full_name||session.user.email
     };
     await must(sb.from('equipos_custom')
-      .upsert(payload,{onConflict:'id'}));
+      .upsert(payload,{onConflict:'proyecto_id,id'}));
     customNames[eqId]=nuevoNombre;
     toast('Nombre guardado &#10003;','ok');
     renderEq();
@@ -1998,7 +2061,7 @@ async function saveEqName(eqId){
 async function resetEqName(eqId){
   if(!confirm('¿Restaurar el nombre original del catálogo?')) return;
   try {
-    await must(sb.from('equipos_custom').delete().eq('id',eqId));
+    await must(sb.from('equipos_custom').delete().eq('id',eqId).eq('proyecto_id',projectId()));
     delete customNames[eqId];
     toast('Nombre restaurado &#10003;','ok');
     renderEq();
@@ -2029,7 +2092,7 @@ async function openModal(id){
   if(!eq){ toast('Equipo no encontrado','err'); return; }
   const r=recs[id]||{};
   document.getElementById('m-name').textContent=eqName(id);
-  document.getElementById('m-floor').textContent=FL[eq.p]||eq.p;
+  document.getElementById('m-floor').textContent=pisoLabel(eq.p);
   document.getElementById('m-grp').textContent=eq.g;
   const z=r.zona||eq.z||'';
   const pill=document.getElementById('m-zpill');
@@ -2090,6 +2153,7 @@ async function duplicateEq(){
       // Guardar equipo en equipos_extra
       const eqPayload = {
         id: newId,
+        proyecto_id:projectId(),
         nombre: nombreBase+sufijo,
         piso: eq.p||eq.piso,
         grupo: eq.g||eq.grupo||'',
@@ -2114,7 +2178,7 @@ async function duplicateEq(){
       await must(sb.from('equipos_extra').insert(eqPayload));
       // Guardar registro de inspección para el nuevo equipo
       const regPayload={
-        equipo_id:newId, equipo_nombre:nombreBase+sufijo,
+        equipo_id:newId, equipo_nombre:nombreBase+sufijo, proyecto_id:projectId(),
         piso:eq.p||eq.piso, grupo:eq.g||eq.grupo||'',
         marca:r.marca||'', modelo:r.modelo||'',
         serie:r.serie||'', tag_planta:r.tag_planta||'', potencia:r.potencia||'',
@@ -2133,7 +2197,7 @@ async function duplicateEq(){
       // Duplicar componentes
       // Duplicar componentes en paralelo
       await Promise.all(comps.map(c=>must(sb.from('componentes').insert({
-        equipo_id:newId, tipo:c.tipo, nombre_comp:c.nombre_comp,
+        equipo_id:newId, tipo:c.tipo, nombre_comp:c.nombre_comp, proyecto_id:projectId(),
         marca:c.marca||'', modelo:c.modelo||'',
         serie:c.serie||'', tag_planta:c.tag_planta||'', potencia:c.potencia||'',
         fecha_fab:c.fecha_fab||null, marcado_ex:c.marcado_ex||'', epl:c.epl||'',
@@ -2170,7 +2234,7 @@ async function deleteEqData(){
     if(r.fotos&&r.fotos.length){
       await must(sb.storage.from('atex-fotos').remove(r.fotos));
     }
-    await must(sb.from('registros').delete().eq('equipo_id',curEq));
+    await must(sb.from('registros').delete().eq('proyecto_id',projectId()).eq('equipo_id',curEq));
     // Si es equipo extra limpiar sus datos también
     const isExtra=!!equiposExtra.find(e=>e.id===curEq);
     if(isExtra){
@@ -2178,7 +2242,7 @@ async function deleteEqData(){
         marca:'',modelo:'',serie:'',tag_planta:'',potencia:'',fecha_fab:null,
         marcado_ex:'',epl:'',temp_max:'',conformidad:'',
         hallazgo:'',accion:'',fotos:[]
-      }).eq('id',curEq));
+      }).eq('proyecto_id',projectId()).eq('id',curEq));
     }
     delete recs[curEq];
     allRaw=allRaw.filter(r=>r.equipo_id!==curEq);
@@ -2197,16 +2261,17 @@ async function hideEq(){
     // Si es equipo extra lo borramos directamente de la tabla
     const isExtra=!!equiposExtra.find(e=>e.id===curEq);
     if(isExtra){
-      await must(sb.from('equipos_extra').delete().eq('id',curEq));
-      await must(sb.from('registros').delete().eq('equipo_id',curEq));
-      await must(sb.from('componentes').delete().eq('equipo_id',curEq));
+      await must(sb.from('equipos_extra').delete().eq('proyecto_id',projectId()).eq('id',curEq));
+      await must(sb.from('registros').delete().eq('proyecto_id',projectId()).eq('equipo_id',curEq));
+      await must(sb.from('componentes').delete().eq('proyecto_id',projectId()).eq('equipo_id',curEq));
       toast(`"${nombre}" eliminado &#10003;`,'ok');
     } else {
       await must(sb.from('equipos_ocultos').upsert({
         id:curEq,
+        proyecto_id:projectId(),
         hidden_at:new Date().toISOString(),
         hidden_by:profile?.full_name||session.user.email
-      },{onConflict:'id'}));
+      },{onConflict:'proyecto_id,id'}));
       hiddenEqs.add(curEq);
       toast(`"${nombre}" ocultado del listado &#10003;`,'ok');
     }
@@ -2252,7 +2317,7 @@ async function saveEq(){
     const eq=getEqDef(curEq);
     if(!eq) throw new Error('Equipo no encontrado');
     const payload={
-      equipo_id:curEq, equipo_nombre:eqName(curEq), piso:eqPiso(curEq), grupo:eq.g, proyecto_id:curProyecto?.id||'ccu-temuco-molino',
+      equipo_id:curEq, equipo_nombre:eqName(curEq), piso:eqPiso(curEq), grupo:eq.g, proyecto_id:projectId(),
       marca:document.getElementById('f-marca').value.trim(),
       modelo:document.getElementById('f-modelo').value.trim(),
       serie:document.getElementById('f-serie').value.trim(),
@@ -2270,9 +2335,9 @@ async function saveEq(){
       inspector_id:session.user.id,
       inspector_nombre:profile?.full_name||session.user.email,
     };
-    const ex=await must(sb.from('registros').select('id').eq('equipo_id',curEq).maybeSingle());
+    const ex=await must(sb.from('registros').select('id').eq('proyecto_id',projectId()).eq('equipo_id',curEq).maybeSingle());
     let saved;
-    if(ex){ saved=await must(sb.from('registros').update(payload).eq('id',ex.id).select().single()); }
+    if(ex){ saved=await must(sb.from('registros').update(payload).eq('proyecto_id',projectId()).eq('id',ex.id).select().single()); }
     else   { saved=await must(sb.from('registros').insert(payload).select().single()); }
     recs[curEq]={...saved,profiles:{full_name:profile?.full_name}};
     toast('Equipo guardado &#10003;','ok');
@@ -2283,17 +2348,22 @@ async function saveEq(){
 }
 
 async function reloadData(){
+  const pid=projectId();
   try {
-    const data=await must(sb.from('registros').select('*, profiles(full_name)').order('updated_at',{ascending:false}));
+    const data=await must(sb.from('registros').select('*, profiles(full_name)').eq('proyecto_id',pid).order('updated_at',{ascending:false}));
     if(data){ allRaw=data; recs={}; data.forEach(r=>{ recs[r.equipo_id]=r; }); }
   } catch(e){ console.warn(e); }
   try {
-    const sd=await must(sb.from('componentes').select('*, profiles(full_name)').order('created_at',{ascending:true}));
+    const sd=await must(sb.from('componentes').select('*, profiles(full_name)').eq('proyecto_id',pid).order('created_at',{ascending:true}));
     if(sd){ allSubRaw=sd; subRecs={}; sd.forEach(c=>{ if(!subRecs[c.equipo_id]) subRecs[c.equipo_id]=[]; subRecs[c.equipo_id].push(c); }); }
   } catch(e){ console.warn(e); }
   try {
-    const ee=await must(sb.from('equipos_extra').select('*').order('created_at',{ascending:true}));
+    const ee=await must(sb.from('equipos_extra').select('*').eq('proyecto_id',pid).order('created_at',{ascending:true}));
     if(ee){ equiposExtra=ee; }
+  } catch(e){ console.warn(e); }
+  try {
+    const ep=await must(sb.from('equipos_piso').select('id,piso').eq('proyecto_id',pid));
+    if(ep){ customPisos={}; ep.forEach(r=>{ customPisos[r.id]=r.piso; }); }
   } catch(e){ console.warn(e); }
   renderEq();
 }
@@ -2301,10 +2371,11 @@ async function reloadData(){
 //  RESUMEN
 async function renderResumen(){
   loader(1);
+  const pid=projectId();
   try {
     const [r1,r2]=await Promise.all([
-      sb.from('registros').select('*, profiles(full_name)').order('updated_at',{ascending:false}),
-      sb.from('componentes').select('*, profiles(full_name)').order('created_at',{ascending:true})
+      sb.from('registros').select('*, profiles(full_name)').eq('proyecto_id',pid).order('updated_at',{ascending:false}),
+      sb.from('componentes').select('*, profiles(full_name)').eq('proyecto_id',pid).order('created_at',{ascending:true})
     ]);
     if(r1.error) throw r1.error;
     if(r2.error) throw r2.error;
@@ -2334,7 +2405,7 @@ function renderGapRows(){
   if(!data.length){ rows.innerHTML='<div style="padding:28px;text-align:center;color:#6b7280">Sin registros</div>'; return; }
   rows.innerHTML=data.map(r=>`
     <div class="dt-row" style="grid-template-columns:2.5fr 0.8fr 0.7fr 2.5fr">
-      <div><div style="font-weight:500;font-size:12px">${esc(r.nombre)}</div><div style="font-family:monospace;font-size:9px;color:#aaa">${esc(FL[r.piso]||r.piso)}${r.principal?' · '+esc(r.principal):''}</div></div>
+      <div><div style="font-weight:500;font-size:12px">${esc(r.nombre)}</div><div style="font-family:monospace;font-size:9px;color:#aaa">${esc(pisoLabel(r.piso))}${r.principal?' · '+esc(r.principal):''}</div></div>
       <div>${zpillHtml(r.zona||'')}</div>
       <div><span class="cbadge b${confClass(r.conformidad)}">${esc(r.conformidad||'—')}</span></div>
       <div style="font-size:11px;color:#6b7280">${esc(r.hallazgo||'—')}</div>
@@ -2380,7 +2451,7 @@ function renderFindings(){
       <div id="nc-list" class="nc-list ${ncExpanded?'on':''}">`
       +nc.map(r=>`<div class="nc-item">
         <div style="font-weight:500;font-size:13px;cursor:pointer;color:#F7C600" onclick="openFromInforme(${jsArg(r.equipo_id)})">${esc(r.tipo==='Componente'?r.principal+' · '+r.nombre:r.nombre)} &#8599;</div>
-        <div style="font-size:10px;color:#aaa;font-family:monospace;margin-bottom:5px">${esc(r.tipo)} · ${esc(FL[r.piso]||r.piso)}</div>
+        <div style="font-size:10px;color:#aaa;font-family:monospace;margin-bottom:5px">${esc(r.tipo)} · ${esc(pisoLabel(r.piso))}</div>
         <div style="font-size:12px;margin-bottom:3px"><strong>Brechas / Obs.:</strong> ${esc(r.hallazgo||'—')}</div>
         <div style="font-size:12px;color:#6b7280"><strong>Acción:</strong> ${esc(r.accion||'—')}</div>
         ${fotosBtnHtml(r.fotos,'nc-'+r.tipo+'-'+r.id)}
@@ -2388,7 +2459,7 @@ function renderFindings(){
   }
 
   const findEl=document.getElementById('findings');
-  const pisoOrder=Object.keys(FL);
+  const pisoOrder=pisoOrderIds(Object.keys(byFloor));
 
   // Equipos con datos (registro o componentes)
   const eqIdsWithData=new Set([
@@ -2440,7 +2511,7 @@ function renderFindings(){
 
     h+=`<div class="inf-piso-hd" onclick="togglePiso('${piso}')">
       <span class="inf-piso-arrow" id="ipa-${piso}">&#9660;</span>
-      ${esc(FL[piso]||piso)}
+      ${esc(pisoLabel(piso))}
       <span style="margin-left:auto;font-size:9px;color:#888;font-weight:400;text-transform:none;letter-spacing:0">${eqs.length} equipo${eqs.length!==1?'s':''} · ${compCount} comp.</span>
     </div>
     <div id="ipb-${piso}">`;
@@ -2534,7 +2605,7 @@ function toggleInfEq(eqId){
   }
 }
 function toggleAllPisos(expand){
-  Object.keys(FL).forEach(piso=>{
+  pisoOrderIds().forEach(piso=>{
     const body=document.getElementById('ipb-'+piso);
     const arrow=document.getElementById('ipa-'+piso);
     if(!body) return;
@@ -2566,7 +2637,7 @@ function exportCSV(){
       r.tipo,
       r.nombre,
       r.principal,
-      FL[r.piso]||r.piso,
+      pisoLabel(r.piso),
       r.zona||'',
       r.fecha_fab||'',
       r.marcado_ex||'',
@@ -2588,7 +2659,7 @@ function copyMD(){
   for(const r of reportRows()){
     const tipo=r.tipo==='Equipo'?'**Equipo**':'&#8627; Comp.';
     const nombre=r.tipo==='Equipo'?`**${mdCell(r.nombre)}**`:mdCell(r.nombre);
-    md+=`| ${tipo} | ${nombre} | ${mdCell(FL[r.piso]||r.piso)} | ${r.zona?'Z'+mdCell(r.zona):'—'} | ${mdCell(r.fecha_fab||'—')} | ${mdCell(r.marcado_ex||'—')} | ${mdCell(r.conformidad||'—')} | ${mdCell(r.hallazgo||'—')} |\n`;
+    md+=`| ${tipo} | ${nombre} | ${mdCell(pisoLabel(r.piso))} | ${r.zona?'Z'+mdCell(r.zona):'—'} | ${mdCell(r.fecha_fab||'—')} | ${mdCell(r.marcado_ex||'—')} | ${mdCell(r.conformidad||'—')} | ${mdCell(r.hallazgo||'—')} |\n`;
   }
   navigator.clipboard.writeText(md).then(()=>toast('Markdown copiado &#10003;','ok')).catch(()=>toast('Error al copiar','err'));
 }
@@ -2619,7 +2690,7 @@ function buildPrintableInforme(rows){
   const NC=items.filter(r=>r.conformidad==='NC').length;
   const OBS=items.filter(r=>r.conformidad==='OBS').length;
   const ncRows=rows.filter(r=>r.conformidad==='NC');
-  const pisoOrder=Object.keys(FL);
+  const pisoOrder=pisoOrderIds(rows.map(r=>r.piso));
   const sorted=[...rows].sort((a,b)=>{
     const pa=pisoOrder.indexOf(a.piso), pb=pisoOrder.indexOf(b.piso);
     if(pa!==pb) return (pa<0?99:pa)-(pb<0?99:pb);
@@ -2703,7 +2774,7 @@ tbody tr:nth-child(even){background:#f9fafb}
 function printNcRowHtml(r){
   return `<div class="nc">
     <div class="nc-name">${esc(r.tipo==='Componente'?r.principal+' · '+r.nombre:r.nombre)}</div>
-    <div class="small">${esc(r.tipo)} · ${esc(FL[r.piso]||r.piso)} · ${r.zona?'Z'+esc(r.zona):'Zona —'} · TAG ${esc(r.tag_planta||'—')}</div>
+    <div class="small">${esc(r.tipo)} · ${esc(pisoLabel(r.piso))} · ${r.zona?'Z'+esc(r.zona):'Zona —'} · TAG ${esc(r.tag_planta||'—')}</div>
     <div><strong>Brechas / Obs.:</strong> ${esc(r.hallazgo||'—')}</div>
     <div><strong>Accion:</strong> ${esc(r.accion||'—')}</div>
   </div>`;
@@ -2714,7 +2785,7 @@ function printTableRowHtml(r){
     <td>${esc(r.tipo)}</td>
     <td><strong>${esc(r.nombre)}</strong>${r.marca||r.modelo?`<div class="small">${esc(r.marca)} ${esc(r.modelo)}</div>`:''}</td>
     <td>${esc(r.principal||'—')}</td>
-    <td>${esc(FL[r.piso]||r.piso||'—')}</td>
+    <td>${esc(pisoLabel(r.piso))}</td>
     <td>${r.zona?'Z'+esc(r.zona):'—'}</td>
     <td>${esc(r.tag_planta||'—')}</td>
     <td>${esc(r.marcado_ex||'—')}</td>
@@ -2806,7 +2877,7 @@ async function saveComp(){
       return cb&&cb.checked;
     });
     const payload={
-      equipo_id:curParentEq, tipo, nombre_comp:nombre||tipo, proyecto_id:curProyecto?.id||'ccu-temuco-molino',
+      equipo_id:curParentEq, tipo, nombre_comp:nombre||tipo, proyecto_id:projectId(),
       marca:document.getElementById('sm-marca').value.trim(),
       modelo:document.getElementById('sm-modelo').value.trim(),
       serie:document.getElementById('sm-serie').value.trim(),
@@ -2827,7 +2898,7 @@ async function saveComp(){
     };
     let saved;
     if(curCompId){
-      saved=await must(sb.from('componentes').update(payload).eq('id',curCompId).select().single());
+      saved=await must(sb.from('componentes').update(payload).eq('proyecto_id',projectId()).eq('id',curCompId).select().single());
     } else {
       saved=await must(sb.from('componentes').insert(payload).select().single());
     }
@@ -2845,7 +2916,7 @@ async function saveComp(){
 async function deleteComp(){
   if(!curCompId||!confirm('¿Eliminar este componente?')) return;
   try {
-    await must(sb.from('componentes').delete().eq('id',curCompId));
+    await must(sb.from('componentes').delete().eq('proyecto_id',projectId()).eq('id',curCompId));
     subRecs[curParentEq]=(subRecs[curParentEq]||[]).filter(c=>c.id!==curCompId);
     toast('Componente eliminado','ok');
     closeSubModal();
@@ -2899,7 +2970,7 @@ async function onExpandDrop(e, toEqId){
   const fromId=dragFromEqId, cId=dragCompId;
   dragCompId=null; dragFromEqId=null;
   try {
-    await must(sb.from('componentes').update({equipo_id:toEqId}).eq('id',cId));
+    await must(sb.from('componentes').update({equipo_id:toEqId}).eq('proyecto_id',projectId()).eq('id',cId));
     // Update local state
     const comp=(subRecs[fromId]||[]).find(c=>c.id===cId);
     if(comp){
@@ -2922,7 +2993,10 @@ function updateZonaUso(cb, z){
 
 //  MÓDULO CICLOS DE INSPECCIÓN
 
-function userRol(){ return profile?.rol||'inspector'; }
+function userRol(){
+  if((perfilActual?.rol||profile?.rol)==='admin') return 'admin';
+  return perfilActual?.rolEnProyecto || perfilActual?.rol || profile?.rol || 'inspector';
+}
 function canEdit(){ return ['supervisor','admin'].includes(userRol()); }
 function isAdmin(){ return userRol()==='admin'; }
 
@@ -2935,7 +3009,7 @@ async function loadCiclos(){
   const container=document.getElementById('ciclos-list');
   container.innerHTML='<div style="padding:30px;text-align:center;color:#aaa;font-family:monospace">Cargando…</div>';
   try {
-    const {data,error}=await sb.from('ciclos').select('*').order('created_at',{ascending:false});
+    const {data,error}=await sb.from('ciclos').select('*').eq('proyecto_id',projectId()).order('created_at',{ascending:false});
     if(error) throw error;
     ciclos=data||[];
     renderCiclosList();
@@ -3020,6 +3094,7 @@ async function crearCiclo(){
   try {
     // Crear el ciclo
     const {data:ciclo,error}=await sb.from('ciclos').insert({
+      proyecto_id:projectId(),
       nombre,
       tipo:document.getElementById('nc-tipo').value,
       fecha_ini:document.getElementById('nc-fecha').value,
@@ -3036,6 +3111,7 @@ async function crearCiclo(){
       const r=recs[eq.id]||{};
       return {
         ciclo_id:ciclo.id,
+        proyecto_id:projectId(),
         equipo_id:eq.id,
         equipo_nombre:eqName(eq.id),
         piso:eq.p,
@@ -3068,14 +3144,14 @@ async function openCicloDetalle(cicloId){
 
   try {
     const {data,error}=await sb.from('inspecciones').select('*')
-      .eq('ciclo_id',cicloId).order('piso').order('equipo_nombre');
+      .eq('proyecto_id',projectId()).eq('ciclo_id',cicloId).order('piso').order('equipo_nombre');
     if(error) throw error;
 
     const inspArr=data||[];
     const total=inspArr.length;
     const completados=inspArr.filter(i=>i.completado).length;
     const pct=total?Math.round(completados/total*100):0;
-    const pisoOrder=Object.keys(FL);
+    const pisoOrder=pisoOrderIds(Object.keys(byPiso));
     const byPiso={};
     inspArr.forEach(i=>{ if(!byPiso[i.piso]) byPiso[i.piso]=[]; byPiso[i.piso].push(i); });
 
@@ -3108,7 +3184,7 @@ async function openCicloDetalle(cicloId){
     for(const piso of [...pisoOrder,'']){
       const rows=(byPiso[piso]||[]);
       if(!rows.length) continue;
-      h+=`<div class="sec-hd" style="${piso===pisoOrder[0]?'margin-top:0':''}">${esc(FL[piso]||piso||'Sin piso')}</div>
+      h+=`<div class="sec-hd" style="${piso===pisoOrder[0]?'margin-top:0':''}">${esc(pisoLabel(piso)||'Sin piso')}</div>
       <div style="background:#fff;border:1px solid #ddd9d0;border-radius:6px;overflow:hidden;margin-bottom:10px">`;
       rows.forEach(insp=>{
         const dotCls=insp.completado?(insp.conformidad?'id-'+insp.conformidad:'id-C'):'id-pendiente';
@@ -3167,14 +3243,14 @@ async function openInspModal(cicloId,inspId,eqId){
   inspConf=''; accionVerif=''; inspPendFiles=[]; inspExPaths=[];
 
   // Cargar datos de la inspección
-  const {data:insp}=await sb.from('inspecciones').select('*').eq('id',inspId).single();
+  const {data:insp}=await sb.from('inspecciones').select('*').eq('proyecto_id',projectId()).eq('id',inspId).single();
   if(!insp){ toast('Error cargando inspección','err'); return; }
 
   // Header modal
   document.getElementById('minsp-ciclo-nombre').textContent=curCiclo?.nombre||'';
   document.getElementById('minsp-eq-nombre').textContent=eqName(eqId);
   const eq=getEqDef(eqId)||{};
-  document.getElementById('minsp-eq-meta').textContent=(FL[insp.piso]||insp.piso||'')+(eq.g?' · '+eq.g:'');
+  document.getElementById('minsp-eq-meta').textContent=pisoLabel(insp.piso)+(eq.g?' · '+eq.g:'');
 
   // Línea base
   const bConf=insp.base_conformidad||'';
@@ -3260,7 +3336,7 @@ async function renderInspComps(cicloId,inspId,eqId){
   }
   // Cargar inspecciones_comp existentes para este ciclo+equipo
   const {data:ic}=await sb.from('inspecciones_comp')
-    .select('*').eq('ciclo_id',cicloId).eq('equipo_id',eqId);
+    .select('*').eq('proyecto_id',projectId()).eq('ciclo_id',cicloId).eq('equipo_id',eqId);
   const icMap={};
   (ic||[]).forEach(r=>{ icMap[r.comp_id]=r; });
 
@@ -3297,7 +3373,7 @@ async function saveInspeccion(){
     const newPaths=await Promise.all(inspPendFiles.map(async f=>{
       const ext=f.name.split('.').pop();
       const path=`ciclos/${curInspId}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
-      await sb.storage.from('atex-fotos').upload(path,f,{contentType:f.type});
+      await must(sb.storage.from('atex-fotos').upload(path,f,{contentType:f.type}));
       return path;
     }));
     const allFotos=[...inspExPaths,...newPaths];
@@ -3316,7 +3392,7 @@ async function saveInspeccion(){
       fecha_insp:new Date().toISOString().slice(0,10),
       completado:true,
       updated_at:new Date().toISOString(),
-    }).eq('id',curInspId));
+    }).eq('proyecto_id',projectId()).eq('id',curInspId));
 
     toast('Inspección guardada &#10003;','ok');
     closeInspModal();
@@ -3329,7 +3405,7 @@ async function openInspCompModal(cicloId,inspId,eqId,compId){
   const comp=(subRecs[eqId]||[]).find(c=>c.id===compId);
   if(!comp) return;
   const {data:ic}=await sb.from('inspecciones_comp')
-    .select('*').eq('ciclo_id',cicloId).eq('comp_id',compId).maybeSingle();
+    .select('*').eq('proyecto_id',projectId()).eq('ciclo_id',cicloId).eq('comp_id',compId).maybeSingle();
 
   const confActual=ic?.conformidad||'';
   const confOpciones=['C','NC','OBS','NA'].map(v=>
@@ -3386,6 +3462,7 @@ async function saveInspComp(cicloId,inspId,eqId,compId,icId){
   try {
     const payload={
       ciclo_id:cicloId, inspeccion_id:inspId, equipo_id:eqId,
+      proyecto_id:projectId(),
       comp_id:compId,
       comp_nombre:(subRecs[eqId]||[]).find(c=>c.id===compId)?.nombre_comp||'',
       comp_tipo:(subRecs[eqId]||[]).find(c=>c.id===compId)?.tipo||'',
@@ -3400,7 +3477,7 @@ async function saveInspComp(cicloId,inspId,eqId,compId,icId){
       updated_at:new Date().toISOString(),
     };
     if(icId){
-      await must(sb.from('inspecciones_comp').update(payload).eq('id',icId));
+      await must(sb.from('inspecciones_comp').update(payload).eq('proyecto_id',projectId()).eq('id',icId));
     } else {
       await must(sb.from('inspecciones_comp').insert(payload));
     }
@@ -3414,7 +3491,7 @@ async function cerrarCiclo(cicloId){
   const c=ciclos.find(x=>x.id===cicloId);
   if(!confirm(`¿Cerrar el ciclo "${c?.nombre}"?\n\nUna vez cerrado no se podrán editar las inspecciones.\nEl ciclo quedará disponible para aprobación.`)) return;
   try {
-    await must(sb.from('ciclos').update({estado:'cerrado'}).eq('id',cicloId));
+    await must(sb.from('ciclos').update({estado:'cerrado'}).eq('proyecto_id',projectId()).eq('id',cicloId));
     toast('Ciclo cerrado &#10003;','ok');
     await loadCiclos();
   } catch(e){ toast('Error: '+e.message,'err'); }
@@ -3429,18 +3506,18 @@ async function aprobarCiclo(cicloId){
       aprobado_por:session.user.id,
       aprobado_nombre:profile?.full_name||session.user.email,
       aprobado_at:new Date().toISOString(),
-    }).eq('id',cicloId));
+    }).eq('proyecto_id',projectId()).eq('id',cicloId));
     toast('Ciclo aprobado &#10003;','ok');
     await loadCiclos();
   } catch(e){ toast('Error: '+e.message,'err'); }
 }
 
 async function exportCicloCSV(cicloId){
-  const {data}=await sb.from('inspecciones').select('*').eq('ciclo_id',cicloId).order('piso').order('equipo_nombre');
+  const data=await must(sb.from('inspecciones').select('*').eq('proyecto_id',projectId()).eq('ciclo_id',cicloId).order('piso').order('equipo_nombre'));
   const c=ciclos.find(x=>x.id===cicloId);
   const rows=[['Equipo','Piso','Base Conformidad','Base Hallazgo','Acción Verificada','Conformidad Nueva','Hallazgo Nuevo','Acción Nueva','Marcado Ex','Inspector','Fecha']];
   (data||[]).forEach(r=>{
-    rows.push([r.equipo_nombre,FL[r.piso]||r.piso,r.base_conformidad||'',r.base_hallazgo||'',
+    rows.push([r.equipo_nombre,pisoLabel(r.piso),r.base_conformidad||'',r.base_hallazgo||'',
       r.accion_verificada?'Sí':'No',r.conformidad||'',r.hallazgo||'',r.accion||'',
       r.marcado_ex||'',r.inspector_nombre||'',r.fecha_insp||''].map(v=>`"${String(v).replace(/"/g,'""')}"`));
   });
@@ -3452,12 +3529,12 @@ async function exportCicloCSV(cicloId){
 }
 
 async function printCicloInforme(cicloId){
-  const {data}=await sb.from('inspecciones').select('*').eq('ciclo_id',cicloId).order('piso').order('equipo_nombre');
+  const data=await must(sb.from('inspecciones').select('*').eq('proyecto_id',projectId()).eq('ciclo_id',cicloId).order('piso').order('equipo_nombre'));
   const c=ciclos.find(x=>x.id===cicloId)||{};
   const inspArr=data||[];
   const win=window.open('','_blank');
   if(!win){ toast('Permite ventanas emergentes','err'); return; }
-  const pisoOrder=Object.keys(FL);
+  const pisoOrder=pisoOrderIds(inspArr.map(r=>r.piso));
   const sorted=[...inspArr].sort((a,b)=>{
     const pa=pisoOrder.indexOf(a.piso), pb=pisoOrder.indexOf(b.piso);
     return (pa<0?99:pa)-(pb<0?99:pb)||a.equipo_nombre.localeCompare(b.equipo_nombre,'es');
@@ -3466,7 +3543,7 @@ async function printCicloInforme(cicloId){
     const cambio=r.base_conformidad!==r.conformidad&&r.conformidad;
     return `<tr style="${cambio?'background:#fffbeb':''}">
       <td>${esc(r.equipo_nombre)}</td>
-      <td>${esc(FL[r.piso]||r.piso||'—')}</td>
+      <td>${esc(pisoLabel(r.piso))}</td>
       <td><span class="badge b${confClass(r.base_conformidad)||''}">${esc(r.base_conformidad||'—')}</span></td>
       <td><span class="badge b${confClass(r.conformidad)||''}">${esc(r.conformidad||'—')}</span></td>
       <td>${r.accion_verificada?'<span style="color:#059669">&#10003; Sí</span>':'<span style="color:#dc2626">&#10005; No</span>'}</td>
@@ -3615,9 +3692,9 @@ function runSearch(){
   const countHtml=`<div class="search-count">${items.length} resultado${items.length!==1?'s':''}${sfFilter!=='all'?' · filtro: <strong>'+sfFilter+'</strong>':''}</div>`;
 
   const rowsHtml=items.map((it,idx)=>{
-    const pisoLabel=FL[it.piso]||it.piso||'';
+    const pisoNombre=pisoLabel(it.piso);
     const meta=[];
-    if(pisoLabel) meta.push(pisoLabel);
+    if(pisoNombre) meta.push(pisoNombre);
     if(it.tag)    meta.push('TAG: '+esc(it.tag));
     if(it.marca)  meta.push(esc(it.marca)+(it.modelo?' · '+esc(it.modelo):''));
     if(it.zona)   meta.push('Z'+esc(it.zona));
@@ -3755,19 +3832,19 @@ async function onPisoDrop(e,toUbId){
   const eqId=_eqDragId; _eqDragId=null;
   const fromUb=eqPiso(eqId);
   if(fromUb===toUbId) return;
-  const pid=curProyecto?.id||'ccu-temuco-molino';
+  const pid=projectId();
   try {
     // Si es equipo dinámico, mover su ubicacion_id
     const dyn=proyEquipos.find(eq=>eq.id===eqId);
     if(dyn){
-      await must(sb.from('proyecto_equipos').update({ubicacion_id:toUbId}).eq('id',eqId));
+      await must(sb.from('proyecto_equipos').update({ubicacion_id:toUbId}).eq('proyecto_id',pid).eq('id',eqId));
       dyn.ubicacion_id=toUbId;
     } else {
       // Equipo del catálogo → guardar en equipos_piso
-      await must(sb.from('equipos_piso').upsert({id:eqId,piso:toUbId,proyecto_id:pid,updated_at:new Date().toISOString(),updated_by:profile?.full_name||session.user.email},{onConflict:'id'}));
+      await must(sb.from('equipos_piso').upsert({id:eqId,piso:toUbId,proyecto_id:pid,updated_at:new Date().toISOString(),updated_by:profile?.full_name||session.user.email},{onConflict:'proyecto_id,id'}));
       customPisos[eqId]=toUbId;
     }
-    const toNombre=proyUbicaciones.find(u=>u.id===toUbId)?.nombre||FL[toUbId]||toUbId;
+    const toNombre=pisoLabel(toUbId);
     toast(`Movido a "${toNombre}" &#10003;`,'ok');
     renderEq();
   } catch(err){toast('Error al mover: '+err.message,'err');}
@@ -3806,7 +3883,7 @@ async function addUbicacion(){
 async function renameUb(ubId,actual){
   const nuevo=prompt('Nuevo nombre:',actual); if(!nuevo||nuevo===actual) return;
   try {
-    await must(sb.from('proyecto_ubicaciones').update({nombre:nuevo}).eq('id',ubId));
+    await must(sb.from('proyecto_ubicaciones').update({nombre:nuevo}).eq('proyecto_id',curProyecto.id).eq('id',ubId));
     const ub=proyUbicaciones.find(u=>u.id===ubId); if(ub) ub.nombre=nuevo;
     renderUbList(); renderEq(); toast('Renombrado &#10003;','ok');
   } catch(e){toast('Error: '+e.message,'err');}
@@ -3816,7 +3893,7 @@ async function deleteUb(ubId){
   const eqsEnUb=proyEquipos.filter(e=>e.ubicacion_id===ubId).length;
   if(!confirm(`¿Eliminar "${ub?.nombre}"?${eqsEnUb?' Los ${eqsEnUb} equipos de esta ubicación quedarán sin asignar.':''}`)) return;
   try {
-    await must(sb.from('proyecto_ubicaciones').delete().eq('id',ubId));
+    await must(sb.from('proyecto_ubicaciones').delete().eq('proyecto_id',curProyecto.id).eq('id',ubId));
     proyUbicaciones=proyUbicaciones.filter(u=>u.id!==ubId);
     renderUbList(); renderEq(); toast('Eliminado &#10003;','ok');
   } catch(e){toast('Error: '+e.message,'err');}
@@ -3893,7 +3970,8 @@ async function showProyectos(){
   // Mostrar/ocultar botón crear según rol
   const btnCrear=document.getElementById('btn-crear-proy');
   if(btnCrear){
-    const puedeCrear=['admin','supervisor','inspector'].includes(perfilActual?.rol);
+    const rolGlobal=perfilActual?.rol||profile?.rol||'inspector';
+    const puedeCrear=PERMISOS[rolGlobal]?.editProyecto===true;
     btnCrear.style.display=puedeCrear?'flex':'none';
   }
   const selUserLbl=document.getElementById('sel-user-lbl');
@@ -3944,6 +4022,7 @@ function volverProyectos(){
   if(!confirm('¿Volver al selector de proyectos?')) return;
   curProyecto=null; customPisos={}; proyUbicaciones=[]; proyEquipos=[];
   recs={}; subRecs={}; allRaw=[]; allSubRaw=[]; customNames={}; hiddenEqs=new Set(); equiposExtra=[];
+  if(perfilActual) delete perfilActual.rolEnProyecto;
   document.getElementById('app').style.display='none';
   showProyectos();
 }
@@ -3963,6 +4042,19 @@ function openNuevoProy(modo='new', proy=null){
   document.body.style.overflow='hidden';
 }
 function closeNuevoProy(){ document.getElementById('nuevo-proy-bg').classList.remove('on'); document.body.style.overflow=''; }
+async function deleteProyecto(){
+  const proy=curProyecto;
+  if(!proy){ toast('Abre un proyecto antes de eliminarlo','err'); return; }
+  if(!canDo('deleteProyecto')){ toast('Sin permiso para eliminar proyectos','err'); return; }
+  if(!confirm(`¿Eliminar el proyecto "${proy.nombre}"?\n\nSe marcará como inactivo y dejará de aparecer en el selector.`)) return;
+  try {
+    await must(sb.from('proyectos').update({activo:false,updated_at:new Date().toISOString()}).eq('id',proy.id));
+    toast('Proyecto eliminado &#10003;','ok');
+    closeNuevoProy();
+    curProyecto=null;
+    await showProyectos();
+  } catch(e){ toast('Error: '+e.message,'err'); }
+}
 async function saveNuevoProy(){
   if(!canDo('editProyecto')){ toast('Sin permiso para crear proyectos','err'); return; }
   const nombre=document.getElementById('np-nombre').value.trim();
@@ -4004,7 +4096,7 @@ const PERMISOS = {
   visita:     {editProyecto:false,deleteProyecto:false,manageUsers:false,fillFicha:false,editEquipo:false,delete:false,viewInforme:true, exportar:false,comentar:false},
 };
 function canDo(accion){
-  const rol = perfilActual?.rol || 'inspector';
+  const rol = userRol();
   return PERMISOS[rol]?.[accion] === true;
 }
 function rolLabel(r){ return {admin:'Admin',supervisor:'Supervisor',inspector:'Inspector',cliente:'Cliente',visita:'Visita'}[r]||r; }
@@ -4166,11 +4258,9 @@ async function saveUsuario(){
     } else {
       // Invitar nuevo usuario vía Supabase Auth
       if(!email){ toast('El email es obligatorio para invitar','err'); btn.disabled=0; btn.textContent='GUARDAR'; return; }
-      const {data,error} = await sb.auth.admin?.inviteUserByEmail
-        ? sb.auth.admin.inviteUserByEmail(email,{data:{full_name:nombre,rol}})
-        : {data:null,error:{message:'Usa el panel de Supabase para invitar usuarios'}};
-      if(error) throw error;
-      toast('Invitacion enviada a '+email+' ✓','ok');
+      toast('Invita al usuario desde Supabase Authentication y luego asigna rol/proyectos aqui','err');
+      btn.disabled=0; btn.textContent='GUARDAR';
+      return;
     }
     renderUsuariosTable();
     closeUsrModal();
@@ -4606,9 +4696,9 @@ async function admUpdateAsignRol(proyId, rol){
   } catch(e){ toast('Error: '+e.message,'err'); }
 }
 
-// ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 //  MÓDULO DOCUMENTOS
-// ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 
 function docIcon(mime){
   if(!mime) return '&#128196;';
@@ -4617,11 +4707,9 @@ function docIcon(mime){
   if(mime.includes('sheet')||mime.includes('excel')) return '&#128202;';
   if(mime.includes('presentation')||mime.includes('powerpoint')) return '&#128202;';
   if(mime.includes('image')) return '&#128247;';
-  if(mime.includes('text')) return '&#128196;';
   return '&#128196;';
 }
-
-function docTipoFromMime(mime){
+function docTipo(mime){
   if(!mime) return 'otro';
   if(mime.includes('pdf')) return 'pdf';
   if(mime.includes('word')||mime.includes('document')) return 'word';
@@ -4629,311 +4717,242 @@ function docTipoFromMime(mime){
   if(mime.includes('image')) return 'imagen';
   return 'otro';
 }
-
-function docScope(doc){
-  if(doc.componente_id) return 'componente';
-  if(doc.equipo_id) return 'equipo';
-  return 'proyecto';
-}
-
-function docScopeLabel(doc){
-  if(doc.componente_id){
-    const comps=allSubRaw.find(c=>c.id===doc.componente_id);
-    return 'Componente: '+(comps?.nombre_comp||comps?.tipo||doc.componente_id);
+function docScope(d){ return d.componente_id?'componente':d.equipo_id?'equipo':'proyecto'; }
+function docScopeLabel(d){
+  if(d.componente_id){
+    const c=allSubRaw.find(c=>c.id===d.componente_id);
+    return 'Comp: '+(c?c.nombre_comp||c.tipo:d.componente_id.slice(0,8));
   }
-  if(doc.equipo_id){
-    return 'Equipo: '+eqName(doc.equipo_id);
-  }
-  return 'Proyecto general';
+  if(d.equipo_id) return 'Equipo: '+eqName(d.equipo_id);
+  return 'Proyecto';
+}
+function fmtBytes(b){
+  if(!b) return '—';
+  if(b<1024) return b+'B';
+  if(b<1048576) return Math.round(b/1024)+'KB';
+  return (b/1048576).toFixed(1)+'MB';
 }
 
-function formatBytes(bytes){
-  if(!bytes) return '—';
-  if(bytes<1024) return bytes+'B';
-  if(bytes<1024*1024) return Math.round(bytes/1024)+'KB';
-  return (bytes/1024/1024).toFixed(1)+'MB';
-}
-
-// ── Carga principal ───────────────────────────────────────
 async function loadDocs(){
   const pid=curProyecto?.id; if(!pid) return;
-  // Mostrar botón subir solo para admin/supervisor
-  const canUpload=canDo('fillFicha');
-  const btnSubir=document.getElementById('btn-subir-doc');
-  if(btnSubir) btnSubir.style.display=canUpload?'block':'none';
-
-  const el=document.getElementById('docs-list');
-  el.innerHTML='<div style="text-align:center;padding:40px;color:#aaa;font-family:monospace;font-size:11px">Cargando&#8230;</div>';
+  const canUp=canDo('fillFicha');
+  const btn=document.getElementById('btn-subir-doc');
+  if(btn) btn.style.display=canUp?'block':'none';
+  const el=document.getElementById('docs-list'); if(!el) return;
+  el.innerHTML='<div style="padding:28px;text-align:center;color:#aaa;font-family:monospace;font-size:11px">Cargando&#8230;</div>';
   try {
     const data=await must(sb.from('documentos').select('*').eq('proyecto_id',pid).order('created_at',{ascending:false}));
     todosDocumentos=data||[];
-    updateDocCounts();
-    renderDocs();
+    updateDocCounts(); renderDocs();
   } catch(e){
-    el.innerHTML=`<div style="text-align:center;padding:40px;color:#dc2626;font-size:12px">${esc(e.message)}</div>`;
+    el.innerHTML=`<div style="padding:28px;text-align:center;color:#dc2626;font-size:12px">${esc(e.message)}<br><div style="font-size:10px;color:#aaa;margin-top:8px;font-family:monospace">Verifica que la tabla 'documentos' existe en Supabase</div></div>`;
   }
 }
 
 function updateDocCounts(){
-  const all=todosDocumentos.length;
-  const proy=todosDocumentos.filter(d=>docScope(d)==='proyecto').length;
-  const eq=todosDocumentos.filter(d=>docScope(d)==='equipo').length;
-  const comp=todosDocumentos.filter(d=>docScope(d)==='componente').length;
-  const setC=(id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v; };
-  setC('dcat-count-all',all); setC('dcat-count-proyecto',proy);
-  setC('dcat-count-equipo',eq); setC('dcat-count-componente',comp);
+  const c=(f)=>todosDocumentos.filter(d=>docScope(d)===f).length;
+  const s=(id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v; };
+  s('dcnt-all',todosDocumentos.length); s('dcnt-proyecto',c('proyecto'));
+  s('dcnt-equipo',c('equipo')); s('dcnt-componente',c('componente'));
 }
 
-function setDocCat(cat,el){
-  docCatFiltro=cat; docTipoFiltro='';
+function setDocFiltro(f,el){
+  docFiltro=f; docTipoFiltro='';
   document.querySelectorAll('.docs-cat').forEach(c=>c.classList.remove('on'));
-  el.classList.add('on');
-  renderDocs();
+  el.classList.add('on'); renderDocs();
 }
-
-function setDocTipo(tipo,el){
-  docTipoFiltro=docTipoFiltro===tipo?'':tipo;
-  docCatFiltro='all';
+function setDocTipoFiltro(t,el){
+  docTipoFiltro=docTipoFiltro===t?'':t; docFiltro='all';
   document.querySelectorAll('.docs-cat').forEach(c=>c.classList.remove('on'));
-  if(docTipoFiltro) el.classList.add('on');
-  renderDocs();
+  if(docTipoFiltro) el.classList.add('on'); renderDocs();
 }
-
 function searchDocs(){
-  docSearchQ=(document.getElementById('docs-search')?.value||'').toLowerCase().trim();
-  const clearBtn=document.getElementById('docs-clear-btn');
-  if(clearBtn) clearBtn.style.display=docSearchQ?'block':'none';
+  docSearchQ=(document.getElementById('docs-search-input')?.value||'').toLowerCase().trim();
+  const cb=document.getElementById('docs-clear-btn');
+  if(cb) cb.style.display=docSearchQ?'inline':'none';
   renderDocs();
 }
-
 function clearDocSearch(){
-  const inp=document.getElementById('docs-search');
-  if(inp) inp.value='';
+  const inp=document.getElementById('docs-search-input'); if(inp) inp.value='';
   docSearchQ='';
-  const clearBtn=document.getElementById('docs-clear-btn');
-  if(clearBtn) clearBtn.style.display='none';
+  const cb=document.getElementById('docs-clear-btn'); if(cb) cb.style.display='none';
   renderDocs();
 }
 
 function renderDocs(){
   const el=document.getElementById('docs-list'); if(!el) return;
   let docs=[...todosDocumentos];
-  // Filtro categoría
-  if(docCatFiltro!=='all') docs=docs.filter(d=>docScope(d)===docCatFiltro);
-  // Filtro tipo
-  if(docTipoFiltro) docs=docs.filter(d=>docTipoFromMime(d.mime_type)===docTipoFiltro);
-  // Filtro búsqueda
-  if(docSearchQ){
-    docs=docs.filter(d=>{
-      const haystack=(d.nombre+' '+(d.descripcion||'')+' '+(d.contenido_texto||'')).toLowerCase();
-      return haystack.includes(docSearchQ);
-    });
-  }
+  if(docFiltro!=='all') docs=docs.filter(d=>docScope(d)===docFiltro);
+  if(docTipoFiltro) docs=docs.filter(d=>docTipo(d.mime_type)===docTipoFiltro);
+  if(docSearchQ) docs=docs.filter(d=>(d.nombre+' '+(d.descripcion||'')+' '+(d.contenido_texto||'')).toLowerCase().includes(docSearchQ));
   const cnt=document.getElementById('docs-search-cnt');
-  if(cnt) cnt.textContent=docSearchQ?`${docs.length} resultado${docs.length!==1?'s':''}`:docs.length+' doc'+( docs.length!==1?'s':'');
-
+  if(cnt) cnt.textContent=docs.length+' doc'+(docs.length!==1?'s':'');
   if(!docs.length){
     el.innerHTML=`<div style="text-align:center;padding:40px;color:#aaa;background:#fff;border:1px solid #ddd9d0;border-radius:6px">
-      <div style="font-size:36px;margin-bottom:10px">&#128269;</div>
-      <div style="font-weight:600;margin-bottom:6px">${docSearchQ?'Sin resultados para "'+esc(docSearchQ)+'"':'Sin documentos en esta categor&#237;a'}</div>
-      <div style="font-size:12px">${docSearchQ?'Prueba con otras palabras':'Sube documentos usando el bot&#243;n superior'}</div>
+      <div style="font-size:32px;margin-bottom:8px">&#128193;</div>
+      <div style="font-weight:600;margin-bottom:4px">${docSearchQ?'Sin resultados para "'+esc(docSearchQ)+'"':'Sin documentos'}</div>
+      <div style="font-size:12px">${docSearchQ?'Intenta con otras palabras':'Sube el primer documento con el botón superior'}</div>
     </div>`;
     return;
   }
-
-  // Agrupar por scope si filtro es 'all'
-  let html='';
-  if(docCatFiltro==='all' && !docTipoFiltro && !docSearchQ){
-    const grupos={proyecto:'&#128203; Del proyecto',equipo:'&#9881; Por equipo',componente:'&#128279; Por componente'};
-    for(const [scope,label] of Object.entries(grupos)){
-      const gDocs=docs.filter(d=>docScope(d)===scope);
-      if(!gDocs.length) continue;
-      html+=`<div class="sec-hd" style="margin-top:8px">${label}</div>`;
-      html+=gDocs.map(d=>docCardHtml(d,docSearchQ)).join('');
+  // Agrupar por scope en vista "todos"
+  let h='';
+  if(docFiltro==='all'&&!docTipoFiltro&&!docSearchQ){
+    const grupos=[['proyecto','&#128203; Del proyecto'],['equipo','&#9881; Por equipo'],['componente','&#128279; Por componente']];
+    for(const [scope,lbl] of grupos){
+      const g=docs.filter(d=>docScope(d)===scope); if(!g.length) continue;
+      h+=`<div class="sec-hd" style="margin-top:4px">${lbl}</div>`;
+      h+=g.map(d=>docCardHtml(d)).join('');
     }
-  } else {
-    html=docs.map(d=>docCardHtml(d,docSearchQ)).join('');
-  }
-  el.innerHTML=html;
+  } else { h=docs.map(d=>docCardHtml(d)).join(''); }
+  el.innerHTML=h;
 }
 
-function docCardHtml(doc, q=''){
-  const icon=docIcon(doc.mime_type);
-  const scope=docScopeLabel(doc);
-  const fecha=doc.created_at?new Date(doc.created_at).toLocaleDateString('es-CL'):'—';
-  const tam=formatBytes(doc.tamano);
+function docCardHtml(d){
+  const icon=docIcon(d.mime_type);
+  const fecha=d.created_at?new Date(d.created_at).toLocaleDateString('es-CL'):'—';
   const canDel=canDo('delete');
-  // Resaltar coincidencia en búsqueda
   let matchHtml='';
-  if(q && doc.contenido_texto){
-    const idx=doc.contenido_texto.toLowerCase().indexOf(q);
+  if(docSearchQ&&d.contenido_texto){
+    const idx=d.contenido_texto.toLowerCase().indexOf(docSearchQ);
     if(idx>=0){
-      const start=Math.max(0,idx-40);
-      const end=Math.min(doc.contenido_texto.length,idx+q.length+40);
-      const snippet=doc.contenido_texto.slice(start,end);
-      matchHtml=`<div class="doc-match">&#8230;${esc(snippet)}&#8230;</div>`;
+      const s=Math.max(0,idx-35), e2=Math.min(d.contenido_texto.length,idx+docSearchQ.length+35);
+      matchHtml=`<div class="doc-match">&#8230;${esc(d.contenido_texto.slice(s,e2))}&#8230;</div>`;
     }
   }
-  return `<div class="doc-card" onclick="openDocPreview('${doc.id}')">
+  return `<div class="doc-card" onclick="openDocPreview('${d.id}')">
     <div class="doc-icon">${icon}</div>
     <div class="doc-info">
-      <div class="doc-name">${esc(doc.nombre)}</div>
-      <div class="doc-meta">
-        <span>${scope}</span>
-        <span>&#183;</span><span>${tam}</span>
-        <span>&#183;</span><span>${fecha}</span>
-        <span>&#183;</span><span>${esc(doc.subido_por||'—')}</span>
-      </div>
-      ${doc.descripcion?`<div class="doc-desc">${esc(doc.descripcion)}</div>`:''}
+      <div class="doc-name">${esc(d.nombre)}</div>
+      <div class="doc-meta"><span>${docScopeLabel(d)}</span><span>·</span><span>${fmtBytes(d.tamano)}</span><span>·</span><span>${fecha}</span><span>·</span><span>${esc(d.subido_por||'—')}</span></div>
+      ${d.descripcion?`<div class="doc-desc">${esc(d.descripcion)}</div>`:''}
       ${matchHtml}
     </div>
     <div class="doc-actions" onclick="event.stopPropagation()">
-      <button class="doc-btn" onclick="openDocPreview('${doc.id}')">&#128065; Ver</button>
-      <button class="doc-btn" onclick="downloadDocById('${doc.id}')">&#11015; Descargar</button>
-      ${canDel?`<button class="doc-btn del" onclick="deleteDocumento('${doc.id}')">&#128465; Eliminar</button>`:''}
+      <button class="doc-btn" onclick="openDocPreview('${d.id}')">&#128065; Ver</button>
+      <button class="doc-btn" onclick="downloadDocById('${d.id}')">&#11015; Descargar</button>
+      ${canDel?`<button class="doc-btn danger" onclick="deleteDocumento('${d.id}')">&#128465; Eliminar</button>`:''}
     </div>
   </div>`;
 }
 
-// ── Preview ───────────────────────────────────────────────
+// Preview
 async function openDocPreview(docId){
   const doc=todosDocumentos.find(d=>d.id===docId); if(!doc) return;
   curDocPreview=doc;
-  document.getElementById('dp-nombre').textContent=doc.nombre;
-  document.getElementById('dp-meta').textContent=docScopeLabel(doc)+' · '+formatBytes(doc.tamano)+' · '+new Date(doc.created_at).toLocaleDateString('es-CL');
-  document.getElementById('dp-body').innerHTML='<div style="display:flex;align-items:center;justify-content:center;padding:40px;color:#aaa">Cargando&#8230;</div>';
+  document.getElementById('dp-title').textContent=doc.nombre;
+  document.getElementById('dp-meta').textContent=docScopeLabel(doc)+' · '+fmtBytes(doc.tamano)+' · '+new Date(doc.created_at).toLocaleDateString('es-CL');
+  document.getElementById('dp-body').innerHTML='<span style="color:#aaa;font-family:monospace">Cargando&#8230;</span>';
   document.getElementById('doc-preview-bg').classList.add('on');
   document.body.style.overflow='hidden';
   try {
-    const {data}=await sb.storage.from('documentos').createSignedUrl(doc.storage_path,3600);
-    if(!data?.signedUrl) throw new Error('No se pudo obtener URL');
-    renderDocPreview(doc, data.signedUrl);
+    const {data,error}=await sb.storage.from('documentos').createSignedUrl(doc.storage_path,3600);
+    if(error) throw error;
+    const url=data.signedUrl;
+    const mime=doc.mime_type||'';
+    let body='';
+    if(mime.includes('pdf')){
+      body=`<iframe src="${url}" style="width:100%;height:75vh;border:none"></iframe>`;
+    } else if(mime.includes('image')){
+      body=`<div style="text-align:center;padding:16px;background:#f5f3ee"><img src="${url}" style="max-width:100%;max-height:70vh;border-radius:4px;box-shadow:0 4px 20px rgba(0,0,0,.15)"></div>`;
+    } else if(mime.includes('text')||mime.includes('csv')){
+      body=`<div style="padding:20px"><pre style="font-family:monospace;font-size:12px;white-space:pre-wrap;color:#374151;line-height:1.5">${esc(doc.contenido_texto||'Sin contenido de texto disponible')}</pre></div>`;
+    } else {
+      body=`<div style="text-align:center;padding:60px 40px">
+        <div style="font-size:56px;margin-bottom:14px">${docIcon(mime)}</div>
+        <div style="font-size:15px;font-weight:600;margin-bottom:8px">${esc(doc.nombre)}</div>
+        <div style="color:#6b7280;margin-bottom:20px;font-size:13px">Este tipo de archivo no puede previsualizarse en el navegador.</div>
+        <button onclick="downloadDocById('${doc.id}')" class="btn-dark" style="padding:10px 24px">&#11015; Descargar archivo</button>
+      </div>`;
+    }
+    document.getElementById('dp-body').innerHTML=body;
   } catch(e){ document.getElementById('dp-body').innerHTML=`<div style="text-align:center;padding:40px;color:#dc2626">${esc(e.message)}</div>`; }
 }
-
-function renderDocPreview(doc, url){
-  const mime=doc.mime_type||'';
-  let body='';
-  if(mime.includes('pdf')){
-    body=`<iframe src="${url}" style="width:100%;height:75vh;border:none"></iframe>`;
-  } else if(mime.includes('image')){
-    body=`<div style="text-align:center;padding:20px;background:#f5f3ee"><img src="${url}" style="max-width:100%;max-height:70vh;border-radius:4px;box-shadow:0 4px 20px rgba(0,0,0,.15)"></div>`;
-  } else if(mime.includes('text')||mime.includes('csv')){
-    body=`<div style="padding:20px"><pre style="font-family:monospace;font-size:12px;white-space:pre-wrap;color:#374151">${esc(doc.contenido_texto||'Sin contenido de texto disponible')}</pre></div>`;
-  } else {
-    body=`<div style="text-align:center;padding:60px 40px">
-      <div style="font-size:64px;margin-bottom:16px">${docIcon(mime)}</div>
-      <div style="font-size:15px;font-weight:600;margin-bottom:8px">${esc(doc.nombre)}</div>
-      <div style="color:#6b7280;margin-bottom:20px">Este tipo de archivo no puede previsualizarse en el navegador.</div>
-      <button onclick="downloadDocById('${doc.id}')" class="btn-dark" style="padding:10px 24px">&#11015; Descargar archivo</button>
-    </div>`;
-  }
-  document.getElementById('dp-body').innerHTML=body;
-}
-
 function closeDocPreview(){ document.getElementById('doc-preview-bg').classList.remove('on'); document.body.style.overflow=''; curDocPreview=null; }
-
-async function downloadDoc(){
-  if(!curDocPreview) return;
-  await downloadDocById(curDocPreview.id);
-}
-
+async function downloadCurDoc(){ if(curDocPreview) await downloadDocById(curDocPreview.id); }
 async function downloadDocById(docId){
   const doc=todosDocumentos.find(d=>d.id===docId); if(!doc) return;
   try {
-    const {data}=await sb.storage.from('documentos').createSignedUrl(doc.storage_path,60);
-    if(!data?.signedUrl) throw new Error('No se pudo generar enlace');
-    const a=document.createElement('a'); a.href=data.signedUrl; a.download=doc.nombre; a.click();
+    const {data,error}=await sb.storage.from('documentos').createSignedUrl(doc.storage_path,60);
+    if(error) throw error;
+    const a=document.createElement('a'); a.href=data.signedUrl; a.download=doc.nombre; document.body.appendChild(a); a.click(); a.remove();
+    toast('Descargando&#8230;','ok');
   } catch(e){ toast('Error al descargar: '+e.message,'err'); }
 }
 
-// ── Subir documento ───────────────────────────────────────
+// Subir documento
 function openDocUpload(){
-  duPendFile=null;
+  duFile=null;
   document.getElementById('du-nombre').value='';
   document.getElementById('du-desc').value='';
   document.getElementById('du-scope').value='proyecto';
-  document.getElementById('du-file-name').style.display='none';
-  document.getElementById('du-prev').style.display='none';
-  updateDuScope();
-  document.getElementById('doc-upload-bg').classList.add('on');
+  document.getElementById('du-filename').style.display='none';
+  document.getElementById('du-eq-wrap').style.display='none';
+  document.getElementById('du-comp-wrap').style.display='none';
+  document.getElementById('doc-upload-modal-bg').classList.add('on');
   document.body.style.overflow='hidden';
 }
-function closeDocUpload(){ document.getElementById('doc-upload-bg').classList.remove('on'); document.body.style.overflow=''; }
+function closeDocUpload(){ document.getElementById('doc-upload-modal-bg').classList.remove('on'); document.body.style.overflow=''; }
 
-function duDragOver(e){ e.preventDefault(); document.getElementById('du-zone').classList.add('dragover'); }
-function duDragLeave(e){ document.getElementById('du-zone').classList.remove('dragover'); }
-function duDrop(e){
-  e.preventDefault(); document.getElementById('du-zone').classList.remove('dragover');
-  const file=e.dataTransfer.files[0]; if(file) setDuFile(file);
+function duHandleDrop(e){
+  e.preventDefault(); document.getElementById('du-dropzone').classList.remove('dragover');
+  const f=e.dataTransfer.files[0]; if(f) duSetFile(f);
 }
-function duFileSelected(e){ const file=e.target.files[0]; if(file) setDuFile(file); }
-function setDuFile(file){
-  duPendFile=file;
-  const fnEl=document.getElementById('du-file-name');
-  fnEl.style.display='block'; fnEl.textContent=file.name+' ('+formatBytes(file.size)+')';
-  if(!document.getElementById('du-nombre').value) document.getElementById('du-nombre').value=file.name.replace(/\.[^.]+$/,'');
+function duFileChosen(e){ const f=e.target.files[0]; if(f) duSetFile(f); e.target.value=''; }
+function duSetFile(f){
+  duFile=f;
+  const el=document.getElementById('du-filename');
+  el.style.display='block'; el.textContent=f.name+' ('+fmtBytes(f.size)+')';
+  const inp=document.getElementById('du-nombre');
+  if(!inp.value) inp.value=f.name.replace(/\.[^.]+$/,'');
 }
-
-function updateDuScope(){
-  const scope=document.getElementById('du-scope').value;
-  const eqWrap=document.getElementById('du-equipo-wrap');
-  const compWrap=document.getElementById('du-comp-wrap');
-  eqWrap.style.display=scope==='equipo'||scope==='componente'?'block':'none';
-  compWrap.style.display=scope==='componente'?'block':'none';
-  if(scope==='equipo'||scope==='componente') populateDuEquipos();
+function duScopeChanged(){
+  const s=document.getElementById('du-scope').value;
+  document.getElementById('du-eq-wrap').style.display=(s==='equipo'||s==='componente')?'block':'none';
+  document.getElementById('du-comp-wrap').style.display=s==='componente'?'block':'none';
+  if(s!=='proyecto') duPopulateEquipos();
 }
-
-function populateDuEquipos(){
-  const sel=document.getElementById('du-equipo');
-  const eqs=allEqs('all').slice(0,200);
-  sel.innerHTML='<option value="">&#8212; Seleccionar equipo &#8212;</option>'+
-    eqs.map(e=>`<option value="${e.id}">${esc(eqName(e.id))}</option>`).join('');
+function duPopulateEquipos(){
+  const sel=document.getElementById('du-eq-sel');
+  sel.innerHTML='<option value="">— Seleccionar equipo —</option>'+
+    allEqs('all').slice(0,200).map(e=>`<option value="${e.id}">${esc(eqName(e.id))}</option>`).join('');
 }
-
-async function updateDuComponentes(){
-  const eqId=document.getElementById('du-equipo').value;
-  const sel=document.getElementById('du-comp');
-  sel.innerHTML='<option value="">&#8212; Seleccionar componente &#8212;</option>';
+async function duEqChanged(){
+  const eqId=document.getElementById('du-eq-sel').value;
+  const sel=document.getElementById('du-comp-sel');
+  sel.innerHTML='<option value="">— Seleccionar componente —</option>';
   if(!eqId) return;
-  const comps=subRecs[eqId]||[];
-  sel.innerHTML+= comps.map(c=>`<option value="${c.id}">${esc(c.nombre_comp||c.tipo||'Componente')}</option>`).join('');
+  (subRecs[eqId]||[]).forEach(c=>{
+    const opt=document.createElement('option'); opt.value=c.id;
+    opt.textContent=c.nombre_comp||c.tipo||'Componente'; sel.appendChild(opt);
+  });
 }
-
 async function saveDocumento(){
-  if(!duPendFile){ toast('Selecciona un archivo primero','err'); return; }
+  if(!duFile){ toast('Selecciona un archivo primero','err'); return; }
   const nombre=document.getElementById('du-nombre').value.trim();
   if(!nombre){ toast('El nombre es obligatorio','err'); return; }
-  const btn=document.getElementById('du-sv'); btn.disabled=1; btn.textContent='Subiendo&#8230;';
+  const btn=document.getElementById('du-save-btn'); btn.disabled=1; btn.textContent='Subiendo&#8230;';
   try {
     const pid=curProyecto.id;
-    const ext=duPendFile.name.split('.').pop()||'bin';
-    const path=`${pid}/${Date.now()}_${Math.random().toString(36).slice(2,6)}.${ext}`;
-    // Subir archivo
-    const {error:upErr}=await sb.storage.from('documentos').upload(path,duPendFile,{contentType:duPendFile.type});
+    const ext=duFile.name.split('.').pop()||'bin';
+    const path=pid+'/'+Date.now()+'_'+Math.random().toString(36).slice(2,6)+'.'+ext;
+    const {error:upErr}=await sb.storage.from('documentos').upload(path,duFile,{contentType:duFile.type,upsert:false});
     if(upErr) throw upErr;
     const scope=document.getElementById('du-scope').value;
-    const eqId=scope!=='proyecto'?document.getElementById('du-equipo').value||null:null;
-    const compId=scope==='componente'?document.getElementById('du-comp').value||null:null;
-    // Extraer texto si es PDF o texto plano (básico)
-    let contenidoTexto='';
-    if(duPendFile.type.includes('text')||duPendFile.type.includes('csv')){
-      try{ contenidoTexto=await duPendFile.text(); }catch(e){}
+    const eqId=(scope!=='proyecto')?document.getElementById('du-eq-sel').value||null:null;
+    const compId=(scope==='componente')?document.getElementById('du-comp-sel').value||null:null;
+    let contenidoTexto=null;
+    if(duFile.type.includes('text')||duFile.type.includes('csv')){
+      try{ contenidoTexto=(await duFile.text()).slice(0,50000); }catch(e){}
     }
-    const payload={
-      proyecto_id:pid,
-      equipo_id:eqId||null,
-      componente_id:compId||null,
-      nombre,
-      descripcion:document.getElementById('du-desc').value.trim()||null,
-      storage_path:path,
-      mime_type:duPendFile.type,
-      tamano:duPendFile.size,
-      contenido_texto:contenidoTexto.slice(0,50000)||null,
+    const saved=await must(sb.from('documentos').insert({
+      proyecto_id:pid, equipo_id:eqId, componente_id:compId,
+      nombre, descripcion:document.getElementById('du-desc').value.trim()||null,
+      storage_path:path, mime_type:duFile.type, tamano:duFile.size,
+      contenido_texto:contenidoTexto,
       subido_por:profile?.full_name||session.user.email,
       subido_por_id:session.user.id,
-    };
-    const saved=await must(sb.from('documentos').insert(payload).select().single());
+    }).select().single());
     todosDocumentos.unshift(saved);
     updateDocCounts(); renderDocs();
     toast('Documento subido ✓','ok');
@@ -4941,17 +4960,16 @@ async function saveDocumento(){
   } catch(e){ toast('Error: '+e.message,'err'); }
   btn.disabled=0; btn.textContent='SUBIR DOCUMENTO';
 }
-
 async function deleteDocumento(docId){
   const doc=todosDocumentos.find(d=>d.id===docId);
-  if(!doc||!confirm('&#191;Eliminar "'+doc.nombre+'"? Esta acci&#243;n no se puede deshacer.')) return;
+  if(!doc||!confirm('¿Eliminar "'+doc.nombre+'"? Esta acción no se puede deshacer.')) return;
   try {
     await sb.storage.from('documentos').remove([doc.storage_path]);
     await must(sb.from('documentos').delete().eq('id',docId));
     todosDocumentos=todosDocumentos.filter(d=>d.id!==docId);
     updateDocCounts(); renderDocs();
     toast('Documento eliminado ✓','ok');
-  } catch(e){ toast('Error: '+e.message,'err'); }
+  } catch(e){ toast('Error al eliminar: '+e.message,'err'); }
 }
 </script>
 </body>
