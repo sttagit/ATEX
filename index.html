@@ -360,7 +360,6 @@ input[type=file]{display:none}
 
 
 /* ══ MÓDULO DOCUMENTOS ══ */
-#tab-docs{display:none}
 .docs-layout{display:grid;grid-template-columns:200px 1fr;gap:16px}
 .docs-sidebar{background:#fff;border:1px solid #ddd9d0;border-radius:6px;overflow:hidden;align-self:start}
 .docs-sidebar-hd{background:#0f1117;color:#F7C600;font-family:monospace;font-size:9px;font-weight:700;letter-spacing:1px;padding:9px 14px;text-transform:uppercase}
@@ -621,127 +620,6 @@ input[type=file]{display:none}
   </div>
 </div>
 
-
-  <!-- TAB DOCUMENTOS -->
-  <div id="tab-docs">
-    <div class="page-wrap">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:18px">
-        <div>
-          <div style="font-size:16px;font-weight:700;margin-bottom:2px">Repositorio de Documentos</div>
-          <div style="font-size:11px;color:#888;font-family:monospace">Planos, normas, certificados y manuales del proyecto</div>
-        </div>
-        <button id="btn-subir-doc" onclick="openDocUpload()" class="btn-dark" style="padding:9px 18px;display:none">&#128196; Subir documento</button>
-      </div>
-      <!-- Buscador -->
-      <div style="display:flex;gap:8px;align-items:center;background:#fff;border:1px solid #ddd9d0;border-radius:6px;padding:10px 14px;margin-bottom:14px">
-        <span style="color:#aaa">&#128269;</span>
-        <input id="docs-search-input" placeholder="Buscar por nombre, descripción o contenido&#8230;" oninput="searchDocs()" style="flex:1;border:none;outline:none;font-size:13px">
-        <span id="docs-search-cnt" style="font-family:monospace;font-size:10px;color:#aaa"></span>
-        <button id="docs-clear-btn" onclick="clearDocSearch()" style="display:none;background:none;border:none;color:#aaa;cursor:pointer">&#10005;</button>
-      </div>
-      <div class="docs-layout">
-        <!-- Sidebar -->
-        <div class="docs-sidebar">
-          <div class="docs-sidebar-hd">Filtrar</div>
-          <div class="docs-cat on" onclick="setDocFiltro('all',this)">&#128193; Todos <span class="docs-cat-badge" id="dcnt-all">0</span></div>
-          <div class="docs-cat" onclick="setDocFiltro('proyecto',this)">&#128203; Proyecto <span class="docs-cat-badge" id="dcnt-proyecto">0</span></div>
-          <div class="docs-cat" onclick="setDocFiltro('equipo',this)">&#9881; Equipo <span class="docs-cat-badge" id="dcnt-equipo">0</span></div>
-          <div class="docs-cat" onclick="setDocFiltro('componente',this)">&#128279; Componente <span class="docs-cat-badge" id="dcnt-componente">0</span></div>
-          <div style="padding:7px 14px;font-size:9px;color:#aaa;font-family:monospace;text-transform:uppercase;letter-spacing:1px;border-top:1px solid #f0ece4;margin-top:4px">Tipo</div>
-          <div class="docs-cat" onclick="setDocTipoFiltro('pdf',this)">&#128441; PDF</div>
-          <div class="docs-cat" onclick="setDocTipoFiltro('word',this)">&#128196; Word</div>
-          <div class="docs-cat" onclick="setDocTipoFiltro('excel',this)">&#128202; Excel</div>
-          <div class="docs-cat" onclick="setDocTipoFiltro('imagen',this)">&#128247; Imágenes</div>
-          <div class="docs-cat" onclick="setDocTipoFiltro('otro',this)">&#128196; Otros</div>
-        </div>
-        <!-- Lista -->
-        <div>
-          <div id="docs-list">
-            <div style="text-align:center;padding:40px;color:#aaa;background:#fff;border:1px solid #ddd9d0;border-radius:6px">
-              <div style="font-size:36px;margin-bottom:8px">&#128193;</div>
-              <div style="font-weight:600;margin-bottom:4px">Sin documentos</div>
-              <div style="font-size:12px">Sube el primer documento con el botón superior</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-
-
-<!-- MODAL SUBIR DOCUMENTO -->
-<div id="doc-upload-modal-bg">
-  <div class="modal" style="border-top-color:#F7C600;max-width:540px">
-    <div class="modal-head" style="background:#0f1117">
-      <div style="flex:1">
-        <div style="font-size:11px;font-family:monospace;color:#F7C600;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">REPOSITORIO</div>
-        <div style="font-size:15px;font-weight:600">Subir documento</div>
-      </div>
-      <button onclick="closeDocUpload()" style="background:none;border:none;color:#666;font-size:20px;cursor:pointer">&#10005;</button>
-    </div>
-    <div class="modal-body">
-      <div class="doc-upload-zone" id="du-dropzone"
-        ondragover="event.preventDefault();this.classList.add('dragover')"
-        ondragleave="this.classList.remove('dragover')"
-        ondrop="duHandleDrop(event)"
-        onclick="document.getElementById('du-file-inp').click()">
-        <div style="font-size:32px;margin-bottom:8px">&#128196;</div>
-        <div style="font-weight:600;margin-bottom:4px">Arrastra o haz clic para seleccionar</div>
-        <div style="font-size:11px;color:#aaa">PDF, Word, Excel, imágenes · Máx. 20MB</div>
-        <div id="du-filename" style="display:none;margin-top:8px;font-family:monospace;font-size:11px;color:#F7C600;font-weight:600"></div>
-      </div>
-      <input type="file" id="du-file-inp" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.png,.jpg,.jpeg,.webp,.txt,.csv" onchange="duFileChosen(event)" style="display:none">
-      <div><div class="field-lbl">Nombre del documento</div><input class="field-input" id="du-nombre" placeholder="Ej: Plano eléctrico zona 21, Certificado Ex motor&#8230;"></div>
-      <div><div class="field-lbl">Descripción (opcional)</div><textarea class="field-ta" id="du-desc" placeholder="Breve descripción del contenido&#8230;" style="min-height:48px"></textarea></div>
-      <div>
-        <div class="field-lbl">Asociar a</div>
-        <select class="field-sel" id="du-scope" onchange="duScopeChanged()">
-          <option value="proyecto">Proyecto (general)</option>
-          <option value="equipo">Equipo específico</option>
-          <option value="componente">Componente específico</option>
-        </select>
-      </div>
-      <div id="du-eq-wrap" style="display:none">
-        <div class="field-lbl">Equipo</div>
-        <select class="field-sel" id="du-eq-sel" onchange="duEqChanged()">
-          <option value="">— Seleccionar equipo —</option>
-        </select>
-      </div>
-      <div id="du-comp-wrap" style="display:none">
-        <div class="field-lbl">Componente</div>
-        <select class="field-sel" id="du-comp-sel">
-          <option value="">— Seleccionar componente —</option>
-        </select>
-      </div>
-    </div>
-    <div class="modal-foot">
-      <button class="btn-out" onclick="closeDocUpload()">Cancelar</button>
-      <button class="btn-save" onclick="saveDocumento()" id="du-save-btn">SUBIR DOCUMENTO</button>
-    </div>
-  </div>
-</div>
-
-<!-- PREVIEW DOCUMENTO -->
-<div id="doc-preview-bg">
-  <div class="doc-preview-box">
-    <div class="doc-preview-hd">
-      <div style="flex:1;min-width:0">
-        <div id="dp-title" style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
-        <div id="dp-meta" style="font-family:monospace;font-size:10px;color:#888;margin-top:2px"></div>
-      </div>
-      <div style="display:flex;gap:8px;flex-shrink:0;margin-left:12px">
-        <button onclick="downloadCurDoc()" style="background:#F7C600;color:#111;border:none;border-radius:4px;padding:6px 14px;font-size:11px;font-family:monospace;cursor:pointer;font-weight:600">&#11015; Descargar</button>
-        <button onclick="closeDocPreview()" style="background:none;border:none;color:#888;font-size:22px;cursor:pointer;line-height:1">&#10005;</button>
-      </div>
-    </div>
-    <div class="doc-preview-body" id="dp-body" style="min-height:300px;display:flex;align-items:center;justify-content:center">
-      <span style="color:#aaa;font-family:monospace">Cargando&#8230;</span>
-    </div>
-  </div>
-</div>
-
-
 <!-- MODAL USUARIO (Admin) -->
 <div id="adm-usr-modal-bg">
   <div class="modal" style="border-top-color:#7c3aed;max-width:520px">
@@ -876,7 +754,6 @@ input[type=file]{display:none}
     <div class="nav-btn" onclick="goTab('rs',this)">📊 RESUMEN</div>
     <div class="nav-btn" onclick="goTab('inf',this)">📄 INFORME</div>
     <div class="nav-btn" onclick="goTab('ciclos',this)">📅 CICLOS</div>
-    <div class="nav-btn" onclick="goTab('docs',this)">📁 DOCUMENTOS</div>
   </div>
 
   <!-- TAB EQUIPOS -->
@@ -979,8 +856,119 @@ input[type=file]{display:none}
       <div id="ciclos-list"><div style="padding:40px;text-align:center;color:#aaa;font-family:monospace">Cargando ciclos…</div></div>
 
     </div>
+
+  <!-- TAB DOCUMENTOS -->
+  <div id="tab-docs" style="display:none">
+    <div class="page-wrap">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:18px">
+        <div>
+          <div style="font-size:16px;font-weight:700;margin-bottom:2px">Repositorio de Documentos</div>
+          <div style="font-size:11px;color:#888;font-family:monospace">Planos, normas, certificados y manuales del proyecto</div>
+        </div>
+        <button id="btn-subir-doc" onclick="openDocUpload()" class="btn-dark" style="padding:9px 18px;display:none">&#128196; Subir documento</button>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;background:#fff;border:1px solid #ddd9d0;border-radius:6px;padding:10px 14px;margin-bottom:14px">
+        <span style="color:#aaa">&#128269;</span>
+        <input id="docs-search-input" placeholder="Buscar por nombre, descripci&#243;n o contenido&#8230;" oninput="searchDocs()" style="flex:1;border:none;outline:none;font-size:13px">
+        <span id="docs-search-cnt" style="font-family:monospace;font-size:10px;color:#aaa"></span>
+        <button id="docs-clear-btn" onclick="clearDocSearch()" style="display:none;background:none;border:none;color:#aaa;cursor:pointer">&#10005;</button>
+      </div>
+      <div class="docs-layout">
+        <div class="docs-sidebar">
+          <div class="docs-sidebar-hd">Filtrar</div>
+          <div class="docs-cat on" onclick="setDocFiltro('all',this)">&#128193; Todos <span class="docs-cat-badge" id="dcnt-all">0</span></div>
+          <div class="docs-cat" onclick="setDocFiltro('proyecto',this)">&#128203; Proyecto <span class="docs-cat-badge" id="dcnt-proyecto">0</span></div>
+          <div class="docs-cat" onclick="setDocFiltro('equipo',this)">&#9881; Equipo <span class="docs-cat-badge" id="dcnt-equipo">0</span></div>
+          <div class="docs-cat" onclick="setDocFiltro('componente',this)">&#128279; Componente <span class="docs-cat-badge" id="dcnt-componente">0</span></div>
+          <div style="padding:7px 14px;font-size:9px;color:#aaa;font-family:monospace;text-transform:uppercase;letter-spacing:1px;border-top:1px solid #f0ece4;margin-top:4px">Tipo</div>
+          <div class="docs-cat" onclick="setDocTipoFiltro('pdf',this)">&#128441; PDF</div>
+          <div class="docs-cat" onclick="setDocTipoFiltro('word',this)">&#128196; Word</div>
+          <div class="docs-cat" onclick="setDocTipoFiltro('excel',this)">&#128202; Excel</div>
+          <div class="docs-cat" onclick="setDocTipoFiltro('imagen',this)">&#128247; Im&#225;genes</div>
+          <div class="docs-cat" onclick="setDocTipoFiltro('otro',this)">&#128196; Otros</div>
+        </div>
+        <div>
+          <div id="docs-list">
+            <div style="text-align:center;padding:40px;color:#aaa;background:#fff;border:1px solid #ddd9d0;border-radius:6px">
+              <div style="font-size:36px;margin-bottom:8px">&#128193;</div>
+              <div style="font-weight:600;margin-bottom:4px">Sin documentos</div>
+              <div style="font-size:12px">Sube el primer documento con el bot&#243;n superior</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   </div>
 </div>
+
+
+<!-- MODAL SUBIR DOCUMENTO -->
+<div id="doc-upload-modal-bg">
+  <div class="modal" style="border-top-color:#F7C600;max-width:540px">
+    <div class="modal-head" style="background:#0f1117">
+      <div style="flex:1">
+        <div style="font-size:11px;font-family:monospace;color:#F7C600;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">REPOSITORIO</div>
+        <div style="font-size:15px;font-weight:600">Subir documento</div>
+      </div>
+      <button onclick="closeDocUpload()" style="background:none;border:none;color:#666;font-size:20px;cursor:pointer">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <div class="doc-upload-zone" id="du-dropzone"
+        ondragover="event.preventDefault();this.classList.add('dragover')"
+        ondragleave="this.classList.remove('dragover')"
+        ondrop="duHandleDrop(event)"
+        onclick="document.getElementById('du-file-inp').click()">
+        <div style="font-size:32px;margin-bottom:8px">&#128196;</div>
+        <div style="font-weight:600;margin-bottom:4px">Arrastra o haz clic para seleccionar</div>
+        <div style="font-size:11px;color:#aaa">PDF, Word, Excel, im&#225;genes &#183; M&#225;x. 20MB</div>
+        <div id="du-filename" style="display:none;margin-top:8px;font-family:monospace;font-size:11px;color:#F7C600;font-weight:600"></div>
+      </div>
+      <input type="file" id="du-file-inp" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.png,.jpg,.jpeg,.webp,.txt,.csv" onchange="duFileChosen(event)" style="display:none">
+      <div><div class="field-lbl">Nombre del documento</div><input class="field-input" id="du-nombre" placeholder="Ej: Plano el&#233;ctrico zona 21&#8230;"></div>
+      <div><div class="field-lbl">Descripci&#243;n (opcional)</div><textarea class="field-ta" id="du-desc" placeholder="Breve descripci&#243;n&#8230;" style="min-height:48px"></textarea></div>
+      <div>
+        <div class="field-lbl">Asociar a</div>
+        <select class="field-sel" id="du-scope" onchange="duScopeChanged()">
+          <option value="proyecto">Proyecto (general)</option>
+          <option value="equipo">Equipo espec&#237;fico</option>
+          <option value="componente">Componente espec&#237;fico</option>
+        </select>
+      </div>
+      <div id="du-eq-wrap" style="display:none"><div class="field-lbl">Equipo</div>
+        <select class="field-sel" id="du-eq-sel" onchange="duEqChanged()"><option value="">&#8212; Seleccionar &#8212;</option></select>
+      </div>
+      <div id="du-comp-wrap" style="display:none"><div class="field-lbl">Componente</div>
+        <select class="field-sel" id="du-comp-sel"><option value="">&#8212; Seleccionar &#8212;</option></select>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-out" onclick="closeDocUpload()">Cancelar</button>
+      <button class="btn-save" onclick="saveDocumento()" id="du-save-btn">SUBIR DOCUMENTO</button>
+    </div>
+  </div>
+</div>
+
+<!-- PREVIEW DOCUMENTO -->
+<div id="doc-preview-bg">
+  <div class="doc-preview-box">
+    <div class="doc-preview-hd">
+      <div style="flex:1;min-width:0">
+        <div id="dp-title" style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+        <div id="dp-meta" style="font-family:monospace;font-size:10px;color:#888;margin-top:2px"></div>
+      </div>
+      <div style="display:flex;gap:8px;flex-shrink:0;margin-left:12px">
+        <button onclick="downloadCurDoc()" style="background:#F7C600;color:#111;border:none;border-radius:4px;padding:6px 14px;font-size:11px;font-family:monospace;cursor:pointer;font-weight:600">&#11015; Descargar</button>
+        <button onclick="closeDocPreview()" style="background:none;border:none;color:#888;font-size:22px;cursor:pointer;line-height:1">&#10005;</button>
+      </div>
+    </div>
+    <div class="doc-preview-body" id="dp-body" style="min-height:300px;display:flex;align-items:center;justify-content:center">
+      <span style="color:#aaa;font-family:monospace">Cargando&#8230;</span>
+    </div>
+  </div>
+</div>
+
 
 <!-- MODAL NUEVO CICLO -->
 <div id="mciclo-bg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;padding:16px;overflow-y:auto;align-items:flex-start;justify-content:center">
@@ -1766,7 +1754,7 @@ async function doLogout(){
 function goTab(name,el){
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('on'));
   el.classList.add('on');
-  ['eq','rs','inf','ciclos','docs'].forEach(t=>{ document.getElementById('tab-'+t).style.display=t===name?'block':'none'; });
+  ['eq','rs','inf','ciclos','docs'].forEach(t=>{ const el=document.getElementById('tab-'+t); if(el) el.style.display=t===name?'block':'none'; });
   if(name==='rs') renderResumen();
   if(name==='inf') loadAndRenderInforme();
   if(name==='ciclos') loadCiclos();
@@ -1786,7 +1774,7 @@ async function loadAndRenderInforme(){
     if(r2.error) throw r2.error;
     if(r1.data){ allRaw=r1.data; recs={}; r1.data.forEach(r=>{ recs[r.equipo_id]=r; }); }
     if(r2.data){ allSubRaw=r2.data; subRecs={}; r2.data.forEach(c=>{ if(!subRecs[c.equipo_id]) subRecs[c.equipo_id]=[]; subRecs[c.equipo_id].push(c); }); }
-  } catch(e){ toast('Error cargando informe','err'); }
+  } catch(e){ toast('Error cargando informe','err'); loader(0); return; }
   // Update KPIs
   const total=inspectedEqIds().size,
         items=statusItems(),
@@ -2466,19 +2454,30 @@ function renderFindings(){
     ...allRaw.map(r=>r.equipo_id),
     ...allSubRaw.map(c=>c.equipo_id)
   ]);
+
+  if(!eqIdsWithData.size){
+    findEl.innerHTML='<div style="padding:28px;text-align:center;color:#6b7280">Sin datos registrados.<br><small style="font-family:monospace;font-size:10px">Completa fichas de equipos para ver la tabla.</small></div>';
+    return;
+  }
+
+  // Construir equipos con datos combinando catálogo + equipos dinámicos
   const allEquip=allEqs('all');
-  const equipWithData=allEquip.filter(e=>eqIdsWithData.has(e.id));
+  // Incluir también equipos que están en allRaw pero no en catálogo local
+  const eqEnCatalogo=new Set(allEquip.map(e=>e.id));
+  const eqsExtra=[];
+  for(const id of eqIdsWithData){
+    if(!eqEnCatalogo.has(id)){
+      const r=recs[id]||{};
+      eqsExtra.push({id, n:r.equipo_nombre||id, p:r.piso||'', g:r.grupo||'', z:r.zona||''});
+    }
+  }
+  const equipWithData=[...allEquip,...eqsExtra].filter(e=>eqIdsWithData.has(e.id));
 
   // Agrupar por piso
   const byFloor={};
   for(const e of equipWithData){
     if(!byFloor[e.p]) byFloor[e.p]=[];
     byFloor[e.p].push(e);
-  }
-
-  if(!eqIdsWithData.size){
-    findEl.innerHTML='<div style="padding:28px;text-align:center;color:#6b7280">Sin datos registrados</div>';
-    return;
   }
 
   let h=`<div class="inf-tree-wrap">`;
@@ -4699,13 +4698,11 @@ async function admUpdateAsignRol(proyId, rol){
 // ═══════════════════════════════════════════════════
 //  MÓDULO DOCUMENTOS
 // ═══════════════════════════════════════════════════
-
 function docIcon(mime){
   if(!mime) return '&#128196;';
   if(mime.includes('pdf')) return '&#128441;';
   if(mime.includes('word')||mime.includes('document')) return '&#128196;';
   if(mime.includes('sheet')||mime.includes('excel')) return '&#128202;';
-  if(mime.includes('presentation')||mime.includes('powerpoint')) return '&#128202;';
   if(mime.includes('image')) return '&#128247;';
   return '&#128196;';
 }
@@ -4719,15 +4716,12 @@ function docTipo(mime){
 }
 function docScope(d){ return d.componente_id?'componente':d.equipo_id?'equipo':'proyecto'; }
 function docScopeLabel(d){
-  if(d.componente_id){
-    const c=allSubRaw.find(c=>c.id===d.componente_id);
-    return 'Comp: '+(c?c.nombre_comp||c.tipo:d.componente_id.slice(0,8));
-  }
+  if(d.componente_id){ const c=allSubRaw.find(c=>c.id===d.componente_id); return 'Comp: '+(c?c.nombre_comp||c.tipo:d.componente_id.slice(0,8)); }
   if(d.equipo_id) return 'Equipo: '+eqName(d.equipo_id);
   return 'Proyecto';
 }
 function fmtBytes(b){
-  if(!b) return '—';
+  if(!b) return '&#8212;';
   if(b<1024) return b+'B';
   if(b<1048576) return Math.round(b/1024)+'KB';
   return (b/1048576).toFixed(1)+'MB';
@@ -4735,9 +4729,8 @@ function fmtBytes(b){
 
 async function loadDocs(){
   const pid=curProyecto?.id; if(!pid) return;
-  const canUp=canDo('fillFicha');
   const btn=document.getElementById('btn-subir-doc');
-  if(btn) btn.style.display=canUp?'block':'none';
+  if(btn) btn.style.display=canDo('fillFicha')?'block':'none';
   const el=document.getElementById('docs-list'); if(!el) return;
   el.innerHTML='<div style="padding:28px;text-align:center;color:#aaa;font-family:monospace;font-size:11px">Cargando&#8230;</div>';
   try {
@@ -4745,40 +4738,27 @@ async function loadDocs(){
     todosDocumentos=data||[];
     updateDocCounts(); renderDocs();
   } catch(e){
-    el.innerHTML=`<div style="padding:28px;text-align:center;color:#dc2626;font-size:12px">${esc(e.message)}<br><div style="font-size:10px;color:#aaa;margin-top:8px;font-family:monospace">Verifica que la tabla 'documentos' existe en Supabase</div></div>`;
+    el.innerHTML='<div style="padding:28px;text-align:center;color:#dc2626;font-size:12px">'+esc(e.message)+'<br><div style="font-size:10px;color:#aaa;margin-top:6px;font-family:monospace">Verifica que la tabla documentos existe en Supabase</div></div>';
   }
 }
-
 function updateDocCounts(){
-  const c=(f)=>todosDocumentos.filter(d=>docScope(d)===f).length;
   const s=(id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v; };
-  s('dcnt-all',todosDocumentos.length); s('dcnt-proyecto',c('proyecto'));
-  s('dcnt-equipo',c('equipo')); s('dcnt-componente',c('componente'));
+  s('dcnt-all',todosDocumentos.length);
+  s('dcnt-proyecto',todosDocumentos.filter(d=>docScope(d)==='proyecto').length);
+  s('dcnt-equipo',todosDocumentos.filter(d=>docScope(d)==='equipo').length);
+  s('dcnt-componente',todosDocumentos.filter(d=>docScope(d)==='componente').length);
 }
-
-function setDocFiltro(f,el){
-  docFiltro=f; docTipoFiltro='';
-  document.querySelectorAll('.docs-cat').forEach(c=>c.classList.remove('on'));
-  el.classList.add('on'); renderDocs();
-}
-function setDocTipoFiltro(t,el){
-  docTipoFiltro=docTipoFiltro===t?'':t; docFiltro='all';
-  document.querySelectorAll('.docs-cat').forEach(c=>c.classList.remove('on'));
-  if(docTipoFiltro) el.classList.add('on'); renderDocs();
-}
+function setDocFiltro(f,el){ docFiltro=f; docTipoFiltro=''; document.querySelectorAll('.docs-cat').forEach(c=>c.classList.remove('on')); el.classList.add('on'); renderDocs(); }
+function setDocTipoFiltro(t,el){ docTipoFiltro=docTipoFiltro===t?'':t; docFiltro='all'; document.querySelectorAll('.docs-cat').forEach(c=>c.classList.remove('on')); if(docTipoFiltro)el.classList.add('on'); renderDocs(); }
 function searchDocs(){
   docSearchQ=(document.getElementById('docs-search-input')?.value||'').toLowerCase().trim();
-  const cb=document.getElementById('docs-clear-btn');
-  if(cb) cb.style.display=docSearchQ?'inline':'none';
+  const cb=document.getElementById('docs-clear-btn'); if(cb) cb.style.display=docSearchQ?'inline':'none';
   renderDocs();
 }
 function clearDocSearch(){
   const inp=document.getElementById('docs-search-input'); if(inp) inp.value='';
-  docSearchQ='';
-  const cb=document.getElementById('docs-clear-btn'); if(cb) cb.style.display='none';
-  renderDocs();
+  docSearchQ=''; document.getElementById('docs-clear-btn').style.display='none'; renderDocs();
 }
-
 function renderDocs(){
   const el=document.getElementById('docs-list'); if(!el) return;
   let docs=[...todosDocumentos];
@@ -4788,61 +4768,50 @@ function renderDocs(){
   const cnt=document.getElementById('docs-search-cnt');
   if(cnt) cnt.textContent=docs.length+' doc'+(docs.length!==1?'s':'');
   if(!docs.length){
-    el.innerHTML=`<div style="text-align:center;padding:40px;color:#aaa;background:#fff;border:1px solid #ddd9d0;border-radius:6px">
-      <div style="font-size:32px;margin-bottom:8px">&#128193;</div>
-      <div style="font-weight:600;margin-bottom:4px">${docSearchQ?'Sin resultados para "'+esc(docSearchQ)+'"':'Sin documentos'}</div>
-      <div style="font-size:12px">${docSearchQ?'Intenta con otras palabras':'Sube el primer documento con el botón superior'}</div>
-    </div>`;
+    el.innerHTML='<div style="text-align:center;padding:40px;color:#aaa;background:#fff;border:1px solid #ddd9d0;border-radius:6px"><div style="font-size:32px;margin-bottom:8px">&#128193;</div><div style="font-weight:600;margin-bottom:4px">'+(docSearchQ?'Sin resultados para "'+esc(docSearchQ)+'"':'Sin documentos')+'</div><div style="font-size:12px">'+(docSearchQ?'Intenta con otras palabras':'Sube el primer documento')+'</div></div>';
     return;
   }
-  // Agrupar por scope en vista "todos"
   let h='';
   if(docFiltro==='all'&&!docTipoFiltro&&!docSearchQ){
     const grupos=[['proyecto','&#128203; Del proyecto'],['equipo','&#9881; Por equipo'],['componente','&#128279; Por componente']];
-    for(const [scope,lbl] of grupos){
-      const g=docs.filter(d=>docScope(d)===scope); if(!g.length) continue;
-      h+=`<div class="sec-hd" style="margin-top:4px">${lbl}</div>`;
-      h+=g.map(d=>docCardHtml(d)).join('');
-    }
+    for(const [scope,lbl] of grupos){ const g=docs.filter(d=>docScope(d)===scope); if(!g.length) continue; h+='<div class="sec-hd" style="margin-top:4px">'+lbl+'</div>'; h+=g.map(d=>docCardHtml(d)).join(''); }
   } else { h=docs.map(d=>docCardHtml(d)).join(''); }
   el.innerHTML=h;
 }
-
 function docCardHtml(d){
   const icon=docIcon(d.mime_type);
-  const fecha=d.created_at?new Date(d.created_at).toLocaleDateString('es-CL'):'—';
+  const fecha=d.created_at?new Date(d.created_at).toLocaleDateString('es-CL'):'&#8212;';
   const canDel=canDo('delete');
   let matchHtml='';
   if(docSearchQ&&d.contenido_texto){
     const idx=d.contenido_texto.toLowerCase().indexOf(docSearchQ);
     if(idx>=0){
-      const s=Math.max(0,idx-35), e2=Math.min(d.contenido_texto.length,idx+docSearchQ.length+35);
-      matchHtml=`<div class="doc-match">&#8230;${esc(d.contenido_texto.slice(s,e2))}&#8230;</div>`;
+      const s=Math.max(0,idx-35),e2=Math.min(d.contenido_texto.length,idx+docSearchQ.length+35);
+      matchHtml='<div class="doc-match">&#8230;'+esc(d.contenido_texto.slice(s,e2))+'&#8230;</div>';
     }
   }
-  return `<div class="doc-card" onclick="openDocPreview('${d.id}')">
-    <div class="doc-icon">${icon}</div>
-    <div class="doc-info">
-      <div class="doc-name">${esc(d.nombre)}</div>
-      <div class="doc-meta"><span>${docScopeLabel(d)}</span><span>·</span><span>${fmtBytes(d.tamano)}</span><span>·</span><span>${fecha}</span><span>·</span><span>${esc(d.subido_por||'—')}</span></div>
-      ${d.descripcion?`<div class="doc-desc">${esc(d.descripcion)}</div>`:''}
-      ${matchHtml}
-    </div>
-    <div class="doc-actions" onclick="event.stopPropagation()">
-      <button class="doc-btn" onclick="openDocPreview('${d.id}')">&#128065; Ver</button>
-      <button class="doc-btn" onclick="downloadDocById('${d.id}')">&#11015; Descargar</button>
-      ${canDel?`<button class="doc-btn danger" onclick="deleteDocumento('${d.id}')">&#128465; Eliminar</button>`:''}
-    </div>
-  </div>`;
+  const id=d.id;
+  return '<div class="doc-card" onclick="openDocPreview(\'' +id+ '\')">'
+    +'<div class="doc-icon">'+icon+'</div>'
+    +'<div class="doc-info">'
+    +'<div class="doc-name">'+esc(d.nombre)+'</div>'
+    +'<div class="doc-meta"><span>'+docScopeLabel(d)+'</span><span>&#183;</span><span>'+fmtBytes(d.tamano)+'</span><span>&#183;</span><span>'+fecha+'</span><span>&#183;</span><span>'+esc(d.subido_por||'&#8212;')+'</span></div>'
+    +(d.descripcion?'<div class="doc-desc">'+esc(d.descripcion)+'</div>':'')
+    +matchHtml
+    +'</div>'
+    +'<div class="doc-actions" onclick="event.stopPropagation()">'
+    +'<button class="doc-btn" onclick="openDocPreview(\'' +id+ '\')">&#128065; Ver</button>'
+    +'<button class="doc-btn" onclick="downloadDocById(\'' +id+ '\')">&#11015; Descargar</button>'
+    +(canDel?'<button class="doc-btn danger" onclick="deleteDocumento(\'' +id+ '\')">&#128465; Eliminar</button>':'')
+    +'</div></div>';
 }
-
-// Preview
 async function openDocPreview(docId){
   const doc=todosDocumentos.find(d=>d.id===docId); if(!doc) return;
   curDocPreview=doc;
   document.getElementById('dp-title').textContent=doc.nombre;
-  document.getElementById('dp-meta').textContent=docScopeLabel(doc)+' · '+fmtBytes(doc.tamano)+' · '+new Date(doc.created_at).toLocaleDateString('es-CL');
-  document.getElementById('dp-body').innerHTML='<span style="color:#aaa;font-family:monospace">Cargando&#8230;</span>';
+  document.getElementById('dp-meta').textContent=docScopeLabel(doc)+' - '+fmtBytes(doc.tamano)+' - '+new Date(doc.created_at).toLocaleDateString('es-CL');
+  const dpBody=document.getElementById('dp-body');
+  dpBody.innerHTML='<span style="color:#aaa;font-family:monospace">Cargando...</span>';
   document.getElementById('doc-preview-bg').classList.add('on');
   document.body.style.overflow='hidden';
   try {
@@ -4850,24 +4819,30 @@ async function openDocPreview(docId){
     if(error) throw error;
     const url=data.signedUrl;
     const mime=doc.mime_type||'';
-    let body='';
     if(mime.includes('pdf')){
-      body=`<iframe src="${url}" style="width:100%;height:75vh;border:none"></iframe>`;
+      dpBody.innerHTML='<iframe src="'+url+'" style="width:100%;height:75vh;border:none"></iframe>';
     } else if(mime.includes('image')){
-      body=`<div style="text-align:center;padding:16px;background:#f5f3ee"><img src="${url}" style="max-width:100%;max-height:70vh;border-radius:4px;box-shadow:0 4px 20px rgba(0,0,0,.15)"></div>`;
+      dpBody.innerHTML='<div style="text-align:center;padding:16px;background:#f5f3ee"><img src="'+url+'" style="max-width:100%;max-height:70vh;border-radius:4px"></div>';
     } else if(mime.includes('text')||mime.includes('csv')){
-      body=`<div style="padding:20px"><pre style="font-family:monospace;font-size:12px;white-space:pre-wrap;color:#374151;line-height:1.5">${esc(doc.contenido_texto||'Sin contenido de texto disponible')}</pre></div>`;
+      const pre=document.createElement('pre');
+      pre.style.cssText='font-family:monospace;font-size:12px;white-space:pre-wrap;color:#374151;padding:20px';
+      pre.textContent=doc.contenido_texto||'Sin texto disponible';
+      dpBody.innerHTML=''; dpBody.appendChild(pre);
     } else {
-      body=`<div style="text-align:center;padding:60px 40px">
-        <div style="font-size:56px;margin-bottom:14px">${docIcon(mime)}</div>
-        <div style="font-size:15px;font-weight:600;margin-bottom:8px">${esc(doc.nombre)}</div>
-        <div style="color:#6b7280;margin-bottom:20px;font-size:13px">Este tipo de archivo no puede previsualizarse en el navegador.</div>
-        <button onclick="downloadDocById('${doc.id}')" class="btn-dark" style="padding:10px 24px">&#11015; Descargar archivo</button>
-      </div>`;
+      const wrap=document.createElement('div');
+      wrap.style.cssText='text-align:center;padding:60px 40px';
+      wrap.innerHTML='<div style="font-size:56px;margin-bottom:14px">'+docIcon(mime)+'</div><div style="font-size:15px;font-weight:600;margin-bottom:8px">'+esc(doc.nombre)+'</div><div style="color:#6b7280;margin-bottom:20px">Este archivo no puede previsualizarse.</div>';
+      const dlBtn=document.createElement('button');
+      dlBtn.className='btn-dark'; dlBtn.style.padding='10px 24px';
+      dlBtn.textContent='Descargar archivo';
+      dlBtn.addEventListener('click',function(){ downloadDocById(doc.id); });
+      wrap.appendChild(dlBtn); dpBody.innerHTML=''; dpBody.appendChild(wrap);
     }
-    document.getElementById('dp-body').innerHTML=body;
-  } catch(e){ document.getElementById('dp-body').innerHTML=`<div style="text-align:center;padding:40px;color:#dc2626">${esc(e.message)}</div>`; }
+  } catch(e){
+    dpBody.innerHTML='<div style="text-align:center;padding:40px;color:#dc2626">'+esc(e.message)+'</div>';
+  }
 }
+
 function closeDocPreview(){ document.getElementById('doc-preview-bg').classList.remove('on'); document.body.style.overflow=''; curDocPreview=null; }
 async function downloadCurDoc(){ if(curDocPreview) await downloadDocById(curDocPreview.id); }
 async function downloadDocById(docId){
@@ -4879,33 +4854,17 @@ async function downloadDocById(docId){
     toast('Descargando&#8230;','ok');
   } catch(e){ toast('Error al descargar: '+e.message,'err'); }
 }
-
-// Subir documento
 function openDocUpload(){
   duFile=null;
-  document.getElementById('du-nombre').value='';
-  document.getElementById('du-desc').value='';
-  document.getElementById('du-scope').value='proyecto';
-  document.getElementById('du-filename').style.display='none';
-  document.getElementById('du-eq-wrap').style.display='none';
-  document.getElementById('du-comp-wrap').style.display='none';
-  document.getElementById('doc-upload-modal-bg').classList.add('on');
-  document.body.style.overflow='hidden';
+  document.getElementById('du-nombre').value=''; document.getElementById('du-desc').value='';
+  document.getElementById('du-scope').value='proyecto'; document.getElementById('du-filename').style.display='none';
+  document.getElementById('du-eq-wrap').style.display='none'; document.getElementById('du-comp-wrap').style.display='none';
+  document.getElementById('doc-upload-modal-bg').classList.add('on'); document.body.style.overflow='hidden';
 }
 function closeDocUpload(){ document.getElementById('doc-upload-modal-bg').classList.remove('on'); document.body.style.overflow=''; }
-
-function duHandleDrop(e){
-  e.preventDefault(); document.getElementById('du-dropzone').classList.remove('dragover');
-  const f=e.dataTransfer.files[0]; if(f) duSetFile(f);
-}
+function duHandleDrop(e){ e.preventDefault(); document.getElementById('du-dropzone').classList.remove('dragover'); const f=e.dataTransfer.files[0]; if(f) duSetFile(f); }
 function duFileChosen(e){ const f=e.target.files[0]; if(f) duSetFile(f); e.target.value=''; }
-function duSetFile(f){
-  duFile=f;
-  const el=document.getElementById('du-filename');
-  el.style.display='block'; el.textContent=f.name+' ('+fmtBytes(f.size)+')';
-  const inp=document.getElementById('du-nombre');
-  if(!inp.value) inp.value=f.name.replace(/\.[^.]+$/,'');
-}
+function duSetFile(f){ duFile=f; const el=document.getElementById('du-filename'); el.style.display='block'; el.textContent=f.name+' ('+fmtBytes(f.size)+')'; const inp=document.getElementById('du-nombre'); if(!inp.value) inp.value=f.name.replace(/[.][^.]+$/,''); }
 function duScopeChanged(){
   const s=document.getElementById('du-scope').value;
   document.getElementById('du-eq-wrap').style.display=(s==='equipo'||s==='componente')?'block':'none';
@@ -4914,18 +4873,14 @@ function duScopeChanged(){
 }
 function duPopulateEquipos(){
   const sel=document.getElementById('du-eq-sel');
-  sel.innerHTML='<option value="">— Seleccionar equipo —</option>'+
-    allEqs('all').slice(0,200).map(e=>`<option value="${e.id}">${esc(eqName(e.id))}</option>`).join('');
+  sel.innerHTML='<option value="">&#8212; Seleccionar &#8212;</option>'+allEqs('all').slice(0,200).map(e=>'<option value="'+e.id+'">'+esc(eqName(e.id))+'</option>').join('');
 }
-async function duEqChanged(){
+function duEqChanged(){
   const eqId=document.getElementById('du-eq-sel').value;
   const sel=document.getElementById('du-comp-sel');
-  sel.innerHTML='<option value="">— Seleccionar componente —</option>';
+  sel.innerHTML='<option value="">&#8212; Seleccionar &#8212;</option>';
   if(!eqId) return;
-  (subRecs[eqId]||[]).forEach(c=>{
-    const opt=document.createElement('option'); opt.value=c.id;
-    opt.textContent=c.nombre_comp||c.tipo||'Componente'; sel.appendChild(opt);
-  });
+  (subRecs[eqId]||[]).forEach(c=>{ const opt=document.createElement('option'); opt.value=c.id; opt.textContent=c.nombre_comp||c.tipo||'Componente'; sel.appendChild(opt); });
 }
 async function saveDocumento(){
   if(!duFile){ toast('Selecciona un archivo primero','err'); return; }
@@ -4939,37 +4894,25 @@ async function saveDocumento(){
     const {error:upErr}=await sb.storage.from('documentos').upload(path,duFile,{contentType:duFile.type,upsert:false});
     if(upErr) throw upErr;
     const scope=document.getElementById('du-scope').value;
-    const eqId=(scope!=='proyecto')?document.getElementById('du-eq-sel').value||null:null;
-    const compId=(scope==='componente')?document.getElementById('du-comp-sel').value||null:null;
+    const eqId=scope!=='proyecto'?document.getElementById('du-eq-sel').value||null:null;
+    const compId=scope==='componente'?document.getElementById('du-comp-sel').value||null:null;
     let contenidoTexto=null;
-    if(duFile.type.includes('text')||duFile.type.includes('csv')){
-      try{ contenidoTexto=(await duFile.text()).slice(0,50000); }catch(e){}
-    }
-    const saved=await must(sb.from('documentos').insert({
-      proyecto_id:pid, equipo_id:eqId, componente_id:compId,
-      nombre, descripcion:document.getElementById('du-desc').value.trim()||null,
-      storage_path:path, mime_type:duFile.type, tamano:duFile.size,
-      contenido_texto:contenidoTexto,
-      subido_por:profile?.full_name||session.user.email,
-      subido_por_id:session.user.id,
-    }).select().single());
-    todosDocumentos.unshift(saved);
-    updateDocCounts(); renderDocs();
-    toast('Documento subido ✓','ok');
-    closeDocUpload();
+    if(duFile.type.includes('text')||duFile.type.includes('csv')){ try{ contenidoTexto=(await duFile.text()).slice(0,50000); }catch(e){} }
+    const saved=await must(sb.from('documentos').insert({proyecto_id:pid,equipo_id:eqId,componente_id:compId,nombre,descripcion:document.getElementById('du-desc').value.trim()||null,storage_path:path,mime_type:duFile.type,tamano:duFile.size,contenido_texto:contenidoTexto,subido_por:profile?.full_name||session.user.email,subido_por_id:session.user.id}).select().single());
+    todosDocumentos.unshift(saved); updateDocCounts(); renderDocs();
+    toast('Documento subido ✓','ok'); closeDocUpload();
   } catch(e){ toast('Error: '+e.message,'err'); }
   btn.disabled=0; btn.textContent='SUBIR DOCUMENTO';
 }
 async function deleteDocumento(docId){
   const doc=todosDocumentos.find(d=>d.id===docId);
-  if(!doc||!confirm('¿Eliminar "'+doc.nombre+'"? Esta acción no se puede deshacer.')) return;
+  if(!doc||!confirm('¿Eliminar "'+doc.nombre+'"?')) return;
   try {
     await sb.storage.from('documentos').remove([doc.storage_path]);
     await must(sb.from('documentos').delete().eq('id',docId));
     todosDocumentos=todosDocumentos.filter(d=>d.id!==docId);
-    updateDocCounts(); renderDocs();
-    toast('Documento eliminado ✓','ok');
-  } catch(e){ toast('Error al eliminar: '+e.message,'err'); }
+    updateDocCounts(); renderDocs(); toast('Documento eliminado ✓','ok');
+  } catch(e){ toast('Error: '+e.message,'err'); }
 }
 </script>
 </body>
