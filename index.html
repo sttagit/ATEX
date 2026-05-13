@@ -754,6 +754,7 @@ input[type=file]{display:none}
     <div class="nav-btn" onclick="goTab('rs',this)">📊 RESUMEN</div>
     <div class="nav-btn" onclick="goTab('inf',this)">📄 INFORME</div>
     <div class="nav-btn" onclick="goTab('ciclos',this)">📅 CICLOS</div>
+    <div class="nav-btn" onclick="goTab('docs',this)">📁 DOCUMENTOS</div>
   </div>
 
   <!-- TAB EQUIPOS -->
@@ -1788,8 +1789,10 @@ async function loadAndRenderInforme(){
   document.getElementById('kC').textContent=C;
   document.getElementById('kNC').textContent=NC;
   document.getElementById('kOBS').textContent=OBS;
-  renderGapRows();
-  renderFindings();
+  try {
+    renderGapRows();
+    renderFindings();
+  } catch(e){ toast('Error al renderizar informe: '+e.message,'err'); console.error(e); }
   loader(0);
 }
 
@@ -2447,7 +2450,6 @@ function renderFindings(){
   }
 
   const findEl=document.getElementById('findings');
-  const pisoOrder=pisoOrderIds(Object.keys(byFloor));
 
   // Equipos con datos (registro o componentes)
   const eqIdsWithData=new Set([
@@ -2479,6 +2481,9 @@ function renderFindings(){
     if(!byFloor[e.p]) byFloor[e.p]=[];
     byFloor[e.p].push(e);
   }
+
+  // pisoOrder debe declararse DESPUÉS de construir byFloor
+  const pisoOrder=pisoOrderIds(Object.keys(byFloor));
 
   let h=`<div class="inf-tree-wrap">`;
 
