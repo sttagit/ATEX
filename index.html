@@ -2656,19 +2656,8 @@ function toggleAllPisos(expand){
   });
 }
 
-// Abre modal desde informe y vuelve al tab equipo
+// Abre modal desde informe — mantiene tab informe activo
 async function openFromInforme(eqId){
-  // Cambiar a tab equipos
-  const navBtns=document.querySelectorAll('.nav-btn');
-  navBtns.forEach(b=>b.classList.remove('on'));
-  navBtns[0].classList.add('on');
-  ['eq','rs','inf'].forEach(t=>{
-    document.getElementById('tab-'+t).style.display=t==='eq'?'block':'none';
-  });
-  // Desplazar al piso del equipo
-  const r=recs[eqId];
-  if(r){ setFloor(r.piso, document.querySelector(`.chip[onclick="setFloor('${r.piso}',this)"]`)||document.querySelector('.chip.on')); }
-  // Abrir modal
   await openModal(eqId);
 }
 
