@@ -2044,8 +2044,12 @@ async function saveEqName(eqId){
       updated_at:new Date().toISOString(),
       updated_by:profile?.full_name||session.user.email
     };
-    await must(sb.from('equipos_custom')
-      .upsert(payload,{onConflict:'proyecto_id,id'}));
+    const {data:existing}=await sb.from('equipos_custom').select('id').eq('id',eqId).eq('proyecto_id',pid).maybeSingle();
+    if(existing){
+      await must(sb.from('equipos_custom').update(payload).eq('id',eqId).eq('proyecto_id',pid));
+    } else {
+      await must(sb.from('equipos_custom').insert(payload));
+    }
     customNames[eqId]=nuevoNombre;
     toast('Nombre guardado &#10003;','ok');
     renderEq();
@@ -2359,6 +2363,10 @@ async function reloadData(){
     if(ep){ customPisos={}; ep.forEach(r=>{ customPisos[r.id]=r.piso; }); }
   } catch(e){ console.warn(e); }
   renderEq();
+  // Si el tab informe está activo, re-renderizar para reflejar cambios inmediatamente
+  if(document.getElementById('tab-inf')?.style.display!=='none'){
+    try { renderGapRows(); renderFindings(); } catch(e){ console.warn(e); }
+  }
 }
 
 //  RESUMEN
