@@ -5083,6 +5083,8 @@ async function ctExecute(toEqId){
     }
   } catch(err){ toast('Error: '+err.message,'err'); }
 }
+</script>
+
 <!-- MODAL TRANSFERIR COMPONENTE -->
 <div id="comp-transfer-bg">
   <div class="modal" style="border-top-color:#7c3aed;max-width:480px;width:100%">
@@ -5094,7 +5096,6 @@ async function ctExecute(toEqId){
       <button onclick="closeCompTransfer()" style="background:none;border:none;color:#666;font-size:20px;cursor:pointer">✕</button>
     </div>
     <div class="modal-body" style="padding:0">
-      <!-- Paso 1: Copiar o Mover -->
       <div id="ct-step1" style="padding:20px">
         <div style="font-size:12px;color:#6b7280;margin-bottom:16px;font-family:monospace">¿Qué deseas hacer con este componente?</div>
         <div style="display:flex;gap:10px">
@@ -5106,7 +5107,6 @@ async function ctExecute(toEqId){
           </button>
         </div>
       </div>
-      <!-- Paso 2: Seleccionar destino -->
       <div id="ct-step2" style="display:none">
         <div style="padding:14px 16px;border-bottom:1px solid #f0ece4;display:flex;align-items:center;gap:8px">
           <button onclick="ctBack()" style="background:none;border:none;cursor:pointer;color:#888;font-size:16px;padding:0 4px">←</button>
@@ -5121,6 +5121,5 @@ async function ctExecute(toEqId){
     </div>
   </div>
 </div>
-</script>
 </body>
 </html>
