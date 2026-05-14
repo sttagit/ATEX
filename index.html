@@ -3947,8 +3947,9 @@ function openEqNuevo(ubId, ubNombre, origen='eq'){
   if(origen==='inf'){
     const tipoUb=curProyecto?.tipo_ubicacion||'Piso';
     document.querySelector('#en-ub-row .field-lbl').textContent=tipoUb;
+    const pisos=pisoOrderIds();
     ubSel.innerHTML=`<option value="">— Sin ${tipoUb.toLowerCase()} —</option>`+
-      proyUbicaciones.map(u=>`<option value="${u.id}">${esc(u.nombre)}</option>`).join('');
+      pisos.map(id=>`<option value="${id}">${esc(pisoLabel(id))}</option>`).join('');
     ubRow.style.display='block';
   } else {
     ubRow.style.display='none';
