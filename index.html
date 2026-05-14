@@ -237,6 +237,9 @@ input[type=file]{display:none}
 .inf-eq-toggle{font-size:10px;color:#aaa;transition:transform .18s;display:inline-block;line-height:1.5;flex-shrink:0}
 .inf-comp-rows{display:none}
 .inf-comp-row{display:grid;grid-template-columns:22px 2fr 0.65fr 0.9fr 0.5fr 1.1fr 0.6fr 1.6fr 1.5fr;gap:6px;padding:6px 14px 6px 38px;align-items:start;border-top:1px solid #f0ece4;background:#fdfcfb;cursor:pointer;transition:background .1s}
+.inf-comp-row[draggable]{cursor:grab}
+.inf-comp-row[draggable]:active{cursor:grabbing}
+.inf-comp-row.dragging{opacity:.35;background:#ede9fe!important}
 .inf-comp-row:hover{background:#f5f3ee}
 /* ── ZONA USO CHECKBOXES ── */
 .zona-uso-wrap{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
@@ -2585,14 +2588,14 @@ function renderFindings(){
       if(hasComps){
         h+=`<div class="inf-comp-rows" id="iec-${eq.id}">`;
         for(const c of comps){
-          h+=`<div class="inf-comp-row" onclick="openSubModal(null,'${eq.id}','${c.id}')">
+          h+=`<div class="inf-comp-row" draggable="true" ondragstart="onCompDragStart(event,'${c.id}','${eq.id}')" ondragend="onCompDragEnd(event)" onclick="openSubModal(null,'${eq.id}','${c.id}')">
             <div></div>
             <div>
               <div style="font-size:11px;color:#5b21b6">&#8627; ${esc(c.nombre_comp||c.tipo)}</div>
               <div style="font-family:monospace;font-size:9px;color:#aaa">${esc(c.tipo||'')}${c.marca?' · '+esc(c.marca):''}${c.modelo?' '+esc(c.modelo):''}</div>
               ${fotosBtnHtml(c.fotos||[],'comp-'+c.id)}
             </div>
-            <div>${zpillHtml(c.zona||'')}</div>
+            <div>${zpillHtml(c.zona||'')} </div>
             <div style="font-family:monospace;font-size:10px;color:#0f1117;font-weight:600">${esc(c.tag_planta||'—')}</div>
             <div style="font-family:monospace;font-size:10px;color:#6b7280">${esc(c.fecha_fab||'—')}</div>
             <div style="font-family:monospace;font-size:10px">${esc(c.marcado_ex||'—')}</div>
@@ -2982,14 +2985,17 @@ function onCompDragEnd(e){
   e.currentTarget.classList.remove('dragging');
   document.querySelectorAll('.eq-expand.drag-over').forEach(z=>z.classList.remove('drag-over'));
   if(_dragGhost){ _dragGhost.remove(); _dragGhost=null; }
-  // Si no cayó en zona válida (otro equipo visible), abrir modal de transferencia
-  if(!_dragDropped && dragCompId && dragFromEqId){
-    const cId=dragCompId, fId=dragFromEqId;
-    dragCompId=null; dragFromEqId=null;
-    openCompTransfer(cId, fId);
-  } else {
-    dragCompId=null; dragFromEqId=null;
-  }
+  // Esperar que onExpandDrop setee _dragDropped antes de evaluar
+  const cId=dragCompId, fId=dragFromEqId;
+  setTimeout(()=>{
+    if(!_dragDropped && cId && fId){
+      dragCompId=null; dragFromEqId=null;
+      openCompTransfer(cId, fId);
+    } else {
+      dragCompId=null; dragFromEqId=null;
+    }
+    _dragDropped=false;
+  }, 50);
 }
 
 function onExpandDragOver(e, eqId){
