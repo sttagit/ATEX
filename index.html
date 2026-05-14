@@ -3980,7 +3980,6 @@ async function saveEqNuevo(){
       rows.push({id,proyecto_id:curProyecto.id,ubicacion_id:ubId||null,nombre:nombreFinal,grupo,zona,orden:proyEquipos.length+i,created_by:profile?.full_name||session.user.email});
     }
     const saved=await must(sb.from('proyecto_equipos').insert(rows).select());
-    if(saved) proyEquipos.push(...saved);
     // Si es piso estático, guardar en equipos_piso para cada equipo creado
     if(isFlPiso && saved){
       const pid=projectId();
