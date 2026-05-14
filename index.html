@@ -2552,11 +2552,11 @@ function renderFindings(){
     const compCount=eqs.reduce((s,e)=>s+(allSubRaw.filter(c=>c.equipo_id===e.id).length),0);
 
     h+=`<div class="inf-piso-hd" onclick="togglePiso('${piso}')">
-      <span class="inf-piso-arrow" id="ipa-${piso}">&#9660;</span>
+      <span class="inf-piso-arrow" id="ipa-${piso}" style="transform:rotate(-90deg)">&#9660;</span>
       ${esc(pisoLabel(piso))}
       <span style="margin-left:auto;font-size:9px;color:#888;font-weight:400;text-transform:none;letter-spacing:0">${eqs.length} equipo${eqs.length!==1?'s':''} · ${compCount} comp.</span>
     </div>
-    <div id="ipb-${piso}">`;
+    <div id="ipb-${piso}" style="display:none">`;
 
     for(const eq of eqs){
       const r=recs[eq.id]||{};
