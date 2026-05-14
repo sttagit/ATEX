@@ -818,8 +818,8 @@ input[type=file]{display:none}
       </div>
       <div class="sec-hd">Hallazgos</div>
       <div class="dt">
-        <div class="dt-head" style="grid-template-columns:2.5fr 0.8fr 0.7fr 2.5fr">
-          <div>EQUIPO</div><div>ZONA</div><div>ESTADO</div><div>BRECHAS / OBS.</div>
+        <div class="dt-head" style="grid-template-columns:2.5fr 0.8fr 0.9fr 0.7fr 2.5fr">
+          <div>EQUIPO</div><div>ZONA</div><div>TAG</div><div>ESTADO</div><div>BRECHAS / OBS.</div>
         </div>
         <div id="gap-rows"><div style="padding:28px;text-align:center;color:#6b7280">Sin registros</div></div>
       </div>
@@ -2433,9 +2433,10 @@ function renderGapRows(){
   const data=reportRows();
   if(!data.length){ rows.innerHTML='<div style="padding:28px;text-align:center;color:#6b7280">Sin registros</div>'; return; }
   rows.innerHTML=data.map(r=>`
-    <div class="dt-row" style="grid-template-columns:2.5fr 0.8fr 0.7fr 2.5fr">
+    <div class="dt-row" style="grid-template-columns:2.5fr 0.8fr 0.9fr 0.7fr 2.5fr">
       <div><div style="font-weight:500;font-size:12px">${esc(r.nombre)}</div><div style="font-family:monospace;font-size:9px;color:#aaa">${esc(pisoLabel(r.piso))}${r.principal?' · '+esc(r.principal):''}</div></div>
       <div>${zpillHtml(r.zona||'')}</div>
+      <div style="font-family:monospace;font-size:10px;font-weight:600">${esc(r.tag_planta||'—')}</div>
       <div><span class="cbadge b${confClass(r.conformidad)}">${esc(r.conformidad||'—')}</span></div>
       <div style="font-size:11px;color:#6b7280">${esc(r.hallazgo||'—')}</div>
     </div>`).join('');
