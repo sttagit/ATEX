@@ -4314,7 +4314,7 @@ async function saveUsuario(){
   try {
     if(curUsrId){
       // Actualizar perfil existente
-      await must(sb.from('profiles').update({full_name:nombre, rol}).eq('id',curUsrId));
+      await must(sb.from('profiles').update({full_name:nombre, rol, role:rol}).eq('id',curUsrId));
       // Actualizar localmente
       const u = todosUsuarios.find(u=>u.id===curUsrId);
       if(u){ u.full_name=nombre; u.rol_global=rol; }
@@ -4470,7 +4470,7 @@ async function loadAdmUsuariosFresh(){
   if(!tbody) return;
   try {
     const [profsData, puData]=await Promise.all([
-      sb.from('profiles').select('id,full_name,rol'),
+      sb.from('profiles').select('id,full_name,rol,role'),
       sb.from('proyecto_usuarios').select('user_id')
     ]);
     const profs=profsData.data||[];
@@ -4481,7 +4481,7 @@ async function loadAdmUsuariosFresh(){
       const existing=admTodosUsuarios.find(u=>u.id===p.id);
       if(existing){
         existing.full_name=p.full_name||'';
-        existing.rol_global=p.rol||'';
+        existing.rol_global=p.rol||p.role||'';
         existing.proyectos_count=puCount[p.id]||0;
       }
     });
@@ -4498,7 +4498,7 @@ async function loadAdmUsuarios(){
   try {
     const [vistaData, profsData, puData]=await Promise.all([
       sb.from('usuarios_vista').select('*').order('created_at',{ascending:false}),
-      sb.from('profiles').select('id,full_name,rol'),
+      sb.from('profiles').select('id,full_name,rol,role'),
       sb.from('proyecto_usuarios').select('user_id')
     ]);
     const data=vistaData.data||[];
@@ -4511,7 +4511,7 @@ async function loadAdmUsuarios(){
     admTodosUsuarios=data.map(u=>({
       ...u,
       full_name: profsMap[u.id]?.full_name || '',
-      rol_global: profsMap[u.id]?.rol || '',
+      rol_global: profsMap[u.id]?.rol || profsMap[u.id]?.role || '',
       proyectos_count: puCount[u.id]||0
     }));
     renderAdmUsuariosTable(admTodosUsuarios);
@@ -4700,7 +4700,7 @@ async function saveAdmUsuario(){
   const btn=document.getElementById('adm-um-sv'); btn.disabled=1; btn.textContent='Guardando&#8230;';
   try {
     if(admCurUsrId){
-      await must(sb.from('profiles').update({full_name:nombre,rol}).eq('id',admCurUsrId));
+      await must(sb.from('profiles').update({full_name:nombre,rol,role:rol}).eq('id',admCurUsrId));
       // Actualizar localmente de inmediato
       const u=admTodosUsuarios.find(u=>u.id===admCurUsrId);
       if(u){ u.full_name=nombre; u.rol_global=rol; }
