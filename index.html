@@ -1621,7 +1621,7 @@ const FL = {
 };
 
 //  STATE
-let session, profile, recs={}, subRecs={}, curEq=null, curConf='', pendFiles=[], exPaths=[], floorF='all', allRaw=[], allSubRaw=[];
+let session, profile, recs={}, subRecs={}, curEq=null, curConf='', pendFiles=[], exPaths=[], floorF='all', allRaw=[], allSubRaw=[], modalOriginTab='eq';
 let curProyecto=null, proyectos=[];
 let todosDocumentos=[], docFiltro='all', docTipoFiltro='', docSearchQ='', curDocPreview=null, duFile=null;
 let todosUsuarios=[], curUsrId=null, curUsrAsignaciones=[], perfilActual=null;
@@ -2085,6 +2085,8 @@ function setFloor(fl,el){
 //  MODAL EQUIPO
 async function openModal(id){
   curEq=id; curConf=''; pendFiles=[]; exPaths=[];
+  // Recordar desde qué tab se abrió el modal
+  modalOriginTab = document.getElementById('tab-inf')?.style.display!=='none' ? 'inf' : 'eq';
   const eq = getEqDef(id);
   if(!eq){ toast('Equipo no encontrado','err'); return; }
   const r=recs[id]||{};
@@ -2281,6 +2283,16 @@ function closeModal(){
   document.getElementById('modal-bg').style.display='none';
   document.body.style.overflow='';
   curEq=null;
+  // Volver al tab desde donde se abrió el modal
+  if(modalOriginTab==='inf'){
+    ['eq','rs','inf','ciclos','docs'].forEach(t=>{
+      const el=document.getElementById('tab-'+t);
+      if(el) el.style.display=t==='inf'?'block':'none';
+    });
+    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('on'));
+    const btn=document.querySelector(`.nav-btn[onclick*="'inf'"]`);
+    if(btn) btn.classList.add('on');
+  }
 }
 function setConf(v){ curConf=v; renderRadios(); }
 function renderRadios(){ document.querySelectorAll('#rgrp .ropt').forEach(b=>{ b.className='ropt'; if(b.dataset.v===curConf) b.classList.add('s'+curConf); }); }
