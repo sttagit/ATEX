@@ -1701,7 +1701,7 @@ async function loadApp(){
     if(data){ data.forEach(r=>{ recs[r.equipo_id]=r; }); allRaw=data; }
   } catch(e){ toast('Error cargando registros','err'); }
   try {
-    const sd=await must(sb.from('componentes').select('*, profiles(full_name)').eq('proyecto_id',pid).order('created_at',{ascending:true}));
+    const sd=await must(sb.from('componentes').select('*').eq('proyecto_id',pid).order('created_at',{ascending:true}));
     if(sd){ allSubRaw=sd; subRecs={}; sd.forEach(c=>{ if(!subRecs[c.equipo_id]) subRecs[c.equipo_id]=[]; subRecs[c.equipo_id].push(c); }); }
   } catch(e){ console.warn('componentes not found'); }
   try {
@@ -1786,7 +1786,7 @@ async function loadAndRenderInforme(){
   try {
     const [r1, r2] = await Promise.all([
       sb.from('registros').select('*, profiles(full_name)').eq('proyecto_id',pid).order('updated_at',{ascending:false}),
-      sb.from('componentes').select('*, profiles(full_name)').eq('proyecto_id',pid).order('created_at',{ascending:true})
+      sb.from('componentes').select('*').eq('proyecto_id',pid).order('created_at',{ascending:true})
     ]);
     if(r1.error) throw r1.error;
     if(r2.error) throw r2.error;
@@ -2379,7 +2379,7 @@ async function reloadData(){
     if(data){ allRaw=data; recs={}; data.forEach(r=>{ recs[r.equipo_id]=r; }); }
   } catch(e){ console.warn(e); }
   try {
-    const sd=await must(sb.from('componentes').select('*, profiles(full_name)').eq('proyecto_id',pid).order('created_at',{ascending:true}));
+    const sd=await must(sb.from('componentes').select('*').eq('proyecto_id',pid).order('created_at',{ascending:true}));
     if(sd){ allSubRaw=sd; subRecs={}; sd.forEach(c=>{ if(!subRecs[c.equipo_id]) subRecs[c.equipo_id]=[]; subRecs[c.equipo_id].push(c); }); }
   } catch(e){ console.warn(e); }
   try {
@@ -2404,7 +2404,7 @@ async function renderResumen(){
   try {
     const [r1,r2]=await Promise.all([
       sb.from('registros').select('*, profiles(full_name)').eq('proyecto_id',pid).order('updated_at',{ascending:false}),
-      sb.from('componentes').select('*, profiles(full_name)').eq('proyecto_id',pid).order('created_at',{ascending:true})
+      sb.from('componentes').select('*').eq('proyecto_id',pid).order('created_at',{ascending:true})
     ]);
     if(r1.error) throw r1.error;
     if(r2.error) throw r2.error;
