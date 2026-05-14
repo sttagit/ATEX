@@ -4460,7 +4460,7 @@ function switchAdminTab(tab, el){
     const p=document.getElementById('adm-panel-'+t);
     if(p) p.style.display=t===tab?'block':'none';
   });
-  if(tab==='usuarios') loadAdmUsuarios();
+  if(tab==='usuarios') loadAdmUsuariosFresh();
   if(tab==='proyectos') loadAdmProyectos();
 }
 
@@ -4468,6 +4468,8 @@ function switchAdminTab(tab, el){
 async function loadAdmUsuariosFresh(){
   const tbody=document.getElementById('adm-usr-tbody');
   if(!tbody) return;
+  // Si no hay datos en memoria, hacer carga completa
+  if(!admTodosUsuarios.length){ await loadAdmUsuarios(); return; }
   try {
     const [profsData, puData]=await Promise.all([
       sb.from('profiles').select('id,full_name,rol,role'),
