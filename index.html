@@ -220,6 +220,11 @@ input[type=file]{display:none}
 .eq-expand.drag-over{background:#ede9fe!important;border:2px dashed #7c3aed!important;border-radius:6px;padding:4px!important}
 .eq-expand.drag-over .comp-add{border-color:#7c3aed;color:#7c3aed}
 .drag-ghost{position:fixed;top:-100px;left:-100px;background:#1e1030;color:#a78bfa;border-radius:4px;padding:5px 12px;font-size:11px;font-family:monospace;pointer-events:none;z-index:9999;white-space:nowrap;border:1px solid #7c3aed}
+#comp-transfer-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:400;padding:16px;overflow-y:auto;align-items:flex-start;justify-content:center}
+#comp-transfer-bg.on{display:flex}
+.ct-eq-item{padding:9px 14px;border-bottom:1px solid #f0ece4;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:8px;transition:background .1s}
+.ct-eq-item:hover{background:#f5f3ee}
+.ct-eq-item .ct-eq-piso{font-family:monospace;font-size:9px;color:#888;margin-left:auto;white-space:nowrap}
 /* ── INFORME ÁRBOL ── */
 .inf-tree-wrap{border:1px solid #ddd9d0;border-radius:6px;overflow:hidden;background:#fff}
 .inf-piso-hd{background:#1e2230;color:#F7C600;padding:9px 14px;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;font-family:monospace;font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;border-top:1px solid #2a2f40}
@@ -2959,17 +2964,16 @@ async function deleteComp(){
 }
 
 //  DRAG & DROP COMPONENTES
-let dragCompId=null, dragFromEqId=null, _dragGhost=null;
+let dragCompId=null, dragFromEqId=null, _dragGhost=null, _dragDropped=false;
 
 function onCompDragStart(e, compId, fromEqId){
-  dragCompId=compId; dragFromEqId=fromEqId;
+  dragCompId=compId; dragFromEqId=fromEqId; _dragDropped=false;
   e.dataTransfer.effectAllowed='move';
   e.currentTarget.classList.add('dragging');
-  // Custom ghost
   _dragGhost=document.createElement('div');
   _dragGhost.className='drag-ghost';
   const name=e.currentTarget.querySelector('.comp-name')?.textContent||'componente';
-  _dragGhost.textContent='&#10303; '+name;
+  _dragGhost.textContent='⇥ '+name;
   document.body.appendChild(_dragGhost);
   try{ e.dataTransfer.setDragImage(_dragGhost,-10,-10); }catch(ex){}
 }
@@ -2978,6 +2982,14 @@ function onCompDragEnd(e){
   e.currentTarget.classList.remove('dragging');
   document.querySelectorAll('.eq-expand.drag-over').forEach(z=>z.classList.remove('drag-over'));
   if(_dragGhost){ _dragGhost.remove(); _dragGhost=null; }
+  // Si no cayó en zona válida (otro equipo visible), abrir modal de transferencia
+  if(!_dragDropped && dragCompId && dragFromEqId){
+    const cId=dragCompId, fId=dragFromEqId;
+    dragCompId=null; dragFromEqId=null;
+    openCompTransfer(cId, fId);
+  } else {
+    dragCompId=null; dragFromEqId=null;
+  }
 }
 
 function onExpandDragOver(e, eqId){
@@ -2999,24 +3011,18 @@ async function onExpandDrop(e, toEqId){
   e.preventDefault();
   document.getElementById('exp-'+toEqId)?.classList.remove('drag-over');
   if(!dragCompId||!dragFromEqId) return;
-  if(toEqId===dragFromEqId){ dragCompId=null; dragFromEqId=null; return; }
-  const fromId=dragFromEqId, cId=dragCompId;
+  if(toEqId===dragFromEqId){ _dragDropped=true; dragCompId=null; dragFromEqId=null; return; }
+  _dragDropped=true;
+  const cId=dragCompId, fId=dragFromEqId;
   dragCompId=null; dragFromEqId=null;
-  try {
-    await must(sb.from('componentes').update({equipo_id:toEqId}).eq('proyecto_id',projectId()).eq('id',cId));
-    // Update local state
-    const comp=(subRecs[fromId]||[]).find(c=>c.id===cId);
-    if(comp){
-      subRecs[fromId]=(subRecs[fromId]||[]).filter(c=>c.id!==cId);
-      comp.equipo_id=toEqId;
-      if(!subRecs[toEqId]) subRecs[toEqId]=[];
-      subRecs[toEqId].push(comp);
-      allSubRaw=allSubRaw.map(c=>c.id===cId?{...c,equipo_id:toEqId}:c);
-    }
-    const fromName=eqName(fromId), toName=eqName(toEqId);
-    toast(`Movido a "${toName}" &#10003;`,'ok');
-    renderEq();
-  } catch(err){ toast('Error al mover: '+err.message,'err'); }
+  // Abrir modal con destino preseleccionado
+  openCompTransfer(cId, fId);
+  // Pre-navegar directo al paso 2 con el equipo destino ya filtrado
+  setTimeout(()=>{
+    ctSelectAction('move');
+    document.getElementById('ct-search').value=eqName(toEqId);
+    ctRenderList();
+  }, 50);
 }
 
 function updateZonaUso(cb, z){
@@ -4980,6 +4986,141 @@ async function deleteDocumento(docId){
     updateDocCounts(); renderDocs(); toast('Documento eliminado ✓','ok');
   } catch(e){ toast('Error: '+e.message,'err'); }
 }
+
+// ── TRANSFERIR COMPONENTE ─────────────────────────────────
+let _ctCompId=null, _ctFromEqId=null, _ctAction=null, _ctPisoFilter='all';
+
+function openCompTransfer(compId, fromEqId){
+  _ctCompId=compId; _ctFromEqId=fromEqId; _ctAction=null; _ctPisoFilter='all';
+  const comp=(subRecs[fromEqId]||[]).find(c=>c.id===compId);
+  document.getElementById('ct-comp-name').textContent=comp?.nombre_comp||comp?.tipo||'Componente';
+  document.getElementById('ct-step1').style.display='block';
+  document.getElementById('ct-step2').style.display='none';
+  document.getElementById('comp-transfer-bg').classList.add('on');
+  document.body.style.overflow='hidden';
+}
+
+function closeCompTransfer(){
+  document.getElementById('comp-transfer-bg').classList.remove('on');
+  document.body.style.overflow='';
+  _ctCompId=null; _ctFromEqId=null; _ctAction=null;
+}
+
+function ctSelectAction(action){
+  _ctAction=action;
+  document.getElementById('ct-step1').style.display='none';
+  document.getElementById('ct-step2').style.display='block';
+  document.getElementById('ct-action-lbl').textContent=action==='copy'?'📋 COPIAR A…':'✂️ MOVER A…';
+  document.getElementById('ct-search').value='';
+  const pisos=pisoOrderIds();
+  const pf=document.getElementById('ct-piso-filters');
+  pf.innerHTML=`<button class="sf-chip on" onclick="ctSetPiso('all',this)">Todos</button>`+
+    pisos.map(p=>`<button class="sf-chip" onclick="ctSetPiso('${p}',this)">${esc(pisoLabel(p))}</button>`).join('');
+  ctRenderList();
+  setTimeout(()=>document.getElementById('ct-search').focus(),100);
+}
+
+function ctBack(){
+  document.getElementById('ct-step1').style.display='block';
+  document.getElementById('ct-step2').style.display='none';
+}
+
+function ctSetPiso(piso, el){
+  _ctPisoFilter=piso;
+  document.querySelectorAll('#ct-piso-filters .sf-chip').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  ctRenderList();
+}
+
+function ctRenderList(){
+  const q=document.getElementById('ct-search').value.toLowerCase().trim();
+  const allEquip=allEqs('all').filter(e=>e.id!==_ctFromEqId);
+  const filtered=allEquip.filter(e=>{
+    const pisoMatch=_ctPisoFilter==='all'||eqPiso(e.id)===_ctPisoFilter;
+    const nameMatch=!q||eqName(e.id).toLowerCase().includes(q);
+    return pisoMatch&&nameMatch;
+  });
+  const el=document.getElementById('ct-eq-list');
+  if(!filtered.length){
+    el.innerHTML='<div style="padding:20px;text-align:center;color:#aaa;font-size:12px;font-family:monospace">Sin resultados</div>';
+    return;
+  }
+  el.innerHTML=filtered.map(e=>`
+    <div class="ct-eq-item" onclick="ctExecute('${e.id}')">
+      <span style="font-size:12px">${esc(eqName(e.id))}</span>
+      <span class="ct-eq-piso">${esc(pisoLabel(eqPiso(e.id)))}</span>
+    </div>`).join('');
+}
+
+async function ctExecute(toEqId){
+  if(!_ctCompId||!_ctFromEqId||!_ctAction) return;
+  const compId=_ctCompId, fromEqId=_ctFromEqId, action=_ctAction;
+  closeCompTransfer();
+  const comp=(subRecs[fromEqId]||[]).find(c=>c.id===compId);
+  if(!comp){ toast('Componente no encontrado','err'); return; }
+  try {
+    if(action==='move'){
+      await must(sb.from('componentes').update({equipo_id:toEqId}).eq('proyecto_id',projectId()).eq('id',compId));
+      subRecs[fromEqId]=(subRecs[fromEqId]||[]).filter(c=>c.id!==compId);
+      comp.equipo_id=toEqId;
+      if(!subRecs[toEqId]) subRecs[toEqId]=[];
+      subRecs[toEqId].push(comp);
+      allSubRaw=allSubRaw.map(c=>c.id===compId?{...c,equipo_id:toEqId}:c);
+      toast(`Movido a "${eqName(toEqId)}" ✓`,'ok');
+    } else {
+      const {id:_omit, fotos:_f, created_at:_c, updated_at:_u, ...rest}=comp;
+      const newComp={...rest, equipo_id:toEqId, fotos:[], proyecto_id:projectId(),
+        inspector_id:session.user.id, inspector_nombre:profile?.full_name||session.user.email};
+      const saved=await must(sb.from('componentes').insert(newComp).select().single());
+      if(!subRecs[toEqId]) subRecs[toEqId]=[];
+      subRecs[toEqId].push(saved);
+      allSubRaw.push(saved);
+      toast(`Copiado a "${eqName(toEqId)}" ✓`,'ok');
+    }
+    renderEq();
+    if(document.getElementById('tab-inf')?.style.display!=='none'){
+      try { renderGapRows(); renderFindings(); } catch(e){ console.warn(e); }
+    }
+  } catch(err){ toast('Error: '+err.message,'err'); }
+}
+<!-- MODAL TRANSFERIR COMPONENTE -->
+<div id="comp-transfer-bg">
+  <div class="modal" style="border-top-color:#7c3aed;max-width:480px;width:100%">
+    <div class="modal-head" style="background:#0f1117">
+      <div style="flex:1">
+        <div style="font-size:11px;font-family:monospace;color:#a78bfa;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">TRANSFERIR COMPONENTE</div>
+        <div id="ct-comp-name" style="font-size:14px;font-weight:600;color:#f5f3ee"></div>
+      </div>
+      <button onclick="closeCompTransfer()" style="background:none;border:none;color:#666;font-size:20px;cursor:pointer">✕</button>
+    </div>
+    <div class="modal-body" style="padding:0">
+      <!-- Paso 1: Copiar o Mover -->
+      <div id="ct-step1" style="padding:20px">
+        <div style="font-size:12px;color:#6b7280;margin-bottom:16px;font-family:monospace">¿Qué deseas hacer con este componente?</div>
+        <div style="display:flex;gap:10px">
+          <button onclick="ctSelectAction('copy')" style="flex:1;padding:14px;border:2px solid #7c3aed;border-radius:6px;background:none;cursor:pointer;font-family:monospace;font-size:12px;font-weight:700;color:#7c3aed;transition:all .15s" onmouseover="this.style.background='#ede9fe'" onmouseout="this.style.background='none'">
+            📋 COPIAR<div style="font-size:10px;font-weight:400;margin-top:4px;color:#888">Queda en origen y destino</div>
+          </button>
+          <button onclick="ctSelectAction('move')" style="flex:1;padding:14px;border:2px solid #F7C600;border-radius:6px;background:none;cursor:pointer;font-family:monospace;font-size:12px;font-weight:700;color:#92400e;transition:all .15s" onmouseover="this.style.background='#fef3c7'" onmouseout="this.style.background='none'">
+            ✂️ MOVER<div style="font-size:10px;font-weight:400;margin-top:4px;color:#888">Solo queda en destino</div>
+          </button>
+        </div>
+      </div>
+      <!-- Paso 2: Seleccionar destino -->
+      <div id="ct-step2" style="display:none">
+        <div style="padding:14px 16px;border-bottom:1px solid #f0ece4;display:flex;align-items:center;gap:8px">
+          <button onclick="ctBack()" style="background:none;border:none;cursor:pointer;color:#888;font-size:16px;padding:0 4px">←</button>
+          <div style="flex:1">
+            <div id="ct-action-lbl" style="font-size:10px;font-family:monospace;color:#7c3aed;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px"></div>
+            <input id="ct-search" class="field-input" placeholder="Buscar equipo destino…" oninput="ctRenderList()" style="margin:0">
+          </div>
+        </div>
+        <div style="padding:8px 16px;border-bottom:1px solid #f0ece4;display:flex;gap:6px;flex-wrap:wrap" id="ct-piso-filters"></div>
+        <div id="ct-eq-list" style="max-height:320px;overflow-y:auto"></div>
+      </div>
+    </div>
+  </div>
+</div>
 </script>
 </body>
 </html>
