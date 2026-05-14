@@ -4460,31 +4460,33 @@ function switchAdminTab(tab, el){
     const p=document.getElementById('adm-panel-'+t);
     if(p) p.style.display=t===tab?'block':'none';
   });
-  if(tab==='usuarios') admTodosUsuarios.length ? loadAdmUsuariosFresh() : loadAdmUsuarios();
+  if(tab==='usuarios') loadAdmUsuarios();
   if(tab==='proyectos') loadAdmProyectos();
 }
 
 // ── Cargar usuarios ───────────────────────────────────────
 async function loadAdmUsuariosFresh(){
-  // Carga directa desde profiles + auth.users sin caché de vista
   const tbody=document.getElementById('adm-usr-tbody');
   if(!tbody) return;
   try {
-    // Leer profiles directamente (más fresco que la vista)
-    const profs=await must(sb.from('profiles').select('id,full_name,rol'));
-    const pu=await must(sb.from('proyecto_usuarios').select('user_id'));
+    const [profsData, puData]=await Promise.all([
+      sb.from('profiles').select('id,full_name,rol'),
+      sb.from('proyecto_usuarios').select('user_id')
+    ]);
+    const profs=profsData.data||[];
     const puCount={};
-    (pu||[]).forEach(r=>{ puCount[r.user_id]=(puCount[r.user_id]||0)+1; });
-    // Combinar con datos existentes en admTodosUsuarios (para tener email y last_sign_in)
-    if(profs){
-      profs.forEach(p=>{
-        const existing=admTodosUsuarios.find(u=>u.id===p.id);
-        if(existing){ existing.full_name=p.full_name; existing.rol_global=p.rol; existing.proyectos_count=puCount[p.id]||0; }
-      });
-    }
+    (puData.data||[]).forEach(r=>{ puCount[r.user_id]=(puCount[r.user_id]||0)+1; });
+    // Actualizar admTodosUsuarios — profiles es fuente de verdad
+    profs.forEach(p=>{
+      const existing=admTodosUsuarios.find(u=>u.id===p.id);
+      if(existing){
+        existing.full_name=p.full_name||'';
+        existing.rol_global=p.rol||'';
+        existing.proyectos_count=puCount[p.id]||0;
+      }
+    });
     renderAdmUsuariosTable(admTodosUsuarios);
   } catch(e){
-    // Fallback: recargar vista completa
     await loadAdmUsuarios();
   }
 }
@@ -4503,13 +4505,13 @@ async function loadAdmUsuarios(){
     const profs=profsData.data||[];
     const puCount={};
     (puData.data||[]).forEach(r=>{ puCount[r.user_id]=(puCount[r.user_id]||0)+1; });
-    // Enriquecer con full_name y rol desde profiles (fuente de verdad)
+    // profiles es SIEMPRE fuente de verdad — ignorar full_name y rol de la vista
     const profsMap={};
     profs.forEach(p=>{ profsMap[p.id]=p; });
     admTodosUsuarios=data.map(u=>({
       ...u,
-      full_name: profsMap[u.id]?.full_name || u.full_name || u.nombre || '',
-      rol_global: profsMap[u.id]?.rol || u.rol_global || u.rol || '',
+      full_name: profsMap[u.id]?.full_name || '',
+      rol_global: profsMap[u.id]?.rol || '',
       proyectos_count: puCount[u.id]||0
     }));
     renderAdmUsuariosTable(admTodosUsuarios);
