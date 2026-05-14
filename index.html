@@ -3945,7 +3945,9 @@ function openEqNuevo(ubId, ubNombre, origen='eq'){
   const ubRow=document.getElementById('en-ub-row');
   const ubSel=document.getElementById('en-ub-sel');
   if(origen==='inf'){
-    ubSel.innerHTML='<option value="">— Sin ubicación —</option>'+
+    const tipoUb=curProyecto?.tipo_ubicacion||'Piso';
+    document.querySelector('#en-ub-row .field-lbl').textContent=tipoUb;
+    ubSel.innerHTML=`<option value="">— Sin ${tipoUb.toLowerCase()} —</option>`+
       proyUbicaciones.map(u=>`<option value="${u.id}">${esc(u.nombre)}</option>`).join('');
     ubRow.style.display='block';
   } else {
@@ -3979,14 +3981,8 @@ async function saveEqNuevo(){
     closeEqNuevo();
     await reloadData();
     if(eqNuevoOriginTab==='inf'){
-      ['eq','rs','inf','ciclos','docs'].forEach(t=>{
-        const el=document.getElementById('tab-'+t);
-        if(el) el.style.display=t==='inf'?'block':'none';
-      });
-      document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('on'));
-      const btn=document.querySelector(`.nav-btn[onclick*="'inf'"]`);
-      if(btn) btn.classList.add('on');
-      try { renderGapRows(); renderFindings(); } catch(e){ console.warn(e); }
+      // Abrir ficha de inspección del primer equipo creado directamente
+      if(saved && saved.length>0) await openModal(saved[0].id);
     }
   } catch(e){toast('Error: '+e.message,'err');}
   btn.disabled=0; btn.textContent='CREAR EQUIPO';
