@@ -1964,7 +1964,7 @@ function renderEq(){
     h+=`<div class="eq-grid" id="egrid-${fl}" ondragover="onPisoDragOver(event,'${fl}')" ondragleave="onPisoDragLeave(event,'${fl}')" ondrop="onPisoDrop(event,'${fl}')">`;
     for(const eq of flItems){
       const r=recs[eq.id]||{};
-      const z=r.zona||eq.z||'';
+      const z=r.zona||'';
       const zClass=['20','21','22'].includes(String(z))?' z'+z:'';
       const conf=eqConf(eq.id);
       const comps=subRecs[eq.id]||[];
@@ -2117,7 +2117,7 @@ async function openModal(id){
   fv('f-marca',r.marca); fv('f-modelo',r.modelo); fv('f-serie',r.serie); fv('f-tag',r.tag_planta);
   fv('f-pot',r.potencia); fv('f-fab',r.fecha_fab);
   fv('f-mex',r.marcado_ex); fv('f-epl',r.epl);
-  fv('f-zona',r.zona||eq.z); fv('f-temp',r.temp_max);
+  fv('f-zona',r.zona||''); fv('f-temp',r.temp_max);
   fv('f-hall',r.hallazgo); fv('f-acc',r.accion);
   curConf=r.conformidad||''; renderRadios();
   exPaths=r.fotos||[]; await renderPhotos();
@@ -2563,7 +2563,7 @@ function renderFindings(){
       const comps=allSubRaw.filter(c=>c.equipo_id===eq.id);
       const hasComps=comps.length>0;
       const nombre=eqName(eq.id);
-      const z=r.zona||eq.z||'';
+      const z=r.zona||'';
 
       h+=`<div id="iew-${eq.id}">
         <div class="inf-eq-row" onclick="toggleInfEq('${eq.id}')">
