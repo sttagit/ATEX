@@ -508,6 +508,10 @@ input[type=file]{display:none}
       <button onclick="closeEqNuevo()" style="background:none;border:none;color:#666;font-size:20px;cursor:pointer">✕</button>
     </div>
     <div class="modal-body">
+      <div id="en-ub-row" style="display:none">
+        <div class="field-lbl">Ubicación / Piso</div>
+        <select class="field-sel" id="en-ub-sel"></select>
+      </div>
       <div><div class="field-lbl">Nombre del equipo</div><input class="field-input" id="en-nombre" placeholder="Ej: Motor ventilador, Sensor de nivel…"></div>
       <div class="two-col">
         <div>
@@ -829,7 +833,10 @@ input[type=file]{display:none}
       </div>
       <div class="sec-hd">No conformidades</div>
       <div id="nc-sum" style="margin-bottom:20px"></div>
-      <div class="sec-hd">Tabla completa</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div class="sec-hd" style="margin:0">Tabla completa</div>
+        <button onclick="openEqNuevo(null,'Nuevo equipo','inf')" style="background:#F7C600;color:#111;border:none;border-radius:4px;padding:6px 14px;font-size:11px;font-weight:700;cursor:pointer;font-family:monospace;display:flex;align-items:center;gap:6px">＋ Nuevo equipo</button>
+      </div>
       <div id="findings" style="overflow-x:auto"><div style="padding:28px;text-align:center;color:#6b7280">Sin datos</div></div>
       <div style="display:flex;gap:10px;margin-top:22px;flex-wrap:wrap">
         <button class="btn-dark btn-lg btn-print" onclick="printInforme()">PDF / Imprimir</button>
@@ -1626,7 +1633,7 @@ let curProyecto=null, proyectos=[];
 let todosDocumentos=[], docFiltro='all', docTipoFiltro='', docSearchQ='', curDocPreview=null, duFile=null;
 let todosUsuarios=[], curUsrId=null, curUsrAsignaciones=[], perfilActual=null;
 let customPisos={}, proyUbicaciones=[], proyEquipos=[];
-let curUbIdNuevoEq=null;
+let curUbIdNuevoEq=null, eqNuevoOriginTab='eq';
 let _eqDragId=null, _eqDragGhost=null;
 let _tipoUbSel='Piso';
 let curParentEq=null, curCompId=null, subConf='', subPendFiles=[], subExPaths=[];
@@ -3926,13 +3933,24 @@ async function deleteUb(ubId){
 }
 
 //  CREAR EQUIPO NUEVO
-function openEqNuevo(ubId,ubNombre){
+function openEqNuevo(ubId, ubNombre, origen='eq'){
   curUbIdNuevoEq=ubId;
-  document.getElementById('en-ub-lbl').textContent=ubNombre||'Nueva ubicación';
+  eqNuevoOriginTab=origen;
+  document.getElementById('en-ub-lbl').textContent=ubNombre||'Nuevo equipo';
   document.getElementById('en-nombre').value='';
   document.getElementById('en-grupo').value='';
   document.getElementById('en-zona').value='';
   document.getElementById('en-cantidad').value='1';
+  // Mostrar selector de ubicación solo cuando se abre desde informe
+  const ubRow=document.getElementById('en-ub-row');
+  const ubSel=document.getElementById('en-ub-sel');
+  if(origen==='inf'){
+    ubSel.innerHTML='<option value="">— Sin ubicación —</option>'+
+      proyUbicaciones.map(u=>`<option value="${u.id}">${esc(u.nombre)}</option>`).join('');
+    ubRow.style.display='block';
+  } else {
+    ubRow.style.display='none';
+  }
   document.getElementById('eq-nuevo-bg').classList.add('on');
   document.body.style.overflow='hidden';
   setTimeout(()=>document.getElementById('en-nombre').focus(),100);
@@ -3947,15 +3965,29 @@ async function saveEqNuevo(){
   const btn=document.getElementById('en-sv'); btn.disabled=1; btn.textContent='Creando…';
   try {
     const rows=[];
+    const ubId = eqNuevoOriginTab==='inf'
+      ? (document.getElementById('en-ub-sel').value || null)
+      : curUbIdNuevoEq;
     for(let i=1;i<=cantidad;i++){
       const id='deq_'+Date.now()+'_'+Math.random().toString(36).slice(2,6);
       const nombreFinal=cantidad>1?`${nombre} N°${i}`:nombre;
-      rows.push({id,proyecto_id:curProyecto.id,ubicacion_id:curUbIdNuevoEq||null,nombre:nombreFinal,grupo,zona,orden:proyEquipos.length+i,created_by:profile?.full_name||session.user.email});
+      rows.push({id,proyecto_id:curProyecto.id,ubicacion_id:ubId||null,nombre:nombreFinal,grupo,zona,orden:proyEquipos.length+i,created_by:profile?.full_name||session.user.email});
     }
     const saved=await must(sb.from('proyecto_equipos').insert(rows).select());
     if(saved) proyEquipos.push(...saved);
     toast(`${cantidad} equipo${cantidad>1?'s':''} creado${cantidad>1?'s':''} &#10003;`,'ok');
-    closeEqNuevo(); renderEq();
+    closeEqNuevo();
+    await reloadData();
+    if(eqNuevoOriginTab==='inf'){
+      ['eq','rs','inf','ciclos','docs'].forEach(t=>{
+        const el=document.getElementById('tab-'+t);
+        if(el) el.style.display=t==='inf'?'block':'none';
+      });
+      document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('on'));
+      const btn=document.querySelector(`.nav-btn[onclick*="'inf'"]`);
+      if(btn) btn.classList.add('on');
+      try { renderGapRows(); renderFindings(); } catch(e){ console.warn(e); }
+    }
   } catch(e){toast('Error: '+e.message,'err');}
   btn.disabled=0; btn.textContent='CREAR EQUIPO';
 }
