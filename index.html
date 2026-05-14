@@ -621,8 +621,8 @@ input[type=file]{display:none}
         <div class="pr">Crear / editar proyectos</div><div class="pc perm-on">&#10003;</div><div class="pc perm-on">&#10003;</div><div class="pc perm-off">&#10005;</div><div class="pc perm-off">&#10005;</div><div class="pc perm-off">&#10005;</div>
         <div class="pr">Eliminar proyectos</div><div class="pc perm-on">&#10003;</div><div class="pc perm-off">&#10005;</div><div class="pc perm-off">&#10005;</div><div class="pc perm-off">&#10005;</div><div class="pc perm-off">&#10005;</div>
         <div class="pr">Gestionar usuarios</div><div class="pc perm-on">&#10003;</div><div class="pc perm-off">&#10005;</div><div class="pc perm-off">&#10005;</div><div class="pc perm-off">&#10005;</div><div class="pc perm-off">&#10005;</div>
-        <div class="pr">Llenar fichas / fotos</div><div class="pc perm-on">&#10003;</div><div class="pc perm-on">&#10003;</div><div class="pc perm-on">&#10003;</div><div class="pc perm-off">&#10005;</div><div class="pc perm-off">&#10005;</div>
-        <div class="pr">Crear / editar equipos</div><div class="pc perm-on">&#10003;</div><div class="pc perm-on">&#10003;</div><div class="pc perm-on">&#10003;</div><div class="pc perm-off">&#10005;</div><div class="pc perm-off">&#10005;</div>
+        <div class="pr">Llenar fichas / fotos</div><div class="pc perm-on">&#10003;</div><div class="pc perm-on">&#10003;</div><div class="pc perm-on">&#10003;</div><div class="pc perm-on">&#10003;</div><div class="pc perm-off">&#10005;</div>
+        <div class="pr">Crear / editar equipos</div><div class="pc perm-on">&#10003;</div><div class="pc perm-on">&#10003;</div><div class="pc perm-on">&#10003;</div><div class="pc perm-on">&#10003;</div><div class="pc perm-off">&#10005;</div>
         <div class="pr">Eliminar equipos / datos</div><div class="pc perm-on">&#10003;</div><div class="pc perm-on">&#10003;</div><div class="pc perm-off">&#10005;</div><div class="pc perm-off">&#10005;</div><div class="pc perm-off">&#10005;</div>
         <div class="pr">Ver informes / resumen</div><div class="pc perm-on">&#10003;</div><div class="pc perm-on">&#10003;</div><div class="pc perm-on">&#10003;</div><div class="pc perm-on">&#10003;</div><div class="pc perm-on">&#10003;</div>
         <div class="pr">Exportar PDF / CSV</div><div class="pc perm-on">&#10003;</div><div class="pc perm-on">&#10003;</div><div class="pc perm-on">&#10003;</div><div class="pc perm-on">&#10003;</div><div class="pc perm-off">&#10005;</div>
@@ -717,21 +717,11 @@ input[type=file]{display:none}
       <div style="font-size:11px;color:#555;margin-top:8px;text-align:center">CCU Chile · Planta Temuco · Edificio Molino</div>
     </div>
     <div class="login-body">
-      <div class="tabs">
-        <div class="tab on" id="tli" onclick="authTab('li')">INGRESAR</div>
-        <div class="tab" id="trg" onclick="authTab('rg')">REGISTRAR</div>
-      </div>
       <div id="auth-msg" class="msg"></div>
       <form id="form-li" onsubmit="doLogin(event)" style="display:flex;flex-direction:column;gap:12px">
         <div><div class="lbl">Email</div><input id="li-e" type="email" placeholder="inspector@sustentaex.com" required></div>
-        <div><div class="lbl">Contraseña</div><input id="li-p" type="password" placeholder="••••••••" required></div>
+        <div><div class="lbl">Contraseña</div><div style="position:relative"><input id="li-p" type="password" placeholder="••••••••" required style="width:100%;padding-right:36px;box-sizing:border-box"><button type="button" onclick="const i=document.getElementById('li-p');i.type=i.type==='password'?'text':'password';this.textContent=i.type==='password'?'👁':'🙈'" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:14px;padding:0;line-height:1">👁</button></div></div>
         <button class="btn-orange" type="submit" id="btn-li">INGRESAR</button>
-      </form>
-      <form id="form-rg" onsubmit="doRegister(event)" style="display:none;flex-direction:column;gap:12px">
-        <div><div class="lbl">Nombre completo</div><input id="rg-n" type="text" placeholder="Nombre Apellido" required></div>
-        <div><div class="lbl">Email</div><input id="rg-e" type="email" placeholder="inspector@sustentaex.com" required></div>
-        <div><div class="lbl">Contraseña (mín. 8)</div><input id="rg-p" type="password" placeholder="••••••••" required minlength="8"></div>
-        <button class="btn-orange" type="submit" id="btn-rg">CREAR CUENTA</button>
       </form>
     </div>
     <div style="padding:12px 28px;border-top:1px solid #ddd9d0;text-align:center;font-size:10px;color:#aaa;display:flex;align-items:center;justify-content:center;gap:6px">
@@ -1226,6 +1216,9 @@ input[type=file]{display:none}
       <button onclick="closeModal()" style="background:none;border:none;color:#666;font-size:20px;cursor:pointer">✕</button>
     </div>
     <div class="modal-body">
+      <div id="m-readonly-banner" style="display:none;background:#fef3c7;border:1px solid #F7C600;border-radius:4px;padding:8px 14px;margin-bottom:12px;align-items:center;gap:8px;font-size:11px;font-family:monospace;color:#92400e">
+        🔒 Modo solo lectura — tu rol de Visita no permite editar fichas
+      </div>
       <div style="font-size:10px;font-weight:600;color:#F7C600;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0">Datos de placa</div>
       <div class="two-col">
         <div><div class="field-lbl">Marca</div><input class="field-input" id="f-marca" placeholder="Siemens, SEW…"></div>
@@ -1293,7 +1286,7 @@ input[type=file]{display:none}
         Componentes del equipo
       </div>
       <div id="m-comp-list" style="display:flex;flex-direction:column;gap:4px"></div>
-      <div class="comp-add" id="m-comp-add" onclick="openSubModal('new',curEq)">
+      <div class="comp-add" id="m-comp-add" onclick="openSubModal('new',curEq)" style="display:none">
         ＋ Agregar componente (motor, sensor, detector…)
       </div>
       <!-- ZONA PELIGROSA -->
@@ -1726,13 +1719,6 @@ async function loadApp(){
 }
 
 //  AUTH
-function authTab(t){
-  document.getElementById('tli').classList.toggle('on',t==='li');
-  document.getElementById('trg').classList.toggle('on',t==='rg');
-  document.getElementById('form-li').style.display=t==='li'?'flex':'none';
-  document.getElementById('form-rg').style.display=t==='rg'?'flex':'none';
-  setMsg('','');
-}
 function setMsg(txt,type){
   const el=document.getElementById('auth-msg');
   el.textContent=txt; el.className='msg'+(type?' '+type:'');
@@ -1747,18 +1733,6 @@ async function doLogin(e){
     if(error)throw error;
     session=data.session; await loadApp();
   } catch(err){ setMsg('Credenciales incorrectas.','err'); btn.disabled=0; btn.textContent='INGRESAR'; }
-}
-async function doRegister(e){
-  e.preventDefault(); setMsg('','');
-  const btn=document.getElementById('btn-rg');
-  btn.disabled=1; btn.textContent='Creando…';
-  try {
-    const {error}=await sb.auth.signUp({email:document.getElementById('rg-e').value.trim(),password:document.getElementById('rg-p').value,options:{data:{full_name:document.getElementById('rg-n').value.trim()}}});
-    if(error)throw error;
-    authTab('li');
-    setMsg('Cuenta creada. Revisa tu email y luego ingresa.','ok');
-  } catch(err){ setMsg(err.message||'Error.','err'); }
-  btn.disabled=0; btn.textContent='CREAR CUENTA';
 }
 async function doLogout(){
   await sb.auth.signOut();
@@ -2010,7 +1984,7 @@ function renderEq(){
               <button onclick="event.stopPropagation();openCompTransfer('${c.id}','${eq.id}')" title="Transferir componente" style="background:none;border:none;cursor:pointer;color:#a78bfa;font-size:11px;padding:0 4px;margin-left:auto;opacity:0.6;flex-shrink:0" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6">⇄</span>
               <span class="dot d${dotClass(c.conformidad)}"></span>
             </div>`).join('')}
-          <div class="comp-add" onclick="openSubModal('new','${eq.id}')">&#65291; Agregar componente</div>
+          ${isVisita()?'':'<div class="comp-add" onclick="openSubModal(\'new\',\''+eq.id+'\')">&#65291; Agregar componente</div>'}
         </div>
       </div>`;
     }
@@ -2130,6 +2104,18 @@ async function openModal(id){
   // Mostrar sección eliminación solo si hay datos guardados
   const delSec=document.getElementById('m-del-section');
   if(delSec) delSec.style.display='none';
+  // Bloquear UI para visita
+  const visita=isVisita();
+  document.getElementById('btn-sv').style.display=visita?'none':'';
+  document.getElementById('m-comp-add').style.display=visita?'none':'';
+  document.querySelectorAll('#modal-bg input, #modal-bg select, #modal-bg textarea').forEach(el=>{ el.disabled=visita; });
+  if(visita){
+    const readonlyBanner=document.getElementById('m-readonly-banner');
+    if(readonlyBanner) readonlyBanner.style.display='flex';
+  } else {
+    const readonlyBanner=document.getElementById('m-readonly-banner');
+    if(readonlyBanner) readonlyBanner.style.display='none';
+  }
   const mbg=document.getElementById('modal-bg');
   mbg.style.display='flex';
   document.body.style.overflow='hidden';
@@ -2330,6 +2316,7 @@ async function renderPhotos(){
 }
 async function saveEq(){
   if(!curEq) return;
+  if(isVisita()){ toast('Sin permisos para editar equipos','err'); return; }
   const btn=document.getElementById('btn-sv');
   btn.disabled=1; btn.textContent='Guardando…';
   try {
@@ -2858,6 +2845,11 @@ async function openSubModal(mode, parentEqId, compId){
     prev.textContent='Actualizado: '+comp.inspector_nombre+' · '+new Date(comp.updated_at).toLocaleString('es-CL');
   } else { prev.style.display='none'; }
   document.getElementById('sm-del-wrap').style.display=compId?'block':'none';
+  // Bloquear UI para visita
+  const visitaComp=isVisita();
+  document.getElementById('sm-sv').style.display=visitaComp?'none':'';
+  document.getElementById('sm-del-wrap').style.display=(!visitaComp&&compId)?'block':'none';
+  document.querySelectorAll('#smodal-bg input, #smodal-bg select, #smodal-bg textarea').forEach(el=>{ el.disabled=visitaComp; });
   const bg=document.getElementById('smodal-bg');
   bg.style.display='flex'; bg.style.alignItems='flex-start'; bg.style.justifyContent='center';
   document.body.style.overflow='hidden';
@@ -2891,6 +2883,7 @@ async function renderSubPhotos(){
 }
 async function saveComp(){
   if(!curParentEq) return;
+  if(isVisita()){ toast('Sin permisos para editar componentes','err'); return; }
   const tipo=document.getElementById('sm-tipo').value.trim();
   const nombre=document.getElementById('sm-nombre').value.trim();
   if(!tipo&&!nombre){ toast('Ingresa al menos el tipo o nombre del componente','err'); return; }
@@ -2947,6 +2940,7 @@ async function saveComp(){
 }
 async function deleteComp(){
   if(!curCompId||!confirm('¿Eliminar este componente?')) return;
+  if(isVisita()){ toast('Sin permisos para eliminar componentes','err'); return; }
   try {
     await must(sb.from('componentes').delete().eq('proyecto_id',projectId()).eq('id',curCompId));
     subRecs[curParentEq]=(subRecs[curParentEq]||[]).filter(c=>c.id!==curCompId);
@@ -3033,8 +3027,10 @@ function userRol(){
   if((perfilActual?.rol||profile?.rol)==='admin') return 'admin';
   return perfilActual?.rolEnProyecto || perfilActual?.rol || profile?.rol || 'inspector';
 }
-function canEdit(){ return ['supervisor','admin'].includes(userRol()); }
+function canInspect(){ return ['cliente','inspector','supervisor','admin'].includes(userRol()); } // llenar fichas
+function canEdit(){ return ['supervisor','admin'].includes(userRol()); } // crear ciclos, acciones admin
 function isAdmin(){ return userRol()==='admin'; }
+function isVisita(){ return userRol()==='visita'; }
 
 async function loadCiclos(){
   // Mostrar/ocultar botón según rol
@@ -4174,7 +4170,7 @@ function rolDesc(r){
     admin:'Acceso completo. Ve y gestiona todos los proyectos y usuarios.',
     supervisor:'Puede crear proyectos y editar equipos. No gestiona usuarios.',
     inspector:'Puede llenar fichas y crear equipos. No puede eliminar.',
-    cliente:'Solo lectura y exportacion. Ideal para el cliente final.',
+    cliente:'Puede ver y editar fichas de equipos y componentes. No puede crear ciclos ni gestionar usuarios.',
     visita:'Solo lectura. Sin exportacion ni comentarios. Para auditorias.'
   }[r]||'';
 }
@@ -4498,8 +4494,24 @@ async function loadAdmUsuarios(){
   if(!tbody) return;
   tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:#666;padding:28px;font-family:monospace;font-size:11px">Cargando&#8230;</td></tr>';
   try {
-    const data=await must(sb.from('usuarios_vista').select('*').order('created_at',{ascending:false}));
-    admTodosUsuarios=data||[];
+    const [vistaData, profsData, puData]=await Promise.all([
+      sb.from('usuarios_vista').select('*').order('created_at',{ascending:false}),
+      sb.from('profiles').select('id,full_name,rol'),
+      sb.from('proyecto_usuarios').select('user_id')
+    ]);
+    const data=vistaData.data||[];
+    const profs=profsData.data||[];
+    const puCount={};
+    (puData.data||[]).forEach(r=>{ puCount[r.user_id]=(puCount[r.user_id]||0)+1; });
+    // Enriquecer con full_name y rol desde profiles (fuente de verdad)
+    const profsMap={};
+    profs.forEach(p=>{ profsMap[p.id]=p; });
+    admTodosUsuarios=data.map(u=>({
+      ...u,
+      full_name: profsMap[u.id]?.full_name || u.full_name || u.nombre || '',
+      rol_global: profsMap[u.id]?.rol || u.rol_global || u.rol || '',
+      proyectos_count: puCount[u.id]||0
+    }));
     renderAdmUsuariosTable(admTodosUsuarios);
   } catch(e){
     tbody.innerHTML=`<tr><td colspan="6" style="text-align:center;color:#dc2626;padding:28px;font-size:11px">${esc(e.message)}</td></tr>`;
