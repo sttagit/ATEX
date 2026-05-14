@@ -3968,15 +3968,26 @@ async function saveEqNuevo(){
   const btn=document.getElementById('en-sv'); btn.disabled=1; btn.textContent='Creando…';
   try {
     const rows=[];
-    const ubId = eqNuevoOriginTab==='inf'
+    const ubSelVal = eqNuevoOriginTab==='inf'
       ? (document.getElementById('en-ub-sel').value || null)
       : curUbIdNuevoEq;
+    // Detectar si es piso del catálogo estático (FL) o ubicacion_id UUID
+    const isFlPiso = ubSelVal && Object.keys(FL).includes(ubSelVal);
+    const ubId = isFlPiso ? null : ubSelVal;
     for(let i=1;i<=cantidad;i++){
       const id='deq_'+Date.now()+'_'+Math.random().toString(36).slice(2,6);
       const nombreFinal=cantidad>1?`${nombre} N°${i}`:nombre;
       rows.push({id,proyecto_id:curProyecto.id,ubicacion_id:ubId||null,nombre:nombreFinal,grupo,zona,orden:proyEquipos.length+i,created_by:profile?.full_name||session.user.email});
     }
     const saved=await must(sb.from('proyecto_equipos').insert(rows).select());
+    if(saved) proyEquipos.push(...saved);
+    // Si es piso estático, guardar en equipos_piso para cada equipo creado
+    if(isFlPiso && saved){
+      const pid=projectId();
+      await Promise.all(saved.map(eq=>
+        sb.from('equipos_piso').upsert({id:eq.id,piso:ubSelVal,proyecto_id:pid,updated_at:new Date().toISOString()},{onConflict:'proyecto_id,id'})
+      ));
+    }
     if(saved) proyEquipos.push(...saved);
     toast(`${cantidad} equipo${cantidad>1?'s':''} creado${cantidad>1?'s':''} &#10003;`,'ok');
     closeEqNuevo();
