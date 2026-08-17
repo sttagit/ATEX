@@ -54,7 +54,7 @@ input{width:100%;padding:8px 10px;border:1px solid #ddd9d0;border-radius:4px;fon
 .z22p{background:#d1fae5;color:#065f46}
 .zdp{background:#f3f4f6;color:#6b7280}
 .dot{width:7px;height:7px;border-radius:50%;margin-left:auto}
-.dC{background:#059669}.dNC{background:#dc2626}.dOBS{background:#d97706}.d-{background:#ddd9d0}
+.dC{background:#059669}.dNC{background:#dc2626}.dOBS{background:#d97706}.dNV{background:#2563eb}.dNA{background:#9ca3af}.d-{background:#ddd9d0}
 /* ── MODAL ── */
 #modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;padding:16px;overflow-y:auto}
 #modal-bg.on{display:flex;align-items:flex-start;justify-content:center}
@@ -72,6 +72,7 @@ input{width:100%;padding:8px 10px;border:1px solid #ddd9d0;border-radius:4px;fon
 .ropt.sNC{border-color:#dc2626;background:#fee2e2;color:#991b1b}
 .ropt.sOBS{border-color:#d97706;background:#fef3c7;color:#92400e}
 .ropt.sNA{border-color:#6b7280;background:#f3f4f6;color:#6b7280}
+.ropt.sNV{border-color:#2563eb;background:#dbeafe;color:#1e40af}
 .photo-zone{border:1.5px dashed #ddd9d0;border-radius:8px;padding:12px;background:#f5f3ee}
 .photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:8px;margin-bottom:10px}
 .photo-wrap{position:relative}
@@ -82,7 +83,7 @@ input{width:100%;padding:8px 10px;border:1px solid #ddd9d0;border-radius:4px;fon
 .btn-out{background:none;border:1.5px solid #ddd9d0;border-radius:4px;padding:8px 16px;font-size:11px;font-weight:600;cursor:pointer;font-family:monospace}
 .btn-save{background:#F7C600;color:#111;border:none;border-radius:4px;padding:8px 20px;font-size:11px;font-weight:600;cursor:pointer;font-family:monospace}
 /* ── RESUMEN ── */
-.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px}
 .kpi{background:#fff;border:1px solid #ddd9d0;border-radius:4px;padding:14px;text-align:center}
 .kpi-n{font-size:30px;font-weight:600;font-family:monospace}
 .kpi-l{font-size:11px;color:#6b7280;margin-top:4px}
@@ -94,7 +95,7 @@ input{width:100%;padding:8px 10px;border:1px solid #ddd9d0;border-radius:4px;fon
 .dt-row:nth-child(odd){background:#fafaf8}
 .dt-row:last-child{border-bottom:none}
 .cbadge{font-size:10px;font-weight:600;padding:2px 9px;border-radius:2px;font-family:monospace}
-.bC{background:#d1fae5;color:#065f46}.bNC{background:#fee2e2;color:#991b1b}.bOBS{background:#fef3c7;color:#92400e}.bNA{background:#f3f4f6;color:#6b7280}
+.bC{background:#d1fae5;color:#065f46}.bNC{background:#fee2e2;color:#991b1b}.bOBS{background:#fef3c7;color:#92400e}.bNV{background:#dbeafe;color:#1e40af}.bNA{background:#f3f4f6;color:#6b7280}
 /* ── INFORME ── */
 .card{background:#fff;border:1px solid #ddd9d0;border-radius:8px;padding:16px 18px}
 .btn-lg{padding:11px 24px;font-size:12px}
@@ -172,6 +173,7 @@ input[type=file]{display:none}
 .id-C{background:#059669}
 .id-NC{background:#dc2626}
 .id-OBS{background:#d97706}
+.id-NV{background:#2563eb}
 .id-NA{background:#9ca3af}
 .prog-ciclo{background:#ddd9d0;border-radius:2px;height:6px;overflow:hidden;margin:8px 0 4px}
 .prog-ciclo-bar{height:100%;background:#059669;border-radius:2px;transition:width .4s}
@@ -805,6 +807,7 @@ input[type=file]{display:none}
         <div class="kpi"><div class="kpi-n" id="kC" style="color:#059669">—</div><div class="kpi-l">Conformes</div></div>
         <div class="kpi"><div class="kpi-n" id="kNC" style="color:#dc2626">—</div><div class="kpi-l">No conformes</div></div>
         <div class="kpi"><div class="kpi-n" id="kOBS" style="color:#d97706">—</div><div class="kpi-l">Observaciones</div></div>
+        <div class="kpi"><div class="kpi-n" id="kNV" style="color:#2563eb">—</div><div class="kpi-l">No verificables</div></div>
       </div>
       <div class="sec-hd">Hallazgos</div>
       <div class="dt">
@@ -837,9 +840,10 @@ input[type=file]{display:none}
       </div>
       <div id="findings" style="overflow-x:auto"><div style="padding:28px;text-align:center;color:#6b7280">Sin datos</div></div>
       <div style="display:flex;gap:10px;margin-top:22px;flex-wrap:wrap">
-        <button class="btn-dark btn-lg btn-print" onclick="printInforme()">PDF / Imprimir</button>
-        <button class="btn-dark btn-lg" onclick="exportCSV()">⬇ CSV</button>
-        <button class="btn-dark btn-lg" onclick="copyMD()">📋 Markdown</button>
+        <button class="btn-dark btn-lg btn-print btn-export-hide" onclick="printInforme()">PDF / Imprimir</button>
+        <button class="btn-dark btn-lg btn-export-hide" onclick="printRegistroFotografico()" style="background:#1e2230">📷 Registro fotográfico</button>
+        <button class="btn-dark btn-lg btn-export-hide" onclick="exportCSV()">⬇ CSV</button>
+        <button class="btn-dark btn-lg btn-export-hide" onclick="copyMD()">📋 Markdown</button>
       </div>
     </div>
   </div>
@@ -1056,8 +1060,8 @@ input[type=file]{display:none}
       <!-- Nuevo estado -->
       <div style="font-size:10px;font-weight:600;color:#0ea5e9;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">Nuevo estado</div>
       <div class="two-col">
-        <div><div class="field-lbl">Marcado Ex actualizado</div><input class="field-input" id="insp-mex" placeholder="Ex db IIB T3 Gb"></div>
-        <div><div class="field-lbl">EPL / Categoría</div>
+        <div><div class="field-lbl">Marcado Ex actualizado</div><input class="field-input" id="insp-mex" placeholder="Ej.: Ex tb IIIC T120°C Db IP6X"></div>
+        <div><div class="field-lbl">EPL / Estado de verificación</div>
           <select class="field-sel" id="insp-epl">
             <option value="">— seleccionar —</option>
             <option>EPL Da / Cat. 1D — Muy alta</option>
@@ -1065,6 +1069,7 @@ input[type=file]{display:none}
             <option>EPL Dc / Cat. 3D — Mejorada</option>
             <option>Sin marcado Ex — requiere reemplazo</option>
             <option>Marcado no visible / ilegible</option>
+            <option>No verificable — sin placa o antecedentes suficientes</option>
             <option>Equipo no eléctrico / mecánico</option>
           </select>
         </div>
@@ -1075,6 +1080,7 @@ input[type=file]{display:none}
           <span class="ropt" data-v="C"   onclick="setInspConf('C',this)">C — Conforme</span>
           <span class="ropt" data-v="NC"  onclick="setInspConf('NC',this)">NC — No conforme</span>
           <span class="ropt" data-v="OBS" onclick="setInspConf('OBS',this)">OBS — Observación</span>
+          <span class="ropt" data-v="NV"  onclick="setInspConf('NV',this)">NV — No verificable</span>
           <span class="ropt" data-v="NA"  onclick="setInspConf('NA',this)">NA — No aplica</span>
         </div>
       </div>
@@ -1124,6 +1130,7 @@ input[type=file]{display:none}
       <span class="sf-chip"    data-f="comp" onclick="setSfChip(this,'comp')">Componentes</span>
       <span class="sf-chip"    data-f="NC"   onclick="setSfChip(this,'NC')">NC</span>
       <span class="sf-chip"    data-f="OBS"  onclick="setSfChip(this,'OBS')">Observación</span>
+      <span class="sf-chip"    data-f="NV"   onclick="setSfChip(this,'NV')">No verificable</span>
       <span class="sf-chip"    data-f="C"    onclick="setSfChip(this,'C')">Conforme</span>
     </div>
     <div id="search-results">
@@ -1234,8 +1241,8 @@ input[type=file]{display:none}
       </div>
       <div style="font-size:10px;font-weight:600;color:#F7C600;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">Clasificación ATEX</div>
       <div class="two-col">
-        <div><div class="field-lbl">Marcado Ex</div><input class="field-input" id="f-mex" placeholder="Ex db IIB T3 Gb"></div>
-        <div><div class="field-lbl">EPL / Categoría</div>
+        <div><div class="field-lbl">Marcado Ex</div><input class="field-input" id="f-mex" placeholder="Ej.: Ex tb IIIC T120°C Db IP6X"></div>
+        <div><div class="field-lbl">EPL / Estado de verificación</div>
           <select class="field-sel" id="f-epl">
             <option value="">— seleccionar —</option>
             <option>EPL Da / Cat. 1D — Muy alta</option>
@@ -1243,12 +1250,13 @@ input[type=file]{display:none}
             <option>EPL Dc / Cat. 3D — Mejorada</option>
             <option>Sin marcado Ex — requiere reemplazo</option>
             <option>Marcado no visible / ilegible</option>
+            <option>No verificable — sin placa o antecedentes suficientes</option>
             <option>Equipo no eléctrico / mecánico</option>
           </select>
         </div>
       </div>
       <div class="two-col">
-        <div><div class="field-lbl">Zona asignada</div>
+        <div><div class="field-lbl">Zona del emplazamiento</div>
           <select class="field-sel" id="f-zona">
             <option value="">— clasificar —</option>
             <option value="20">Zona 20</option>
@@ -1257,13 +1265,15 @@ input[type=file]{display:none}
             <option value="NG">No peligroso</option>
           </select>
         </div>
-        <div><div class="field-lbl">Temp. superficial máx.</div><input class="field-input" id="f-temp" placeholder="T3 (200°C)"></div>
+        <div><div class="field-lbl">Temp. superficial máx.</div><input class="field-input" id="f-temp" placeholder="Ej.: 120 °C (según placa)"></div>
       </div>
+      <div style="font-size:9px;color:#888;font-family:monospace;line-height:1.4;margin-top:-4px">La zona corresponde al emplazamiento donde está instalado el equipo. La aptitud del equipo se determina a partir de su marcado Ex, EPL/categoría y evidencia disponible.</div>
       <div style="font-size:10px;font-weight:600;color:#F7C600;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">Conformidad</div>
       <div class="radio-grp" id="rgrp">
         <span class="ropt" data-v="C" onclick="setConf('C',this)">C — Conforme</span>
         <span class="ropt" data-v="NC" onclick="setConf('NC',this)">NC — No conforme</span>
         <span class="ropt" data-v="OBS" onclick="setConf('OBS',this)">OBS — Observación</span>
+        <span class="ropt" data-v="NV" onclick="setConf('NV',this)">NV — No verificable</span>
         <span class="ropt" data-v="NA" onclick="setConf('NA',this)">NA — No aplica</span>
       </div>
       <div style="font-size:10px;font-weight:600;color:#F7C600;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">Hallazgos</div>
@@ -1338,8 +1348,8 @@ input[type=file]{display:none}
       </div>
       <div style="font-size:10px;font-weight:600;color:#7c3aed;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">Clasificación ATEX</div>
       <div class="two-col">
-        <div><div class="field-lbl">Marcado Ex</div><input class="field-input" id="sm-mex" placeholder="Ex db IIB T3 Gb"></div>
-        <div><div class="field-lbl">EPL / Categoría</div>
+        <div><div class="field-lbl">Marcado Ex</div><input class="field-input" id="sm-mex" placeholder="Ej.: Ex tb IIIC T120°C Db IP6X"></div>
+        <div><div class="field-lbl">EPL / Estado de verificación</div>
           <select class="field-sel" id="sm-epl">
             <option value="">— seleccionar —</option>
             <option>EPL Da / Cat. 1D — Muy alta</option>
@@ -1347,12 +1357,13 @@ input[type=file]{display:none}
             <option>EPL Dc / Cat. 3D — Mejorada</option>
             <option>Sin marcado Ex — requiere reemplazo</option>
             <option>Marcado no visible / ilegible</option>
+            <option>No verificable — sin placa o antecedentes suficientes</option>
             <option>Equipo no eléctrico / mecánico</option>
           </select>
         </div>
       </div>
       <div class="two-col">
-        <div><div class="field-lbl">Zona ubicada equipo</div>
+        <div><div class="field-lbl">Zona del emplazamiento</div>
           <select class="field-sel" id="sm-zona">
             <option value="">— clasificar —</option>
             <option value="20">Zona 20</option>
@@ -1362,21 +1373,23 @@ input[type=file]{display:none}
             <option value="NG">No peligroso</option>
           </select>
         </div>
-        <div><div class="field-lbl">Temp. superficial máx.</div><input class="field-input" id="sm-temp" placeholder="T3 (200°C)"></div>
+        <div><div class="field-lbl">Temp. superficial máx.</div><input class="field-input" id="sm-temp" placeholder="Ej.: 120 °C (según placa)"></div>
       </div>
       <div>
-        <div class="field-lbl">Zona uso equipo</div>
+        <div class="field-lbl">Aptitud de uso según marcado / documentación</div>
         <div class="zona-uso-wrap">
           <label class="zona-uso-opt" id="zuo-20"><input type="checkbox" value="20" onchange="updateZonaUso(this,'20')"> Z20</label>
           <label class="zona-uso-opt" id="zuo-21"><input type="checkbox" value="21" onchange="updateZonaUso(this,'21')"> Z21</label>
           <label class="zona-uso-opt" id="zuo-22"><input type="checkbox" value="22" onchange="updateZonaUso(this,'22')"> Z22</label>
         </div>
+        <div style="font-size:9px;color:#888;margin-top:5px;font-family:monospace;line-height:1.4">Marcar sólo cuando la aptitud esté respaldada por placa, certificado o documentación técnica. La zona del emplazamiento se registra por separado.</div>
       </div>
       <div style="font-size:10px;font-weight:600;color:#7c3aed;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">Conformidad</div>
       <div class="radio-grp" id="sm-rgrp">
         <span class="ropt" data-v="C" onclick="setSubConf('C',this)">C — Conforme</span>
         <span class="ropt" data-v="NC" onclick="setSubConf('NC',this)">NC — No conforme</span>
         <span class="ropt" data-v="OBS" onclick="setSubConf('OBS',this)">OBS — Observación</span>
+        <span class="ropt" data-v="NV" onclick="setSubConf('NV',this)">NV — No verificable</span>
         <span class="ropt" data-v="NA" onclick="setSubConf('NA',this)">NA — No aplica</span>
       </div>
       <div style="font-size:10px;font-weight:600;color:#7c3aed;letter-spacing:1.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #ddd9d0;margin-top:4px">Hallazgos</div>
@@ -1440,7 +1453,7 @@ function jsArg(v){
 
 function confClass(v){
   const s=String(v ?? '');
-  return ['C','NC','OBS','NA'].includes(s) ? s : '';
+  return ['C','NC','OBS','NV','NA'].includes(s) ? s : '';
 }
 
 function dotClass(v){
@@ -1772,7 +1785,8 @@ async function loadAndRenderInforme(){
         items=statusItems(),
         C=items.filter(r=>r.conformidad==='C').length,
         NC=items.filter(r=>r.conformidad==='NC').length,
-        OBS=items.filter(r=>r.conformidad==='OBS').length;
+        OBS=items.filter(r=>r.conformidad==='OBS').length,
+        NV=items.filter(r=>r.conformidad==='NV').length;
   const pct=pctFrom(total);
   document.getElementById('pct').textContent=pct+'%';
   document.getElementById('prog').style.width=pct+'%';
@@ -1780,6 +1794,7 @@ async function loadAndRenderInforme(){
   document.getElementById('kC').textContent=C;
   document.getElementById('kNC').textContent=NC;
   document.getElementById('kOBS').textContent=OBS;
+  const kNV=document.getElementById('kNV'); if(kNV) kNV.textContent=NV;
   try {
     renderGapRows();
     renderFindings();
@@ -1794,7 +1809,7 @@ function zpillHtml(z){
 }
 function worstConf(eqId){
   const comps=(subRecs[eqId]||[]);
-  const order=['NC','OBS','C','NA',''];
+  const order=['NC','NV','OBS','C','NA',''];
   let worst='';
   for(const c of comps){
     const ci=order.indexOf(c.conformidad||'');
@@ -1806,7 +1821,7 @@ function worstConf(eqId){
 function eqConf(eqId){
   const main=(recs[eqId]||{}).conformidad||'';
   const sub=worstConf(eqId);
-  const order=['NC','OBS','C','NA',''];
+  const order=['NC','NV','OBS','C','NA',''];
   const mi=order.indexOf(main), si=order.indexOf(sub);
   if(mi===-1&&si===-1) return '';
   if(mi===-1) return sub;
@@ -1874,8 +1889,12 @@ function reportRows(){
       tag_planta:r.tag_planta||'',
       marca:r.marca||'',
       modelo:r.modelo||'',
+      serie:r.serie||'',
+      potencia:r.potencia||'',
       fecha_fab:r.fecha_fab||'',
       marcado_ex:r.marcado_ex||'',
+      epl:r.epl||'',
+      temp_max:r.temp_max||'',
       conformidad:r.conformidad||'',
       hallazgo:r.hallazgo||'',
       accion:r.accion||'',
@@ -1897,8 +1916,13 @@ function reportRows(){
       tag_planta:c.tag_planta||'',
       marca:c.marca||'',
       modelo:c.modelo||'',
+      serie:c.serie||'',
+      potencia:c.potencia||'',
       fecha_fab:c.fecha_fab||'',
       marcado_ex:c.marcado_ex||'',
+      epl:c.epl||'',
+      temp_max:c.temp_max||'',
+      zona_uso:c.zona_uso||[],
       conformidad:c.conformidad||'',
       hallazgo:c.hallazgo||'',
       accion:c.accion||'',
@@ -2403,7 +2427,8 @@ async function renderResumen(){
           items=statusItems(),
           C=items.filter(r=>r.conformidad==='C').length,
           NC=items.filter(r=>r.conformidad==='NC').length,
-          OBS=items.filter(r=>r.conformidad==='OBS').length;
+          OBS=items.filter(r=>r.conformidad==='OBS').length,
+          NV=items.filter(r=>r.conformidad==='NV').length;
     const pct=pctFrom(total);
     document.getElementById('pct').textContent=pct+'%';
     document.getElementById('prog').style.width=pct+'%';
@@ -2411,6 +2436,7 @@ async function renderResumen(){
     document.getElementById('kC').textContent=C;
     document.getElementById('kNC').textContent=NC;
     document.getElementById('kOBS').textContent=OBS;
+  const kNV=document.getElementById('kNV'); if(kNV) kNV.textContent=NV;
     renderGapRows();
   } catch(e){ toast('Error cargando resumen','err'); }
   loader(0);
@@ -2650,7 +2676,7 @@ async function openFromInforme(eqId){
 }
 
 function exportCSV(){
-  const rows=[['Tipo','Equipo / Componente','Equipo principal','Piso','Zona','Fabricación','Marcado Ex','Conformidad','Hallazgo','Acción','Inspector']];
+  const rows=[['Tipo','Equipo / Componente','Equipo principal','Piso','Zona emplazamiento','TAG Planta','Marca','Modelo','N° Serie','Potencia / Tensión','Fabricación','Marcado Ex','EPL / Estado verificación','Temp. superficial máx.','Conformidad','Hallazgo','Acción','N° Fotos','Inspector']];
   for(const r of reportRows()){
     rows.push([
       r.tipo,
@@ -2658,11 +2684,19 @@ function exportCSV(){
       r.principal,
       pisoLabel(r.piso),
       r.zona||'',
+      r.tag_planta||'',
+      r.marca||'',
+      r.modelo||'',
+      r.serie||'',
+      r.potencia||'',
       r.fecha_fab||'',
       r.marcado_ex||'',
+      r.epl||'',
+      r.temp_max||'',
       r.conformidad||'',
       r.hallazgo||'',
       r.accion||'',
+      (r.fotos||[]).length,
       r.inspector_nombre||''
     ]);
   }
@@ -2673,7 +2707,7 @@ function exportCSV(){
 }
 
 function copyMD(){
-  let md=`# Informe ATEX — CCU Chile · Planta Temuco\n\n**Inspector:** ${document.getElementById('i-insp').value||'—'}  \n**Fecha:** ${document.getElementById('i-fecha').value||'—'}  \n**Norma:** UNE-EN 60079-10-2:2010\n\n`;
+  let md=`# Informe ATEX — ${curProyecto?.nombre||'Proyecto ATEX'}\n\n**Cliente:** ${curProyecto?.cliente||'—'}  \n**Planta:** ${curProyecto?.planta||'—'}  \n**Inspector:** ${document.getElementById('i-insp').value||'—'}  \n**Fecha:** ${document.getElementById('i-fecha').value||'—'}  \n**Norma:** UNE-EN 60079-10-2:2010\n\n`;
   md+=`| Tipo | Equipo / Componente | Piso | Zona | Fabricación | Marcado Ex | Estado | Hallazgo |\n|---|---|---|---|---|---|---|---|\n`;
   for(const r of reportRows()){
     const tipo=r.tipo==='Equipo'?'**Equipo**':'&#8627; Comp.';
@@ -2708,6 +2742,7 @@ function buildPrintableInforme(rows){
   const C=items.filter(r=>r.conformidad==='C').length;
   const NC=items.filter(r=>r.conformidad==='NC').length;
   const OBS=items.filter(r=>r.conformidad==='OBS').length;
+  const NV=items.filter(r=>r.conformidad==='NV').length;
   const ncRows=rows.filter(r=>r.conformidad==='NC');
   const pisoOrder=pisoOrderIds(rows.map(r=>r.piso));
   const sorted=[...rows].sort((a,b)=>{
@@ -2723,7 +2758,7 @@ function buildPrintableInforme(rows){
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<title>Informe ATEX - CCU Temuco</title>
+<title>Informe ATEX - ${esc(curProyecto?.nombre||'Proyecto ATEX')}</title>
 <style>
 @page{size:A4 landscape;margin:12mm}
 *{box-sizing:border-box}
@@ -2736,7 +2771,7 @@ body{font-family:Arial,Helvetica,sans-serif;color:#111827;margin:0;background:#f
 .meta{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}
 .meta div,.kpi div,.concl{border:1px solid #d1d5db;border-radius:4px;padding:8px}
 .lbl{display:block;color:#6b7280;font-family:Consolas,monospace;font-size:8px;text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px}
-.kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0 14px}
+.kpi{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:10px 0 14px}
 .kpi strong{display:block;font-size:22px;font-family:Consolas,monospace}
 h2{font-size:12px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #d1d5db;padding-bottom:5px;margin:16px 0 8px;color:#111}
 .nc{break-inside:avoid;border:1px solid #fecaca;border-left:4px solid #dc2626;border-radius:4px;margin-bottom:7px;padding:8px}
@@ -2747,7 +2782,7 @@ th{background:#111827;color:#fff;text-align:left;font-family:Consolas,monospace;
 th,td{border:1px solid #d1d5db;padding:4px;vertical-align:top}
 tbody tr:nth-child(even){background:#f9fafb}
 .badge{display:inline-block;border-radius:3px;font-family:Consolas,monospace;font-weight:700;padding:1px 5px}
-.bC{background:#d1fae5;color:#065f46}.bNC{background:#fee2e2;color:#991b1b}.bOBS{background:#fef3c7;color:#92400e}.bNA{background:#f3f4f6;color:#374151}
+.bC{background:#d1fae5;color:#065f46}.bNC{background:#fee2e2;color:#991b1b}.bOBS{background:#fef3c7;color:#92400e}.bNV{background:#dbeafe;color:#1e40af}.bNA{background:#f3f4f6;color:#374151}
 .small{color:#6b7280;font-size:8px}
 .footer{margin-top:14px;color:#6b7280;font-size:8px;text-align:right}
 @media print{button{display:none}}
@@ -2760,7 +2795,7 @@ tbody tr:nth-child(even){background:#f9fafb}
       <div class="title">Informe ATEX - Levantamiento de Equipos Ex</div>
       <div class="sub">UNE-EN 60079-10-2:2010 · IEC 60079-10-2:2009</div>
     </div>
-    <div class="sub" style="text-align:right">CCU Chile · Planta Temuco<br>Edificio de Molino</div>
+    <div class="sub" style="text-align:right">${esc(curProyecto?.cliente||'—')} · ${esc(curProyecto?.planta||'—')}<br>${esc(curProyecto?.nombre||'Proyecto ATEX')}</div>
   </section>
   <section class="meta">
     <div><span class="lbl">Inspector</span>${esc(meta.inspector)}</div>
@@ -2773,6 +2808,7 @@ tbody tr:nth-child(even){background:#f9fafb}
     <div><span class="lbl">Conformes</span><strong style="color:#059669">${C}</strong></div>
     <div><span class="lbl">No conformidades</span><strong style="color:#dc2626">${NC}</strong></div>
     <div><span class="lbl">Observaciones</span><strong style="color:#d97706">${OBS}</strong></div>
+    <div><span class="lbl">No verificables</span><strong style="color:#2563eb">${NV}</strong></div>
   </section>
   <h2>Conclusiones</h2>
   <div class="concl">${esc(meta.concl).replace(/\n/g,'<br>')}</div>
@@ -2788,6 +2824,166 @@ tbody tr:nth-child(even){background:#f9fafb}
   <div class="footer">Generado ${esc(new Date().toLocaleString('es-CL'))}</div>
 </body>
 </html>`;
+}
+
+
+async function signedPhotoUrl(path, ttl=3600){
+  try {
+    const {data,error}=await sb.storage.from('atex-fotos').createSignedUrl(path,ttl);
+    if(error) throw error;
+    return data?.signedUrl||'';
+  } catch(e){
+    console.warn('No se pudo firmar foto',path,e);
+    return '';
+  }
+}
+
+async function printRegistroFotografico(){
+  const eqIds=[...inspectedEqIds()];
+  if(!eqIds.length){ toast('No hay equipos registrados para el informe fotográfico','err'); return; }
+  const win=window.open('','_blank');
+  if(!win){ toast('Permite ventanas emergentes para generar el registro fotográfico','err'); return; }
+  win.document.open();
+  win.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Preparando registro fotográfico…</title><style>body{font-family:Arial;padding:40px;color:#111827}.spin{display:inline-block;width:18px;height:18px;border:2px solid #ddd;border-top-color:#F7C600;border-radius:50%;animation:s .7s linear infinite;vertical-align:middle;margin-right:10px}@keyframes s{to{transform:rotate(360deg)}}</style></head><body><span class="spin"></span>Preparando registro fotográfico y cargando imágenes…</body></html>`);
+  win.document.close();
+
+  try {
+    const order=pisoOrderIds(eqIds.map(eqPiso));
+    eqIds.sort((a,b)=>{
+      const pa=order.indexOf(eqPiso(a)), pb=order.indexOf(eqPiso(b));
+      if(pa!==pb) return (pa<0?99:pa)-(pb<0?99:pb);
+      return eqName(a).localeCompare(eqName(b),'es');
+    });
+
+    const fichas=[];
+    for(const eqId of eqIds){
+      const def=getEqDef(eqId)||{};
+      const r=recs[eqId]||{};
+      const comps=(subRecs[eqId]||[]).map(c=>({...c}));
+      const eqFotos=await Promise.all((r.fotos||[]).map(async path=>({path,url:await signedPhotoUrl(path)})));
+      const compsConFotos=[];
+      for(const c of comps){
+        const fotos=await Promise.all((c.fotos||[]).map(async path=>({path,url:await signedPhotoUrl(path)})));
+        compsConFotos.push({...c,_signedFotos:fotos.filter(f=>f.url)});
+      }
+      fichas.push({
+        id:eqId,
+        nombre:eqName(eqId),
+        piso:eqPiso(eqId)||r.piso||def.p||'',
+        grupo:r.grupo||def.g||'',
+        zona:r.zona||def.z||'',
+        registro:r,
+        fotos:eqFotos.filter(f=>f.url),
+        componentes:compsConFotos
+      });
+    }
+
+    win.document.open();
+    win.document.write(buildRegistroFotograficoHtml(fichas));
+    win.document.close();
+    win.focus();
+  } catch(e){
+    win.document.open();
+    win.document.write(`<html><body style="font-family:Arial;padding:30px"><h2>No fue posible generar el registro fotográfico</h2><p>${esc(e.message)}</p></body></html>`);
+    win.document.close();
+    toast('Error generando registro fotográfico: '+e.message,'err');
+  }
+}
+
+function buildRegistroFotograficoHtml(fichas){
+  const inspector=document.getElementById('i-insp')?.value||profile?.full_name||session?.user?.email||'—';
+  const fecha=document.getElementById('i-fecha')?.value||new Date().toISOString().slice(0,10);
+  const area=document.getElementById('i-area')?.value||curProyecto?.planta||'—';
+  const rev=document.getElementById('i-rev')?.value||'—';
+  const totalFotos=fichas.reduce((s,f)=>s+f.fotos.length+f.componentes.reduce((a,c)=>a+(c._signedFotos?.length||0),0),0);
+  const totalComps=fichas.reduce((s,f)=>s+f.componentes.length,0);
+
+  const fotoGrid=(fotos,prefix)=>{
+    if(!fotos?.length) return '<div class="nofoto">Sin fotografías asociadas.</div>';
+    return `<div class="photos">${fotos.map((f,i)=>`<figure><img src="${escAttr(f.url)}" alt="${escAttr(prefix+' '+(i+1))}"><figcaption>${esc(prefix)} ${i+1}</figcaption></figure>`).join('')}</div>`;
+  };
+
+  const fichaHtml=fichas.map((f,idx)=>{
+    const r=f.registro||{};
+    const conf=r.conformidad||'';
+    const compHtml=f.componentes.length?f.componentes.map(c=>`
+      <div class="comp">
+        <div class="comp-hd"><strong>${esc(c.nombre_comp||c.tipo||'Componente')}</strong><span>${esc(c.tipo||'—')} · ${c.conformidad?`Estado ${esc(c.conformidad)}`:'Sin estado'}</span></div>
+        <div class="mini-grid">
+          <div><b>Marca / Modelo</b>${esc([c.marca,c.modelo].filter(Boolean).join(' · ')||'—')}</div>
+          <div><b>TAG / Serie</b>${esc([c.tag_planta,c.serie].filter(Boolean).join(' · ')||'—')}</div>
+          <div><b>Zona emplazamiento</b>${c.zona?'Zona '+esc(c.zona):'—'}</div>
+          <div><b>Marcado Ex</b>${esc(c.marcado_ex||'—')}</div>
+          <div><b>EPL / Verificación</b>${esc(c.epl||'—')}</div>
+          <div><b>Aptitud documentada</b>${esc((c.zona_uso||[]).map(z=>'Z'+z).join(', ')||'—')}</div>
+        </div>
+        ${c.hallazgo?`<div class="textrow"><b>Brechas / Observaciones:</b> ${esc(c.hallazgo)}</div>`:''}
+        ${c.accion?`<div class="textrow"><b>Acción:</b> ${esc(c.accion)}</div>`:''}
+        ${fotoGrid(c._signedFotos||[],'Foto componente')}
+      </div>`).join(''):'<div class="muted">Sin componentes registrados.</div>';
+
+    return `<section class="eqsheet">
+      <div class="sheet-head">
+        <div>
+          <div class="eyebrow">REGISTRO ${idx+1} DE ${fichas.length}</div>
+          <h1>${esc(f.nombre)}</h1>
+          <div class="sub">${esc(pisoLabel(f.piso))} · ${esc(f.grupo||'Sin grupo')} · ${f.zona?'Zona '+esc(f.zona):'Sin clasificación de emplazamiento'}</div>
+        </div>
+        <div class="status ${conf?'st-'+conf:''}">${esc(conf||'SIN ESTADO')}</div>
+      </div>
+      <div class="data-grid">
+        <div><b>Marca</b>${esc(r.marca||'—')}</div>
+        <div><b>Modelo</b>${esc(r.modelo||'—')}</div>
+        <div><b>N° serie</b>${esc(r.serie||'—')}</div>
+        <div><b>TAG planta</b>${esc(r.tag_planta||'—')}</div>
+        <div><b>Potencia / Tensión</b>${esc(r.potencia||'—')}</div>
+        <div><b>Año fabricación</b>${esc(r.fecha_fab||'—')}</div>
+        <div><b>Marcado Ex</b>${esc(r.marcado_ex||'—')}</div>
+        <div><b>EPL / Estado verificación</b>${esc(r.epl||'—')}</div>
+        <div><b>Temp. superficial máx.</b>${esc(r.temp_max||'—')}</div>
+        <div><b>Zona del emplazamiento</b>${f.zona?'Zona '+esc(f.zona):'—'}</div>
+      </div>
+      <div class="textrow"><b>Brechas / Observaciones:</b> ${esc(r.hallazgo||'—')}</div>
+      <div class="textrow"><b>Acción correctiva:</b> ${esc(r.accion||'—')}</div>
+      <h2>Fotografías del equipo <span>${f.fotos.length}</span></h2>
+      ${fotoGrid(f.fotos,'Foto equipo')}
+      <h2>Componentes asociados <span>${f.componentes.length}</span></h2>
+      ${compHtml}
+      <div class="trace">Registro actualizado por ${esc(r.inspector_nombre||'—')}${r.updated_at?' · '+esc(new Date(r.updated_at).toLocaleString('es-CL')):''}</div>
+    </section>`;
+  }).join('');
+
+  return `<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><title>Registro fotográfico - ${esc(curProyecto?.nombre||'Proyecto ATEX')}</title>
+<style>
+@page{size:A4 portrait;margin:11mm}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;color:#111827;background:#fff;font-size:9.5px;line-height:1.35}
+.toolbar{position:sticky;top:0;z-index:10;background:#111827;color:#fff;padding:9px 14px;display:flex;justify-content:space-between;align-items:center}.toolbar button{background:#F7C600;border:0;border-radius:4px;padding:7px 14px;font-weight:700;cursor:pointer}
+.coverpage{min-height:260mm;display:flex;flex-direction:column;justify-content:center;page-break-after:always;border-top:7px solid #F7C600;padding:22mm 12mm}.brand{font-size:30px;font-weight:900;letter-spacing:3px}.brand span{background:#F7C600;padding:4px 8px;border-radius:4px;font-size:15px}.coverpage h1{font-size:27px;margin:20px 0 6px}.cover-meta{margin-top:25px;display:grid;grid-template-columns:1fr 1fr;gap:10px}.cover-meta div{border:1px solid #d1d5db;border-radius:5px;padding:10px}.cover-meta b,.data-grid b,.mini-grid b{display:block;color:#6b7280;font-size:7.5px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:3px;font-family:Consolas,monospace}.cover-stats{display:flex;gap:10px;margin-top:18px}.cover-stats div{background:#f3f4f6;border-radius:5px;padding:9px 14px}.cover-stats strong{font-size:18px;display:block}
+.eqsheet{page-break-after:always;padding:0 1mm}.eqsheet:last-child{page-break-after:auto}.sheet-head{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #F7C600;padding-bottom:8px;margin-bottom:10px;gap:12px}.eyebrow{font:700 8px Consolas,monospace;color:#6b7280;letter-spacing:1px}.sheet-head h1{font-size:17px;margin:2px 0 3px}.sub{color:#6b7280;font:9px Consolas,monospace}.status{font:700 9px Consolas,monospace;border:1px solid #d1d5db;border-radius:4px;padding:5px 8px;white-space:nowrap}.st-C{background:#d1fae5;color:#065f46}.st-NC{background:#fee2e2;color:#991b1b}.st-OBS{background:#fef3c7;color:#92400e}.st-NV{background:#dbeafe;color:#1e40af}.st-NA{background:#f3f4f6;color:#374151}
+.data-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:8px}.data-grid>div,.mini-grid>div{border:1px solid #e5e7eb;border-radius:4px;padding:6px;min-height:37px}.textrow{border-left:3px solid #d1d5db;background:#f9fafb;padding:6px 8px;margin:5px 0}.textrow b{margin-right:4px}
+h2{font-size:10px;text-transform:uppercase;letter-spacing:.8px;border-bottom:1px solid #d1d5db;padding-bottom:4px;margin:11px 0 6px}h2 span{color:#6b7280;font-family:Consolas,monospace}
+.photos{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px}.photos figure{margin:0;border:1px solid #d1d5db;border-radius:4px;overflow:hidden;break-inside:avoid}.photos img{width:100%;height:49mm;object-fit:contain;background:#f3f4f6;display:block}.photos figcaption{padding:3px 5px;color:#6b7280;font:7.5px Consolas,monospace}.nofoto,.muted{border:1px dashed #d1d5db;border-radius:4px;padding:8px;color:#9ca3af;font-family:Consolas,monospace}
+.comp{border:1px solid #ddd6fe;border-left:3px solid #7c3aed;border-radius:4px;padding:7px;margin:7px 0;break-inside:avoid}.comp-hd{display:flex;justify-content:space-between;gap:8px;margin-bottom:5px}.comp-hd strong{font-size:10px}.comp-hd span{font:8px Consolas,monospace;color:#6b7280}.mini-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}.comp .photos img{height:37mm}.trace{margin-top:8px;text-align:right;color:#9ca3af;font:7.5px Consolas,monospace}
+@media print{.toolbar{display:none}.coverpage{min-height:270mm}}
+</style></head><body>
+<div class="toolbar"><span>Registro fotográfico listo · ${fichas.length} equipos · ${totalFotos} fotos</span><button onclick="window.print()">Imprimir / Guardar PDF</button></div>
+<section class="coverpage">
+  <div class="brand">SUSTENTA <span>Ex</span></div>
+  <h1>Registro fotográfico de equipos Ex</h1>
+  <div class="sub">${esc(curProyecto?.nombre||'Proyecto ATEX')} · ${esc(curProyecto?.cliente||'—')} · ${esc(curProyecto?.planta||'—')}</div>
+  <div class="cover-meta">
+    <div><b>Inspector</b>${esc(inspector)}</div><div><b>Fecha</b>${esc(fecha)}</div>
+    <div><b>Área / Instalación</b>${esc(area)}</div><div><b>Revisión</b>${esc(rev)}</div>
+  </div>
+  <div class="cover-stats"><div><strong>${fichas.length}</strong>Equipos</div><div><strong>${totalComps}</strong>Componentes</div><div><strong>${totalFotos}</strong>Fotografías</div></div>
+  <div style="margin-top:auto;color:#6b7280;font:8px Consolas,monospace">Registro generado desde SUSTENTA Ex · La zona indicada corresponde al emplazamiento; la aptitud del equipo debe sustentarse en su marcado y evidencia documental.</div>
+</section>
+${fichaHtml}
+<script>
+window.addEventListener('load',()=>{const imgs=[...document.images];Promise.all(imgs.map(img=>img.complete?Promise.resolve():new Promise(r=>{img.onload=r;img.onerror=r}))).then(()=>document.title='Registro fotográfico - '+${JSON.stringify(curProyecto?.nombre||'Proyecto ATEX')});});
+<\/script>
+</body></html>`;
 }
 
 function printNcRowHtml(r){
@@ -3440,7 +3636,7 @@ async function openInspCompModal(cicloId,inspId,eqId,compId){
     .select('*').eq('proyecto_id',projectId()).eq('ciclo_id',cicloId).eq('comp_id',compId).maybeSingle();
 
   const confActual=ic?.conformidad||'';
-  const confOpciones=['C','NC','OBS','NA'].map(v=>
+  const confOpciones=['C','NC','OBS','NV','NA'].map(v=>
     `<option value="${v}" ${confActual===v?'selected':''}>${v}</option>`
   ).join('');
 
@@ -3695,7 +3891,7 @@ function runSearch(){
   // Filtro tipo/conformidad
   if(sfFilter==='eq')   items=items.filter(it=>it.tipo==='eq');
   else if(sfFilter==='comp') items=items.filter(it=>it.tipo==='comp');
-  else if(['NC','OBS','C'].includes(sfFilter)) items=items.filter(it=>it.conformidad===sfFilter);
+  else if(['NC','OBS','NV','C'].includes(sfFilter)) items=items.filter(it=>it.conformidad===sfFilter);
 
   // Filtro texto - todas las palabras deben aparecer
   if(q){
