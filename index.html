@@ -402,6 +402,19 @@ input[type=file]{display:none}
 #doc-upload-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;padding:16px;overflow-y:auto;align-items:flex-start;justify-content:center}
 #doc-upload-modal-bg.on{display:flex}
 @media(max-width:640px){.docs-layout{grid-template-columns:1fr}.docs-sidebar{display:none}}
+
+/* ══ CLASIFICACIÓN ATEX / P&ID ══ */
+.atex-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.atex-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.atex-kpi{background:#fff;border:1px solid #ddd9d0;border-radius:6px;padding:12px 14px}.atex-kpi b{display:block;font:700 24px monospace}.atex-kpi span{font-size:10px;color:#6b7280}
+.atex-switch{display:flex;border:1px solid #ddd9d0;border-radius:5px;overflow:hidden;background:#fff;margin-bottom:14px}.atex-switch button{flex:1;border:none;background:#fff;padding:9px 12px;font:700 10px monospace;cursor:pointer;color:#6b7280}.atex-switch button.on{background:#0f1117;color:#F7C600}
+.pid-table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #ddd9d0}.pid-table th{background:#0f1117;color:#ccc;font:700 9px monospace;text-align:left;padding:8px}.pid-table td{padding:8px;border-top:1px solid #eee;font-size:11px;vertical-align:top}.pid-table tr:hover td{background:#fafaf8}
+.conf-pill{display:inline-block;font:700 9px monospace;padding:2px 7px;border-radius:3px}.conf-A{background:#d1fae5;color:#065f46}.conf-B{background:#fef3c7;color:#92400e}.conf-C{background:#fee2e2;color:#991b1b}.conf-X{background:#f3f4f6;color:#6b7280}
+.pid-status{font:700 9px monospace}.ps-confirmado{color:#059669}.ps-sugerido{color:#d97706}.ps-revisar{color:#dc2626}.ps-no_representado{color:#6b7280}
+.fe-card{background:#fff;border:1px solid #ddd9d0;border-left:4px solid #F7C600;border-radius:6px;padding:12px 14px;margin-bottom:9px}.fe-head{display:flex;justify-content:space-between;gap:10px}.fe-code{font:700 10px monospace;color:#F7C600}.fe-name{font-weight:700;font-size:13px;margin:2px 0}.fe-meta{font:10px monospace;color:#6b7280}.zona-line{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.zona-box{border:1px solid #ddd9d0;border-radius:4px;padding:5px 8px;font:10px monospace;background:#fafaf8}.zona-box strong{color:#0f1117}
+.atex-help{background:#fffdf0;border:1px solid #f5d76e;border-left:3px solid #F7C600;border-radius:4px;padding:10px 12px;font-size:11px;color:#6b5a00;line-height:1.5;margin-bottom:14px}
+@media(max-width:700px){.atex-kpis{grid-template-columns:1fr 1fr}.pid-table{min-width:950px}}
+
 </style>
 </head>
 <body>
@@ -759,6 +772,7 @@ input[type=file]{display:none}
     <div class="nav-btn" onclick="goTab('rs',this)">📊 RESUMEN</div>
     <div class="nav-btn" onclick="goTab('inf',this)">📄 INFORME</div>
     <div class="nav-btn" onclick="goTab('ciclos',this)">📅 CICLOS</div>
+    <div class="nav-btn" onclick="goTab('atex',this)">⌁ CLASIFICACIÓN ATEX</div>
     <div class="nav-btn" onclick="goTab('docs',this)">📁 DOCUMENTOS</div>
   </div>
 
@@ -866,6 +880,42 @@ input[type=file]{display:none}
       <!-- Lista ciclos -->
       <div id="ciclos-list"><div style="padding:40px;text-align:center;color:#aaa;font-family:monospace">Cargando ciclos…</div></div>
 
+    </div>
+  </div>
+
+
+  <!-- TAB CLASIFICACIÓN ATEX -->
+  <div id="tab-atex" style="display:none">
+    <div class="page-wrap">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px">
+        <div><div style="font-size:17px;font-weight:700">Clasificación de Emplazamientos / Fuentes de Emisión</div>
+        <div style="font:10px monospace;color:#888;margin-top:3px">P&ID → equipo levantado → fuente de emisión → zona ATEX → equipos afectados</div></div>
+        <div class="atex-toolbar">
+          <button class="btn-dark" onclick="autoAsociarPidSeguros()">⚙ Autoasignar A</button>
+          <button class="btn-dark" onclick="exportPidCSV()" style="background:#374151">⬇ Matriz P&ID</button>
+          <button class="btn-save" onclick="openFuenteModal()">＋ Fuente de emisión</button>
+        </div>
+      </div>
+      <div class="atex-help"><b>Criterio de trabajo:</b> TAG Planta conserva lo observado en terreno. La referencia P&ID se almacena por separado. Las asociaciones A pueden confirmarse automáticamente; B y C quedan como sugerencias para revisión. Una Zona 20 interna no genera por sí sola una Zona 22 exterior.</div>
+      <div class="atex-kpis">
+        <div class="atex-kpi"><b id="ak-confirm">0</b><span>Vínculos confirmados</span></div>
+        <div class="atex-kpi"><b id="ak-sug">0</b><span>Sugerencias por revisar</span></div>
+        <div class="atex-kpi"><b id="ak-unres">0</b><span>Sin referencia P&ID</span></div>
+        <div class="atex-kpi"><b id="ak-fe">0</b><span>Fuentes de emisión</span></div>
+      </div>
+      <div class="atex-switch">
+        <button id="atex-sw-pid" class="on" onclick="switchAtexView('pid')">CONCILIACIÓN P&ID</button>
+        <button id="atex-sw-fe" onclick="switchAtexView('fe')">FUENTES / EMPLAZAMIENTOS</button>
+        <button id="atex-sw-polvo" onclick="switchAtexView('polvo')">CARACTERIZACIÓN POLVO</button>
+      </div>
+      <div id="atex-view-pid">
+        <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap"><input id="pid-filter" class="field-input" placeholder="Buscar equipo, TAG o referencia P&ID…" oninput="renderPidConciliacion()" style="max-width:380px"><select id="pid-status-filter" class="field-sel" onchange="renderPidConciliacion()" style="width:190px"><option value="all">Todos los estados</option><option value="confirmado">Confirmados</option><option value="sugerido">Sugeridos</option><option value="pendiente">Sin referencia</option></select></div>
+        <div id="pid-conciliacion" style="overflow-x:auto"></div>
+      </div>
+      <div id="atex-view-fe" style="display:none"><div id="fuentes-list"></div></div>
+      <div id="atex-view-polvo" style="display:none">
+        <div class="card"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><div><b>Caracterización de polvos</b><div style="font-size:11px;color:#888;margin-top:3px">Registra ensayos propios, bibliografía o estado no determinado.</div></div><button class="btn-save" onclick="openPolvoModal()">＋ Sustancia</button></div><div id="polvos-list" style="margin-top:12px"></div></div>
+      </div>
     </div>
   </div>
 
@@ -1423,6 +1473,40 @@ input[type=file]{display:none}
   </div>
 </div>
 
+
+<!-- MODAL VÍNCULO P&ID -->
+<div id="pid-link-bg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:350;padding:16px;overflow-y:auto;align-items:flex-start;justify-content:center">
+ <div class="modal" style="max-width:560px"><div class="modal-head"><div><div class="field-lbl">CONCILIACIÓN P&ID</div><div id="pl-title" style="font-weight:700"></div></div><button onclick="closePidLinkModal()" style="background:none;border:none;color:#888;font-size:20px">✕</button></div>
+ <div class="modal-body"><div class="two-col"><div><div class="field-lbl">TAG observado</div><input id="pl-tag" class="field-input" readonly></div><div><div class="field-lbl">Referencia P&ID</div><input id="pl-ref" class="field-input" placeholder="Ej: 05.26"></div></div>
+ <div class="two-col"><div><div class="field-lbl">Confianza</div><select id="pl-conf" class="field-sel"><option value="A">A — Confirmado / inequívoco</option><option value="B">B — Alta probabilidad</option><option value="C">C — Candidato</option></select></div><div><div class="field-lbl">Estado</div><select id="pl-status" class="field-sel"><option value="confirmado">Confirmado</option><option value="sugerido">Sugerido</option><option value="revisar">Revisar</option><option value="no_representado">No representado individualmente</option></select></div></div>
+ <div><div class="field-lbl">Método / evidencia</div><input id="pl-metodo" class="field-input" placeholder="TAG explícito, componentes asociados, P&ID…"></div><div><div class="field-lbl">Observación</div><textarea id="pl-obs" class="field-ta"></textarea></div></div>
+ <div class="modal-foot"><button class="btn-out" onclick="closePidLinkModal()">Cancelar</button><button class="btn-save" onclick="savePidLink()">GUARDAR VÍNCULO</button></div></div>
+</div>
+
+<!-- MODAL FUENTE EMISIÓN -->
+<div id="fuente-bg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:350;padding:16px;overflow-y:auto;align-items:flex-start;justify-content:center">
+ <div class="modal" style="max-width:720px"><div class="modal-head"><div><div class="field-lbl">FUENTE DE EMISIÓN</div><div id="fe-title" style="font-weight:700">Nueva fuente</div></div><button onclick="closeFuenteModal()" style="background:none;border:none;color:#888;font-size:20px">✕</button></div>
+ <div class="modal-body">
+  <div class="two-col"><div><div class="field-lbl">Equipo</div><select id="fe-eq" class="field-sel" onchange="feEquipoChanged()"></select></div><div><div class="field-lbl">Referencia P&ID</div><input id="fe-ref" class="field-input" placeholder="05.26"></div></div>
+  <div class="two-col"><div><div class="field-lbl">Código fuente</div><input id="fe-code" class="field-input" placeholder="FE-05.26-01"></div><div><div class="field-lbl">Material</div><select id="fe-material" class="field-sel"><option>Polvo de malta</option><option>Polvo de arroz</option><option>Malta / arroz</option><option>Otro</option></select></div></div>
+  <div><div class="field-lbl">Nombre / punto de emisión</div><input id="fe-name" class="field-input" placeholder="Descarga inferior, boca de carga, sello, escotilla…"></div>
+  <div class="two-col"><div><div class="field-lbl">Tipo de fuente</div><select id="fe-tipo" class="field-sel"><option>Interior de equipo</option><option>Punto de descarga</option><option>Punto de carga</option><option>Transferencia</option><option>Venteo / filtro</option><option>Sello / unión</option><option>Escotilla / registro</option><option>Otro</option></select></div><div><div class="field-lbl">Condición</div><select id="fe-cond" class="field-sel"><option>Operación normal</option><option>Carga / descarga</option><option>Arranque / parada</option><option>Limpieza</option><option>Mantenimiento / apertura</option><option>Falla previsible</option></select></div></div>
+  <div class="two-col"><div><div class="field-lbl">Grado de escape</div><select id="fe-grado" class="field-sel"><option>Continuo</option><option>Primario</option><option>Secundario</option><option>Mantenimiento solamente</option><option>No determinado</option></select></div><div><div class="field-lbl">Hermeticidad</div><select id="fe-herm" class="field-sel"><option>Hermético en operación normal</option><option>Liberación localizada posible</option><option>No hermético</option><option>No determinado</option></select></div></div>
+  <div class="two-col"><div><div class="field-lbl">Aspiración</div><select id="fe-asp" class="field-sel"><option>Activa / eficaz</option><option>Activa / eficacia no verificada</option><option>Sin aspiración</option><option>No aplica</option></select></div><div><div class="field-lbl">Estado</div><select id="fe-status" class="field-sel"><option value="preliminar">Preliminar</option><option value="confirmada">Confirmada</option><option value="pendiente">Pendiente</option></select></div></div>
+  <div><div class="field-lbl">Justificación técnica</div><textarea id="fe-just" class="field-ta" placeholder="Fundamento de clasificación, observación de terreno, P&ID, limpieza, aspiración…"></textarea></div>
+  <div style="font-size:10px;font-weight:700;color:#F7C600;letter-spacing:1.5px;border-bottom:1px solid #ddd9d0;padding-bottom:5px">CLASIFICACIÓN RESULTANTE</div>
+  <div class="two-col">
+    <div style="background:#fafaf8;border:1px solid #ddd9d0;border-radius:5px;padding:10px"><div class="field-lbl">Zona interna del equipo</div><select id="fz-int-zona" class="field-sel"><option value="20">Zona 20</option><option value="21">Zona 21</option><option value="22">Zona 22</option><option value="NG">No clasificada</option><option value="ND">No determinada</option></select><div style="font-size:9px;color:#888;margin-top:5px">Volumen contenido dentro del equipo/ducto/tolva. No implica automáticamente zona exterior.</div></div>
+    <div style="background:#fafaf8;border:1px solid #ddd9d0;border-radius:5px;padding:10px"><div class="field-lbl">Zona exterior</div><select id="fz-ext-zona" class="field-sel"><option value="NG">No clasificada</option><option value="21">Zona 21</option><option value="22">Zona 22</option><option value="20">Zona 20</option><option value="ND">No determinada</option></select><div style="font-size:9px;color:#888;margin-top:5px">Se determina por la liberación real al recinto, no por la clasificación interna.</div></div>
+  </div>
+  <div class="two-col"><div><div class="field-lbl">Extensión exterior horizontal [m]</div><input id="fz-ext-h" type="number" step="0.1" min="0" class="field-input"></div><div><div class="field-lbl">Extensión exterior vertical [m]</div><input id="fz-ext-v" type="number" step="0.1" min="0" class="field-input"></div></div>
+  <div class="two-col"><div><div class="field-lbl">Geometría exterior</div><select id="fz-ext-geo" class="field-sel"><option>Radial</option><option>Cilíndrica</option><option>Semiesférica</option><option>Prismática</option><option>Localizada</option><option>Otra</option></select></div><div><div class="field-lbl">Origen de medición</div><input id="fz-ext-origen" class="field-input" placeholder="Borde de descarga / escotilla…"></div></div>
+ </div><div class="modal-foot"><button class="btn-out" onclick="closeFuenteModal()">Cancelar</button><button class="btn-save" onclick="saveFuenteEmision()">GUARDAR FUENTE</button></div></div>
+</div>
+
+<!-- MODAL POLVO -->
+<div id="polvo-bg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:350;padding:16px;overflow-y:auto;align-items:flex-start;justify-content:center"><div class="modal" style="max-width:650px"><div class="modal-head"><div><div class="field-lbl">CARACTERIZACIÓN</div><div style="font-weight:700">Sustancia / polvo combustible</div></div><button onclick="closePolvoModal()" style="background:none;border:none;color:#888;font-size:20px">✕</button></div><div class="modal-body"><div class="two-col"><div><div class="field-lbl">Nombre</div><input id="po-name" class="field-input" placeholder="Polvo de malta"></div><div><div class="field-lbl">Grupo</div><select id="po-grupo" class="field-sel"><option value="">No determinado</option><option>IIIA</option><option>IIIB</option><option>IIIC</option></select></div></div><div class="two-col"><div><div class="field-lbl">Kst [bar·m/s]</div><input id="po-kst" class="field-input" type="number" step="0.1"></div><div><div class="field-lbl">Pmax [bar]</div><input id="po-pmax" class="field-input" type="number" step="0.01"></div><div><div class="field-lbl">MIT nube [°C]</div><input id="po-mitn" class="field-input" type="number"></div><div><div class="field-lbl">MIT capa [°C]</div><input id="po-mitc" class="field-input" type="number"></div></div><div><div class="field-lbl">Fuente / estado</div><input id="po-fuente" class="field-input" placeholder="No ensayado / bibliografía / fabricante…"></div></div><div class="modal-foot"><button class="btn-out" onclick="closePolvoModal()">Cancelar</button><button class="btn-save" onclick="savePolvo()">GUARDAR</button></div></div></div>
+
 <script charset="utf-8">
 //  CONFIG
 const SUPA_URL = 'https://nyqqaaqxjdmedggpkxbj.supabase.co';
@@ -1657,6 +1741,8 @@ let equiposExtra=[]; // equipos duplicados guardados en Supabase
 let ncExpanded=false;
 let ciclos=[], curCiclo=null, curInspEqId=null, curInspId=null;
 let inspConf='', accionVerif='', inspPendFiles=[], inspExPaths=[];
+// Estado módulo P&ID / Clasificación
+let pidLinks=[], pidCatalogo=[], fuentesEmision=[], zonasAtex=[], polvosProyecto=[], curPidEntity=null, curFuenteId=null;
 
 //  BOOT
 (async()=>{
@@ -1759,10 +1845,11 @@ async function doLogout(){
 function goTab(name,el){
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('on'));
   el.classList.add('on');
-  ['eq','rs','inf','ciclos','docs'].forEach(t=>{ const el=document.getElementById('tab-'+t); if(el) el.style.display=t===name?'block':'none'; });
+  ['eq','rs','inf','ciclos','atex','docs'].forEach(t=>{ const el=document.getElementById('tab-'+t); if(el) el.style.display=t===name?'block':'none'; });
   if(name==='rs') renderResumen();
   if(name==='inf') loadAndRenderInforme();
   if(name==='ciclos') loadCiclos();
+  if(name==='atex') loadAtexModule();
   if(name==='docs') loadDocs();
 
 }
@@ -2311,7 +2398,7 @@ function closeModal(){
   curEq=null;
   // Volver al tab desde donde se abrió el modal
   if(modalOriginTab==='inf'){
-    ['eq','rs','inf','ciclos','docs'].forEach(t=>{
+    ['eq','rs','inf','ciclos','atex','docs'].forEach(t=>{
       const el=document.getElementById('tab-'+t);
       if(el) el.style.display=t==='inf'?'block':'none';
     });
@@ -5292,6 +5379,89 @@ async function ctExecute(toEqId){
     }
   } catch(err){ toast('Error: '+err.message,'err'); }
 }
+
+
+// ═══════════════════════════════════════════════════════════════
+// MÓDULO P&ID / CLASIFICACIÓN ATEX
+// ═══════════════════════════════════════════════════════════════
+const PID_EQ_EXACT = [
+  [/elevador.*malta procesada.*n.?1/i,'05.26'],[/elevador.*malta procesada.*n.?2/i,'05.40'],
+  [/tornillo acondicionador.*bühler/i,'05.45'],[/despedradora.*arroz.*bühler/i,'06.52'],
+  [/criba circular.*arroz/i,'06.51'],[/molino de arroz.*bühler/i,'06.54'],[/molino rodillos.*malta.*seeger/i,'05.06'],
+  [/correa redler descarga silos de malta/i,'04.01'],[/criba circular de malta/i,'04.05'],[/elevador.*recepción arroz/i,'02.07'],
+  [/válvula rotatoria descarga.*recepción arroz/i,'02.04'],[/elevador.*recepción malta/i,'01.06'],
+  [/cabezal ciclón.*polvos de malta.*línea 1/i,'08.01'],[/cabezal ciclón.*orujos de redlers/i,'07.01'],
+  [/aspiración polvos de malta línea 1/i,'2.20'],[/aspiración orujos.*recepción malta/i,'1.21'],
+  [/soplador preparación de arroz/i,'06.34']
+];
+function pidLinkKey(tipo,id){return tipo+':'+id}
+function findPidLink(tipo,id){return pidLinks.find(x=>x.entidad_tipo===tipo&&String(x.entidad_id)===String(id));}
+function exactPidFromTag(tag){
+  tag=String(tag||'').trim();
+  // Extrae nomenclatura P&ID inequívoca con prefijo 01..09, incluso si lleva prefijos PZA/GS/TF.
+  const m=tag.match(/(?:^|\s)(0[1-9]\.\d{2}(?:(?:\.\d{2})(?:_\d+)?|(?:M|V|F)\d+)?)(?:\s|$)/i);
+  return m?m[1]:'';
+}
+function pidParentRef(ref){ const m=String(ref||'').match(/^(0[1-9]\.\d{2})/); return m?m[1]:''; }
+function derivePidSuggestion(tipo,id,nombre,tag){
+  const exact=exactPidFromTag(tag);
+  if(exact) return {ref:exact,conf:'A',metodo:'TAG registrado coincide con nomenclatura P&ID'};
+  for(const [rx,ref] of PID_EQ_EXACT){ if(tipo==='equipo'&&rx.test(nombre||'')) return {ref,conf:'A',metodo:'Correspondencia inequívoca informe/P&ID'}; }
+  if(tipo==='equipo'){
+    const comps=(subRecs[id]||[]).map(c=>pidParentRef(exactPidFromTag(c.tag_planta))).filter(Boolean);
+    if(comps.length){ const freq={}; comps.forEach(x=>freq[x]=(freq[x]||0)+1); const best=Object.entries(freq).sort((a,b)=>b[1]-a[1])[0]; if(best&&best[1]>=2) return {ref:best[0],conf:'B',metodo:'Herencia por componentes P&ID asociados'}; }
+  }
+  return {ref:'',conf:'C',metodo:'Sin regla automática'};
+}
+async function loadAtexModule(){
+  loader(1); const pid=projectId();
+  try{
+    const qs=await Promise.all([
+      sb.from('pid_vinculos').select('*').eq('proyecto_id',pid).order('updated_at',{ascending:false}),
+      sb.from('pid_catalogo').select('*').eq('proyecto_id',pid).order('ref_pid',{ascending:true}),
+      sb.from('fuentes_emision').select('*').eq('proyecto_id',pid).order('codigo',{ascending:true}),
+      sb.from('zonas_atex').select('*').eq('proyecto_id',pid).order('created_at',{ascending:true}),
+      sb.from('sustancias_polvo').select('*').eq('proyecto_id',pid).order('nombre',{ascending:true})
+    ]);
+    pidLinks=qs[0].error?[]:(qs[0].data||[]); pidCatalogo=qs[1].error?[]:(qs[1].data||[]); fuentesEmision=qs[2].error?[]:(qs[2].data||[]); zonasAtex=qs[3].error?[]:(qs[3].data||[]); polvosProyecto=qs[4].error?[]:(qs[4].data||[]);
+    if(qs.some(q=>q.error)) toast('Módulo ATEX requiere ejecutar la migración SQL de Supabase','err');
+  }catch(e){toast('No se pudo cargar clasificación: '+e.message,'err');}
+  renderAtexAll(); loader(0);
+}
+function renderAtexAll(){renderPidConciliacion();renderFuentes();renderPolvos();updateAtexKpis();}
+function updateAtexKpis(){
+ const entities=[...allEqs('all').map(e=>['equipo',e.id]),...allSubRaw.map(c=>['componente',c.id])];
+ const confirmed=pidLinks.filter(x=>x.estado==='confirmado').length, sug=pidLinks.filter(x=>x.estado==='sugerido'||x.estado==='revisar').length;
+ const linked=new Set(pidLinks.filter(x=>x.ref_pid||x.estado==='no_representado').map(x=>pidLinkKey(x.entidad_tipo,x.entidad_id)));
+ document.getElementById('ak-confirm').textContent=confirmed;document.getElementById('ak-sug').textContent=sug;document.getElementById('ak-unres').textContent=Math.max(0,entities.length-linked.size);document.getElementById('ak-fe').textContent=fuentesEmision.length;
+}
+function switchAtexView(v){['pid','fe','polvo'].forEach(x=>{document.getElementById('atex-view-'+x).style.display=x===v?'block':'none';document.getElementById('atex-sw-'+x).classList.toggle('on',x===v)});}
+function pidEntities(){
+ const a=allEqs('all').map(e=>{const r=recs[e.id]||{};return{tipo:'equipo',id:e.id,nombre:eqName(e.id),padre:'',piso:eqPiso(e.id),tag:r.tag_planta||'',zona:r.zona||''}});
+ allSubRaw.forEach(c=>a.push({tipo:'componente',id:c.id,nombre:c.nombre_comp||c.tipo||'Componente',padre:eqName(c.equipo_id),piso:(recs[c.equipo_id]||{}).piso||eqPiso(c.equipo_id),tag:c.tag_planta||'',zona:c.zona||''})); return a;
+}
+function renderPidConciliacion(){
+ const box=document.getElementById('pid-conciliacion');if(!box)return; let data=pidEntities(); const q=(document.getElementById('pid-filter')?.value||'').toLowerCase(), sf=document.getElementById('pid-status-filter')?.value||'all';
+ if(q)data=data.filter(e=>(e.nombre+' '+e.padre+' '+e.tag+' '+(findPidLink(e.tipo,e.id)?.ref_pid||'')).toLowerCase().includes(q));
+ if(sf!=='all') data=data.filter(e=>{const l=findPidLink(e.tipo,e.id); if(sf==='pendiente')return !l||(!l.ref_pid&&l.estado!=='no_representado'); return l?.estado===sf;});
+ let h='<table class="pid-table"><thead><tr><th>TIPO</th><th>EQUIPO / COMPONENTE</th><th>PISO</th><th>TAG OBSERVADO</th><th>REF. P&ID</th><th>SISTEMA</th><th>CONFIANZA</th><th>ESTADO</th><th></th></tr></thead><tbody>';
+ for(const e of data){const l=findPidLink(e.tipo,e.id), sug=derivePidSuggestion(e.tipo,e.id,e.nombre,e.tag);const ref=l?.ref_pid||sug.ref||'—',conf=l?.confianza||sug.conf||'C',status=l?.estado||(sug.ref?(conf==='A'?'sugerido':'sugerido'):'pendiente');h+=`<tr><td style="font:9px monospace">${esc(e.tipo)}</td><td><b>${esc(e.nombre)}</b>${e.padre?`<div style="font-size:9px;color:#888">${esc(e.padre)}</div>`:''}</td><td>${esc(pisoLabel(e.piso))}</td><td style="font:700 10px monospace">${esc(e.tag||'—')}</td><td style="font:700 11px monospace;color:#0f1117">${esc(ref)}</td><td style="font-size:10px;color:#6b7280">${esc((pidCatalogo.find(p=>p.ref_pid===ref)||{}).sistema||'—')}</td><td><span class="conf-pill conf-${esc(conf)}">${esc(conf)}</span></td><td><span class="pid-status ps-${esc(status)}">${esc(status)}</span>${!l&&sug.ref?`<div style="font-size:9px;color:#888">${esc(sug.metodo)}</div>`:''}</td><td><button class="doc-btn" onclick="openPidLinkModal(${jsArg(e.tipo)},${jsArg(e.id)})">Editar</button></td></tr>`;}
+ box.innerHTML=h+'</tbody></table>';
+}
+function openPidLinkModal(tipo,id){curPidEntity={tipo,id};const e=pidEntities().find(x=>x.tipo===tipo&&String(x.id)===String(id));if(!e)return;const l=findPidLink(tipo,id),sug=derivePidSuggestion(tipo,id,e.nombre,e.tag);document.getElementById('pl-title').textContent=e.nombre;document.getElementById('pl-tag').value=e.tag||'';document.getElementById('pl-ref').value=l?.ref_pid||sug.ref||'';document.getElementById('pl-conf').value=l?.confianza||sug.conf||'C';document.getElementById('pl-status').value=l?.estado||(sug.ref?'sugerido':'revisar');document.getElementById('pl-metodo').value=l?.metodo||sug.metodo||'';document.getElementById('pl-obs').value=l?.observacion||'';document.getElementById('pid-link-bg').style.display='flex';}
+function closePidLinkModal(){document.getElementById('pid-link-bg').style.display='none';curPidEntity=null;}
+async function savePidLink(){if(!curPidEntity)return;const e=pidEntities().find(x=>x.tipo===curPidEntity.tipo&&String(x.id)===String(curPidEntity.id));const payload={proyecto_id:projectId(),entidad_tipo:curPidEntity.tipo,entidad_id:String(curPidEntity.id),tag_observado:e?.tag||'',ref_pid:document.getElementById('pl-ref').value.trim(),confianza:document.getElementById('pl-conf').value,estado:document.getElementById('pl-status').value,metodo:document.getElementById('pl-metodo').value.trim(),observacion:document.getElementById('pl-obs').value.trim(),updated_by:profile?.full_name||session.user.email,updated_at:new Date().toISOString()};try{await must(sb.from('pid_vinculos').upsert(payload,{onConflict:'proyecto_id,entidad_tipo,entidad_id'}));toast('Vínculo P&ID guardado','ok');closePidLinkModal();await loadAtexModule();}catch(e){toast('Error: '+e.message,'err')}}
+async function autoAsociarPidSeguros(){if(!canDo('fillFicha')){toast('Sin permiso para modificar','err');return;}const rows=[];for(const e of pidEntities()){if(findPidLink(e.tipo,e.id))continue;const sug=derivePidSuggestion(e.tipo,e.id,e.nombre,e.tag);if(sug.ref&&sug.conf==='A')rows.push({proyecto_id:projectId(),entidad_tipo:e.tipo,entidad_id:String(e.id),tag_observado:e.tag||'',ref_pid:sug.ref,confianza:'A',estado:'confirmado',metodo:sug.metodo,observacion:'Autoasignación segura',updated_by:profile?.full_name||session.user.email,updated_at:new Date().toISOString()});}if(!rows.length){toast('No hay nuevas asociaciones A para aplicar');return;}try{await must(sb.from('pid_vinculos').upsert(rows,{onConflict:'proyecto_id,entidad_tipo,entidad_id'}));toast(rows.length+' asociaciones A confirmadas','ok');await loadAtexModule();}catch(e){toast('Error: '+e.message,'err')}}
+function exportPidCSV(){const rows=[['Tipo','Entidad','Equipo principal','Piso','TAG observado','Referencia P&ID','Confianza','Estado','Método']];for(const e of pidEntities()){const l=findPidLink(e.tipo,e.id),sug=derivePidSuggestion(e.tipo,e.id,e.nombre,e.tag);rows.push([e.tipo,e.nombre,e.padre,pisoLabel(e.piso),e.tag,l?.ref_pid||sug.ref||'',l?.confianza||sug.conf||'',l?.estado||(sug.ref?'sugerido':'pendiente'),l?.metodo||sug.metodo||'']);}const csv='\ufeff'+rows.map(r=>r.map(csvCell).join(';')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='Matriz_PID_'+(curProyecto?.nombre||'ATEX').replace(/[^\w-]+/g,'_')+'.csv';a.click();URL.revokeObjectURL(a.href)}
+function renderFuentes(){const box=document.getElementById('fuentes-list');if(!box)return;if(!fuentesEmision.length){box.innerHTML='<div class="card" style="text-align:center;color:#888;padding:28px">Sin fuentes de emisión registradas.</div>';return;}box.innerHTML=fuentesEmision.map(f=>{const zs=zonasAtex.filter(z=>z.fuente_id===f.id);return`<div class="fe-card"><div class="fe-head"><div><div class="fe-code">${esc(f.codigo||'FE')}</div><div class="fe-name">${esc(f.nombre)}</div><div class="fe-meta">${esc(eqName(f.equipo_id))} · P&ID ${esc(f.ref_pid||'—')} · ${esc(f.material||'—')} · ${esc(f.condicion_operacion||'—')}</div></div><div><button class="doc-btn" onclick="openFuenteModal(${jsArg(f.id)})">Editar</button></div></div><div class="zona-line">${zs.map(z=>`<div class="zona-box"><strong>${z.zona==='NG'?'No clasificada':'Z'+esc(z.zona)}</strong> · ${esc(z.tipo_zona)} · H ${z.extension_horizontal??'—'} m · V ${z.extension_vertical??'—'} m · ${esc(z.geometria||'—')}</div>`).join('')||'<span style="font-size:10px;color:#aaa">Sin zona asociada</span>'}</div>${f.justificacion?`<div style="font-size:11px;color:#6b7280;margin-top:7px">${esc(f.justificacion)}</div>`:''}</div>`}).join('');}
+function feEquipoChanged(){const id=document.getElementById('fe-eq').value,l=findPidLink('equipo',id),e=getEqDef(id);document.getElementById('fe-ref').value=l?.ref_pid||derivePidSuggestion('equipo',id,eqName(id),(recs[id]||{}).tag_planta).ref||'';const ref=document.getElementById('fe-ref').value;if(ref&&!document.getElementById('fe-code').value)document.getElementById('fe-code').value=`FE-${ref}-01`;}
+function openFuenteModal(id=null){curFuenteId=id;const sel=document.getElementById('fe-eq');sel.innerHTML=allEqs('all').map(e=>`<option value="${escAttr(e.id)}">${esc(eqName(e.id))} · ${esc(pisoLabel(eqPiso(e.id)))}</option>`).join('');const f=id?fuentesEmision.find(x=>x.id===id):null;if(f){sel.value=f.equipo_id;document.getElementById('fe-ref').value=f.ref_pid||'';document.getElementById('fe-code').value=f.codigo||'';document.getElementById('fe-material').value=f.material||'Polvo de malta';document.getElementById('fe-name').value=f.nombre||'';document.getElementById('fe-tipo').value=f.tipo_fuente||'Interior de equipo';document.getElementById('fe-cond').value=f.condicion_operacion||'Operación normal';document.getElementById('fe-grado').value=f.grado_escape||'No determinado';document.getElementById('fe-herm').value=f.hermeticidad||'No determinado';document.getElementById('fe-asp').value=f.aspiracion||'No aplica';document.getElementById('fe-status').value=f.estado||'preliminar';document.getElementById('fe-just').value=f.justificacion||'';const zi=zonasAtex.find(z=>z.fuente_id===id&&z.tipo_zona==='interna'),ze=zonasAtex.find(z=>z.fuente_id===id&&z.tipo_zona==='exterior');document.getElementById('fz-int-zona').value=zi?.zona||'ND';document.getElementById('fz-ext-zona').value=ze?.zona||'NG';document.getElementById('fz-ext-h').value=ze?.extension_horizontal??'';document.getElementById('fz-ext-v').value=ze?.extension_vertical??'';document.getElementById('fz-ext-geo').value=ze?.geometria||'Localizada';document.getElementById('fz-ext-origen').value=ze?.origen_medicion||'';}else{['fe-ref','fe-code','fe-name','fe-just','fz-ext-h','fz-ext-v','fz-ext-origen'].forEach(x=>document.getElementById(x).value='');document.getElementById('fz-int-zona').value='ND';document.getElementById('fz-ext-zona').value='NG';document.getElementById('fz-ext-geo').value='Localizada';feEquipoChanged();}document.getElementById('fuente-bg').style.display='flex';}
+function closeFuenteModal(){document.getElementById('fuente-bg').style.display='none';curFuenteId=null;}
+async function saveFuenteEmision(){const eq=document.getElementById('fe-eq').value;if(!eq||!document.getElementById('fe-name').value.trim()){toast('Selecciona equipo y describe la fuente','err');return;}let code=document.getElementById('fe-code').value.trim();if(!code){const ref=document.getElementById('fe-ref').value.trim()||'SINPID';code=`FE-${ref}-${String(fuentesEmision.length+1).padStart(2,'0')}`;}const payload={proyecto_id:projectId(),codigo:code,equipo_id:eq,ref_pid:document.getElementById('fe-ref').value.trim(),nombre:document.getElementById('fe-name').value.trim(),material:document.getElementById('fe-material').value,tipo_fuente:document.getElementById('fe-tipo').value,condicion_operacion:document.getElementById('fe-cond').value,grado_escape:document.getElementById('fe-grado').value,hermeticidad:document.getElementById('fe-herm').value,aspiracion:document.getElementById('fe-asp').value,estado:document.getElementById('fe-status').value,justificacion:document.getElementById('fe-just').value.trim(),updated_by:profile?.full_name||session.user.email,updated_at:new Date().toISOString()};try{let f;if(curFuenteId)f=await must(sb.from('fuentes_emision').update(payload).eq('id',curFuenteId).select().single());else f=await must(sb.from('fuentes_emision').insert(payload).select().single());const baseZ={proyecto_id:projectId(),fuente_id:f.id,updated_at:new Date().toISOString()};const zi={...baseZ,tipo_zona:'interna',zona:document.getElementById('fz-int-zona').value,extension_horizontal:null,extension_vertical:null,geometria:'Volumen interior',origen_medicion:'Interior del equipo'};const ze={...baseZ,tipo_zona:'exterior',zona:document.getElementById('fz-ext-zona').value,extension_horizontal:document.getElementById('fz-ext-h').value||null,extension_vertical:document.getElementById('fz-ext-v').value||null,geometria:document.getElementById('fz-ext-geo').value,origen_medicion:document.getElementById('fz-ext-origen').value.trim()};for(const zp of [zi,ze]){const old=zonasAtex.find(z=>z.fuente_id===f.id&&z.tipo_zona===zp.tipo_zona);if(old)await must(sb.from('zonas_atex').update(zp).eq('id',old.id));else await must(sb.from('zonas_atex').insert(zp));}toast('Fuente y clasificación interna/exterior guardadas','ok');closeFuenteModal();await loadAtexModule();}catch(e){toast('Error: '+e.message,'err')}}
+function renderPolvos(){const b=document.getElementById('polvos-list');if(!b)return;b.innerHTML=polvosProyecto.length?polvosProyecto.map(p=>`<div style="border-top:1px solid #eee;padding:9px 0"><b>${esc(p.nombre)}</b> <span style="font:9px monospace;color:#888">${esc(p.grupo_polvo||'Grupo ND')}</span><div style="font:10px monospace;color:#6b7280">Kst ${p.kst??'ND'} · Pmax ${p.pmax??'ND'} bar · MIT nube ${p.mit_nube??'ND'}°C · MIT capa ${p.mit_capa??'ND'}°C · ${esc(p.fuente||'Sin fuente')}</div></div>`).join(''):'<div style="color:#888;font-size:11px">Sin caracterización registrada.</div>';}
+function openPolvoModal(){['po-name','po-kst','po-pmax','po-mitn','po-mitc','po-fuente'].forEach(x=>document.getElementById(x).value='');document.getElementById('po-grupo').value='';document.getElementById('polvo-bg').style.display='flex'}function closePolvoModal(){document.getElementById('polvo-bg').style.display='none'}
+async function savePolvo(){const nombre=document.getElementById('po-name').value.trim();if(!nombre){toast('Ingresa nombre','err');return;}const p={proyecto_id:projectId(),nombre,grupo_polvo:document.getElementById('po-grupo').value,kst:document.getElementById('po-kst').value||null,pmax:document.getElementById('po-pmax').value||null,mit_nube:document.getElementById('po-mitn').value||null,mit_capa:document.getElementById('po-mitc').value||null,fuente:document.getElementById('po-fuente').value.trim(),updated_at:new Date().toISOString()};try{await must(sb.from('sustancias_polvo').upsert(p,{onConflict:'proyecto_id,nombre'}));toast('Caracterización guardada','ok');closePolvoModal();await loadAtexModule();}catch(e){toast('Error: '+e.message,'err')}}
+
 </script>
 
 <!-- MODAL TRANSFERIR COMPONENTE -->
