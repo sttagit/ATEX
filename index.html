@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- SUSTENTA Ex v3 · Clasificación simplificada por equipo: zona interior / exterior / mantenimiento + extensiones editables -->
+<!-- SUSTENTA Ex v3.2 · Informe editable + clasificación interior / exterior / mantenimiento -->
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SUSTENTA Ex — Levantamiento ATEX · Zonas por Equipo v3</title>
+<title>SUSTENTA Ex — Levantamiento ATEX · Informe Editable v3.2</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" charset="utf-8"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -427,6 +427,46 @@ input[type=file]{display:none}
 @media(max-width:760px){.three-col,.zone3-grid{grid-template-columns:1fr}}
 .atex-help{background:#fffdf0;border:1px solid #f5d76e;border-left:3px solid #F7C600;border-radius:4px;padding:10px 12px;font-size:11px;color:#6b5a00;line-height:1.5;margin-bottom:14px}
 @media(max-width:700px){.atex-kpis{grid-template-columns:1fr 1fr}.pid-table{min-width:950px}}
+
+
+/* ══ INFORME EDITABLE v3.2 ══ */
+.inf-edit-toolbar{padding:8px 12px;background:#202536;display:flex;align-items:center;gap:8px;flex-wrap:wrap;border-bottom:1px solid #343a4e}
+.inf-edit-search{background:#111827!important;color:#e5e7eb!important;border:1px solid #3b4255!important;min-width:250px;max-width:360px;font-family:monospace;font-size:10px!important;padding:6px 9px!important}
+.inf-edit-filter{background:#111827;color:#d1d5db;border:1px solid #3b4255;border-radius:4px;padding:6px 9px;font:10px monospace}
+.inf-edit-note{font:9px monospace;color:#9ca3af;margin-left:auto;line-height:1.35}
+.inf-input,.inf-select,.inf-ta{width:100%;border:1px solid #d8d5cd;border-radius:3px;background:#fff;font-size:10px;color:#111827;padding:4px 5px;min-height:27px}
+.inf-input:focus,.inf-select:focus,.inf-ta:focus{outline:none;border-color:#F7C600;box-shadow:0 0 0 2px rgba(247,198,0,.12)}
+.inf-ta{min-height:46px;resize:vertical;line-height:1.3;font-family:inherit}
+.inf-mini{font-size:9px!important;min-height:24px;padding:3px 4px!important}
+.inf-zone-stack{display:grid;grid-template-columns:16px 1fr;gap:3px 4px;align-items:center}
+.inf-zone-stack label{font:700 8px monospace;color:#6b7280;text-align:center}
+.inf-save-state{display:inline-flex;align-items:center;gap:3px;font:8px monospace;color:#9ca3af;white-space:nowrap;min-height:14px}
+.inf-save-state.saving{color:#d97706}.inf-save-state.saved{color:#059669}.inf-save-state.error{color:#dc2626}
+.inf-complete{display:inline-flex;align-items:center;gap:5px;font:8px monospace;color:#6b7280;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:10px;padding:2px 6px;white-space:nowrap}
+.inf-complete.low{background:#fee2e2;color:#991b1b;border-color:#fecaca}.inf-complete.mid{background:#fef3c7;color:#92400e;border-color:#fde68a}.inf-complete.high{background:#d1fae5;color:#065f46;border-color:#a7f3d0}
+.inf-inline-actions{display:flex;gap:4px;align-items:center;flex-wrap:wrap;margin-top:4px}
+.inf-small-btn{border:1px solid #d8d5cd;background:#fff;border-radius:3px;padding:3px 7px;font:9px monospace;cursor:pointer;color:#4b5563;white-space:nowrap}
+.inf-small-btn:hover{border-color:#F7C600;color:#8a6f00;background:#fffdf0}
+.inf-small-btn.purple:hover{border-color:#7c3aed;color:#6d28d9;background:#f5f3ff}
+.inf-detail-panel{display:none;background:#fffdf7;border-top:1px dashed #d6d3d1;border-bottom:1px solid #eceae3;padding:10px 14px 12px 38px}
+.inf-detail-panel.on{display:block}
+.inf-detail-title{font:700 9px monospace;letter-spacing:1px;color:#9a7b00;text-transform:uppercase;margin-bottom:7px}
+.inf-detail-grid{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:8px}
+.inf-detail-grid.comp{grid-template-columns:repeat(4,minmax(120px,1fr))}
+.inf-detail-field .k{font:700 8px monospace;color:#6b7280;text-transform:uppercase;letter-spacing:.45px;margin-bottom:3px}
+.inf-detail-field.w2{grid-column:span 2}.inf-detail-field.w4{grid-column:1/-1}
+.inf-eq-row.inf-no-record{border-left:3px dashed #d1d5db;background:#fbfbfa}
+.inf-eq-row.inf-has-record{border-left:3px solid #F7C600}
+.inf-comp-row.inf-has-record{border-left:3px solid #7c3aed}
+.inf-name-edit{font-weight:600!important;font-size:11px!important}
+.inf-row-hidden{display:none!important}
+.inf-empty-tag{font:8px monospace;color:#b45309;background:#fffbeb;border-radius:2px;padding:1px 4px}
+.inf-readonly-val{font-size:10px;line-height:1.35;color:#374151;word-break:break-word}
+.inf-readonly-ta{font-size:10px;line-height:1.35;color:#374151;white-space:pre-wrap;word-break:break-word}
+.inf-zu{display:flex;gap:4px;flex-wrap:wrap}.inf-zu label{display:flex;align-items:center;gap:3px;font:9px monospace;border:1px solid #ddd9d0;border-radius:3px;padding:3px 6px;background:#fff}.inf-zu input{width:12px;height:12px;margin:0;padding:0;accent-color:#7c3aed}
+.inf-fill-legend{background:#fffdf0;border:1px solid #f5d76e;border-left:3px solid #F7C600;border-radius:4px;padding:8px 10px;margin-bottom:10px;font-size:10px;color:#6b5a00;line-height:1.45}
+@media(max-width:900px){.inf-detail-grid,.inf-detail-grid.comp{grid-template-columns:repeat(2,minmax(130px,1fr))}.inf-detail-field.w4{grid-column:1/-1}}
+@media(max-width:620px){.inf-detail-grid,.inf-detail-grid.comp{grid-template-columns:1fr}.inf-detail-field.w2,.inf-detail-field.w4{grid-column:auto}.inf-edit-note{width:100%;margin-left:0}}
 
 </style>
 </head>
@@ -2097,10 +2137,11 @@ function reportRows(){
       nombre:c.nombre_comp||c.tipo||'Componente',
       principal:eqName(c.equipo_id),
       piso:parent.piso||eq.p||'',
-      zona:c.zona||'',
-      zona_interior:'', zona_exterior:c.zona||'', zona_mantenimiento:'',
-      ext_exterior_h:null, ext_exterior_sup:null, ext_exterior_inf:null, ext_mantenimiento_h:null, ext_mantenimiento_sup:null, ext_mantenimiento_inf:null,
-      hermeticidad:'', criterio_zona:'',
+      zona:c.zona_exterior||c.zona||'',
+      relacion_equipo:c.relacion_equipo||'',
+      zona_interior:c.zona_interior||'', zona_exterior:c.zona_exterior||c.zona||'', zona_mantenimiento:c.zona_mantenimiento||'',
+      ext_exterior_h:c.ext_exterior_h??null, ext_exterior_sup:c.ext_exterior_sup??null, ext_exterior_inf:c.ext_exterior_inf??null, ext_mantenimiento_h:null, ext_mantenimiento_sup:null, ext_mantenimiento_inf:null,
+      hermeticidad:c.hermeticidad||'', criterio_zona:c.criterio_zona||'',
       tag_planta:c.tag_planta||'',
       marca:c.marca||'',
       modelo:c.modelo||'',
@@ -2688,6 +2729,244 @@ async function toggleInfFotos(rowId, fotos){
   panel.innerHTML = h || '<span class="inf-spin">Sin fotos</span>';
 }
 
+
+// ════════════════════════════════════════════════════════════════════════════
+// INFORME EDITABLE v3.2
+// La tabla Informe funciona como planilla de revisión. Guardado por fila al
+// salir del campo (blur) o al cambiar un selector. La cola serial por entidad
+// evita inserciones duplicadas si el usuario avanza rápidamente con TAB.
+// ════════════════════════════════════════════════════════════════════════════
+let infFilterText='';
+let infFilterMode='all';
+let infFilterTimer=null;
+const infSaveQueues={};
+
+function infSelectOptions(value, items){
+  value=String(value??'');
+  return items.map(([v,l])=>`<option value="${escAttr(v)}" ${String(v)===value?'selected':''}>${esc(l)}</option>`).join('');
+}
+function infZoneOptions(v, allowNA=false){
+  const arr=[['','—'],['20','Z20'],['21','Z21'],['22','Z22'],['NG','NG'],['ND','ND']];
+  if(allowNA) arr.push(['NA','NA']);
+  return infSelectOptions(v,arr);
+}
+function infConfOptions(v){
+  return infSelectOptions(v,[['','—'],['C','C'],['NC','NC'],['OBS','OBS'],['NV','NV'],['NA','NA']]);
+}
+function infEplOptions(v){
+  return infSelectOptions(v,[
+    ['','— seleccionar —'],
+    ['EPL Da / Cat. 1D — Muy alta','EPL Da / Cat. 1D — Muy alta'],
+    ['EPL Db / Cat. 2D — Alta','EPL Db / Cat. 2D — Alta'],
+    ['EPL Dc / Cat. 3D — Mejorada','EPL Dc / Cat. 3D — Mejorada'],
+    ['Sin marcado Ex — requiere reemplazo','Sin marcado Ex — requiere reemplazo'],
+    ['Marcado no visible / ilegible','Marcado no visible / ilegible'],
+    ['No verificable — sin placa o antecedentes suficientes','No verificable — sin placa o antecedentes suficientes'],
+    ['Equipo no eléctrico / mecánico','Equipo no eléctrico / mecánico']
+  ]);
+}
+function infHermOptions(v){
+  return infSelectOptions(v,[['','— evaluar —'],['Estanco','Estanco'],['Operativamente estanco','Operativamente estanco'],['No estanco','No estanco'],['Desconocido / no verificable','Desconocido / no verificable'],['No aplica','No aplica']]);
+}
+function infRelacionOptions(v){
+  return infSelectOptions(v,[
+    ['','— seleccionar —'],['interior','Interior'],['exterior','Exterior'],['interfaz','Interfaz interior/exterior'],['proceso_propio','Proceso con volumen interno propio'],['no_definido','No determinado']
+  ]);
+}
+function infInputValue(id){ const el=document.getElementById(id); return el?el.value.trim():''; }
+function infNumValue(id){ const v=infInputValue(id); if(v==='') return null; const n=Number(v.replace(',','.')); return Number.isFinite(n)&&n>=0?n:null; }
+function infEditKey(e){
+  if(e.key==='Enter' && e.target.tagName!=='TEXTAREA'){ e.preventDefault(); e.target.blur(); }
+  if(e.key==='Enter' && e.target.tagName==='TEXTAREA' && (e.ctrlKey||e.metaKey)){ e.preventDefault(); e.target.blur(); }
+}
+function infEnqueue(key,fn){
+  const prev=infSaveQueues[key]||Promise.resolve();
+  const next=prev.catch(()=>{}).then(fn);
+  const final=next.finally(()=>{ if(infSaveQueues[key]===final) delete infSaveQueues[key]; });
+  infSaveQueues[key]=final;
+  return final;
+}
+function infStateId(kind,id){ return `inf-state-${kind}-${safeDomId(id)}`; }
+function infSetSaveState(kind,id,state,msg=''){
+  const el=document.getElementById(infStateId(kind,id)); if(!el) return;
+  el.className='inf-save-state '+state;
+  el.textContent=state==='saving'?'● Guardando…':state==='saved'?'✓ Guardado':state==='error'?'⚠ '+(msg||'Error'):'';
+  if(state==='saved') setTimeout(()=>{ if(el&&el.classList.contains('saved')){el.className='inf-save-state';el.textContent='';}},1800);
+}
+function infHas(v){ return v!==null&&v!==undefined&&String(v).trim()!==''; }
+function infEqFill(eqId){
+  const r=recs[eqId]||{};
+  const vals=[r.marca,r.modelo,r.tag_planta,r.marcado_ex,r.epl,r.zona_interior,r.zona_exterior||r.zona,r.zona_mantenimiento,r.hermeticidad,r.criterio_zona,r.temp_max,r.conformidad];
+  const filled=vals.filter(infHas).length,total=vals.length,pct=Math.round(filled/total*100);
+  return {filled,total,pct,hasRecord:!!r.id};
+}
+function infCompFill(c){
+  c=c||{};
+  const vals=[c.tipo,c.nombre_comp,c.marca,c.modelo,c.tag_planta,c.marcado_ex,c.epl,c.relacion_equipo,c.zona_interior,c.zona_exterior||c.zona,c.zona_mantenimiento,c.hermeticidad,c.conformidad];
+  const filled=vals.filter(infHas).length,total=vals.length,pct=Math.round(filled/total*100);
+  return {filled,total,pct};
+}
+function infCompleteHtml(kind,id,obj){
+  const st=kind==='eq'?infEqFill(id):infCompFill(obj);
+  const cls=st.pct>=85?'high':st.pct>=50?'mid':'low';
+  return `<span class="inf-complete ${cls}" id="inf-fill-${kind}-${safeDomId(id)}" title="Indicador de llenado de campos clave; no equivale a conformidad ATEX">${st.filled}/${st.total} · ${st.pct}%</span>`;
+}
+function infRefreshFill(kind,id){
+  let st;
+  if(kind==='eq') st=infEqFill(id); else { const c=allSubRaw.find(x=>x.id===id)||{}; st=infCompFill(c); }
+  const el=document.getElementById(`inf-fill-${kind}-${safeDomId(id)}`); if(!el) return;
+  el.className='inf-complete '+(st.pct>=85?'high':st.pct>=50?'mid':'low');
+  el.textContent=`${st.filled}/${st.total} · ${st.pct}%`;
+}
+function infToggleDetails(kind,id){ const el=document.getElementById(`inf-detail-${kind}-${safeDomId(id)}`); if(el) el.classList.toggle('on'); }
+function infScheduleFilter(){ clearTimeout(infFilterTimer); infFilterTimer=setTimeout(()=>renderFindings(),120); }
+function infSetFilterMode(v){ infFilterMode=v; renderFindings(); }
+
+function infEqSearchText(eq){
+  const r=recs[eq.id]||{}; const comps=allSubRaw.filter(c=>c.equipo_id===eq.id);
+  return [eqName(eq.id),eq.g,pisoLabel(eqPiso(eq.id)),r.marca,r.modelo,r.tag_planta,r.marcado_ex,r.hallazgo,r.accion,...comps.flatMap(c=>[c.nombre_comp,c.tipo,c.marca,c.modelo,c.tag_planta,c.marcado_ex,c.hallazgo,c.accion])].join(' ').toLowerCase();
+}
+function infEqPasses(eq){
+  const q=(infFilterText||'').trim().toLowerCase(); if(q&&!infEqSearchText(eq).includes(q)) return false;
+  const r=recs[eq.id]||{}, comps=allSubRaw.filter(c=>c.equipo_id===eq.id);
+  if(infFilterMode==='incomplete') return infEqFill(eq.id).pct<100 || comps.some(c=>infCompFill(c).pct<100);
+  if(infFilterMode==='empty') return !r.id;
+  if(['NC','OBS','NV','C'].includes(infFilterMode)) return r.conformidad===infFilterMode || comps.some(c=>c.conformidad===infFilterMode);
+  return true;
+}
+function infLocationOptions(eqId){
+  const cur=eqPiso(eqId);
+  let ids=pisoOrderIds(allEqs('all').map(e=>eqPiso(e.id)));
+  if(cur&&!ids.includes(cur)) ids.push(cur);
+  return ids.map(id=>`<option value="${escAttr(id)}" ${id===cur?'selected':''}>${esc(pisoLabel(id))}</option>`).join('');
+}
+async function infChangeEqLocation(eqId,toUbId){
+  if(isVisita()) return; if(!toUbId||eqPiso(eqId)===toUbId) return;
+  infSetSaveState('eq',eqId,'saving');
+  try{
+    const pid=projectId(),dyn=proyEquipos.find(e=>e.id===eqId);
+    if(dyn){ await must(sb.from('proyecto_equipos').update({ubicacion_id:toUbId}).eq('proyecto_id',pid).eq('id',eqId)); dyn.ubicacion_id=toUbId; }
+    else { await must(sb.from('equipos_piso').upsert({id:eqId,piso:toUbId,proyecto_id:pid,updated_at:new Date().toISOString(),updated_by:profile?.full_name||session.user.email},{onConflict:'proyecto_id,id'})); customPisos[eqId]=toUbId; }
+    if(recs[eqId]?.id){ const saved=await must(sb.from('registros').update({piso:toUbId}).eq('proyecto_id',pid).eq('id',recs[eqId].id).select().single()); recs[eqId]={...recs[eqId],...saved}; }
+    infSetSaveState('eq',eqId,'saved'); renderEq(); renderFindings();
+  }catch(e){ infSetSaveState('eq',eqId,'error',e.message); toast('Error al mover equipo: '+e.message,'err'); }
+}
+
+async function infSaveEqDirect(eqId){
+  if(isVisita()) return;
+  return infEnqueue('eq:'+eqId,async()=>{
+    infSetSaveState('eq',eqId,'saving');
+    try{
+      const sid=safeDomId(eqId),eq=getEqDef(eqId); if(!eq) throw new Error('Equipo no encontrado');
+      const old=recs[eqId]||{};
+      const name=infInputValue(`inf-eq-name-${sid}`)||eqName(eqId);
+      if(name!==eqName(eqId)){
+        const cp={id:eqId,proyecto_id:projectId(),nombre:name,updated_at:new Date().toISOString(),updated_by:profile?.full_name||session.user.email};
+        const {data:ex}=await sb.from('equipos_custom').select('id').eq('id',eqId).eq('proyecto_id',projectId()).maybeSingle();
+        if(ex) await must(sb.from('equipos_custom').update(cp).eq('id',eqId).eq('proyecto_id',projectId())); else await must(sb.from('equipos_custom').insert(cp));
+        customNames[eqId]=name;
+      }
+      const payload={
+        equipo_id:eqId,equipo_nombre:name,piso:eqPiso(eqId),grupo:eq.g||old.grupo||'',proyecto_id:projectId(),
+        marca:infInputValue(`inf-eq-marca-${sid}`),modelo:infInputValue(`inf-eq-modelo-${sid}`),serie:infInputValue(`inf-eq-serie-${sid}`),tag_planta:infInputValue(`inf-eq-tag-${sid}`),potencia:infInputValue(`inf-eq-pot-${sid}`),fecha_fab:infInputValue(`inf-eq-fab-${sid}`)||null,
+        marcado_ex:infInputValue(`inf-eq-mex-${sid}`),epl:infInputValue(`inf-eq-epl-${sid}`),
+        zona:infInputValue(`inf-eq-ze-${sid}`),zona_interior:infInputValue(`inf-eq-zi-${sid}`),zona_exterior:infInputValue(`inf-eq-ze-${sid}`),zona_mantenimiento:infInputValue(`inf-eq-zm-${sid}`),
+        ext_exterior_h:infNumValue(`inf-eq-eh-${sid}`),ext_exterior_sup:infNumValue(`inf-eq-es-${sid}`),ext_exterior_inf:infNumValue(`inf-eq-ei-${sid}`),
+        ext_mantenimiento_h:infNumValue(`inf-eq-mh-${sid}`),ext_mantenimiento_sup:infNumValue(`inf-eq-ms-${sid}`),ext_mantenimiento_inf:infNumValue(`inf-eq-mi-${sid}`),
+        hermeticidad:infInputValue(`inf-eq-herm-${sid}`),criterio_zona:infInputValue(`inf-eq-crit-${sid}`),temp_max:infInputValue(`inf-eq-temp-${sid}`),
+        conformidad:infInputValue(`inf-eq-conf-${sid}`),hallazgo:infInputValue(`inf-eq-hall-${sid}`),accion:infInputValue(`inf-eq-acc-${sid}`),
+        fotos:old.fotos||[],inspector_id:session.user.id,inspector_nombre:profile?.full_name||session.user.email
+      };
+      let saved;
+      if(old.id) saved=await must(sb.from('registros').update(payload).eq('proyecto_id',projectId()).eq('id',old.id).select().single());
+      else saved=await must(sb.from('registros').insert(payload).select().single());
+      recs[eqId]={...saved,profiles:{full_name:profile?.full_name}};
+      const idx=allRaw.findIndex(x=>x.equipo_id===eqId); if(idx>=0) allRaw[idx]=recs[eqId]; else allRaw.push(recs[eqId]);
+      infSetSaveState('eq',eqId,'saved'); infRefreshFill('eq',eqId);
+      const row=document.getElementById(`inf-row-eq-${sid}`); if(row){row.classList.remove('inf-no-record');row.classList.add('inf-has-record');}
+    }catch(e){ infSetSaveState('eq',eqId,'error',e.message); toast('Error guardando desde Informe: '+e.message,'err'); }
+  });
+}
+
+async function infSaveCompDirect(compId){
+  if(isVisita()) return;
+  return infEnqueue('comp:'+compId,async()=>{
+    infSetSaveState('comp',compId,'saving');
+    try{
+      const c=allSubRaw.find(x=>x.id===compId); if(!c) throw new Error('Componente no encontrado');
+      const sid=safeDomId(compId),zu=['20','21','22'].filter(z=>document.getElementById(`inf-c-zu-${z}-${sid}`)?.checked);
+      const payload={
+        tipo:infInputValue(`inf-c-tipo-${sid}`),nombre_comp:infInputValue(`inf-c-name-${sid}`)||infInputValue(`inf-c-tipo-${sid}`),
+        marca:infInputValue(`inf-c-marca-${sid}`),modelo:infInputValue(`inf-c-modelo-${sid}`),serie:infInputValue(`inf-c-serie-${sid}`),tag_planta:infInputValue(`inf-c-tag-${sid}`),potencia:infInputValue(`inf-c-pot-${sid}`),fecha_fab:infInputValue(`inf-c-fab-${sid}`)||null,
+        marcado_ex:infInputValue(`inf-c-mex-${sid}`),epl:infInputValue(`inf-c-epl-${sid}`),relacion_equipo:infInputValue(`inf-c-rel-${sid}`),
+        zona:infInputValue(`inf-c-ze-${sid}`),zona_interior:infInputValue(`inf-c-zi-${sid}`),zona_exterior:infInputValue(`inf-c-ze-${sid}`),zona_mantenimiento:infInputValue(`inf-c-zm-${sid}`),
+        ext_exterior_h:infNumValue(`inf-c-eh-${sid}`),ext_exterior_sup:infNumValue(`inf-c-es-${sid}`),ext_exterior_inf:infNumValue(`inf-c-ei-${sid}`),
+        hermeticidad:infInputValue(`inf-c-herm-${sid}`),criterio_zona:infInputValue(`inf-c-crit-${sid}`),zona_uso:zu,temp_max:infInputValue(`inf-c-temp-${sid}`),
+        conformidad:infInputValue(`inf-c-conf-${sid}`),hallazgo:infInputValue(`inf-c-hall-${sid}`),accion:infInputValue(`inf-c-acc-${sid}`),
+        fotos:c.fotos||[],inspector_id:session.user.id,inspector_nombre:profile?.full_name||session.user.email
+      };
+      const saved=await must(sb.from('componentes').update(payload).eq('proyecto_id',projectId()).eq('id',compId).select().single());
+      const i=allSubRaw.findIndex(x=>x.id===compId); if(i>=0) allSubRaw[i]=saved;
+      const arr=subRecs[saved.equipo_id]||[]; const j=arr.findIndex(x=>x.id===compId); if(j>=0) arr[j]=saved;
+      infSetSaveState('comp',compId,'saved'); infRefreshFill('comp',compId);
+    }catch(e){ infSetSaveState('comp',compId,'error',e.message); toast('Error guardando componente desde Informe: '+e.message,'err'); }
+  });
+}
+
+function infEqDetailsHtml(eq,r){
+  const id=eq.id,s=safeDomId(id),ro=isVisita();
+  if(ro) return `<div class="inf-detail-panel" id="inf-detail-eq-${s}"><div class="inf-detail-title">Detalle completo · solo lectura</div><div class="inf-detail-grid">
+    <div class="inf-detail-field"><div class="k">Ubicación</div><div class="inf-readonly-val">${esc(pisoLabel(eqPiso(id)))}</div></div><div class="inf-detail-field"><div class="k">Marca</div><div class="inf-readonly-val">${esc(r.marca||'—')}</div></div><div class="inf-detail-field"><div class="k">Modelo</div><div class="inf-readonly-val">${esc(r.modelo||'—')}</div></div><div class="inf-detail-field"><div class="k">Serie</div><div class="inf-readonly-val">${esc(r.serie||'—')}</div></div>
+    <div class="inf-detail-field"><div class="k">Potencia / tensión</div><div class="inf-readonly-val">${esc(r.potencia||'—')}</div></div><div class="inf-detail-field"><div class="k">EPL</div><div class="inf-readonly-val">${esc(r.epl||'—')}</div></div><div class="inf-detail-field"><div class="k">Temp. máx.</div><div class="inf-readonly-val">${esc(r.temp_max||'—')}</div></div><div class="inf-detail-field"><div class="k">Hermeticidad</div><div class="inf-readonly-val">${esc(r.hermeticidad||'—')}</div></div>
+    <div class="inf-detail-field"><div class="k">Ext. exterior H</div><div>${esc(r.ext_exterior_h??'—')}</div></div><div class="inf-detail-field"><div class="k">Ext. exterior ↑</div><div>${esc(r.ext_exterior_sup??'—')}</div></div><div class="inf-detail-field"><div class="k">Ext. exterior ↓</div><div>${esc(r.ext_exterior_inf??'—')}</div></div><div></div>
+    <div class="inf-detail-field"><div class="k">Ext. mantenimiento H</div><div>${esc(r.ext_mantenimiento_h??'—')}</div></div><div class="inf-detail-field"><div class="k">Ext. mantenimiento ↑</div><div>${esc(r.ext_mantenimiento_sup??'—')}</div></div><div class="inf-detail-field"><div class="k">Ext. mantenimiento ↓</div><div>${esc(r.ext_mantenimiento_inf??'—')}</div></div><div></div>
+    <div class="inf-detail-field w4"><div class="k">Criterio / justificación</div><div class="inf-readonly-ta">${esc(r.criterio_zona||'—')}</div></div></div></div>`;
+  const on=`onblur="infSaveEqDirect(${jsArg(id)})" onkeydown="infEditKey(event)" onclick="event.stopPropagation()"`;
+  return `<div class="inf-detail-panel" id="inf-detail-eq-${s}" onclick="event.stopPropagation()"><div class="inf-detail-title">Detalle completo · los cambios se guardan al salir del campo</div><div class="inf-detail-grid">
+    <div class="inf-detail-field"><div class="k">Ubicación / piso</div><select class="inf-select" onchange="infChangeEqLocation(${jsArg(id)},this.value)" onclick="event.stopPropagation()">${infLocationOptions(id)}</select></div>
+    <div class="inf-detail-field"><div class="k">Marca</div><input id="inf-eq-marca-${s}" class="inf-input" value="${escAttr(r.marca||'')}" ${on}></div>
+    <div class="inf-detail-field"><div class="k">Modelo</div><input id="inf-eq-modelo-${s}" class="inf-input" value="${escAttr(r.modelo||'')}" ${on}></div>
+    <div class="inf-detail-field"><div class="k">N° serie</div><input id="inf-eq-serie-${s}" class="inf-input" value="${escAttr(r.serie||'')}" ${on}></div>
+    <div class="inf-detail-field"><div class="k">Potencia / tensión</div><input id="inf-eq-pot-${s}" class="inf-input" value="${escAttr(r.potencia||'')}" ${on}></div>
+    <div class="inf-detail-field"><div class="k">EPL / verificación</div><select id="inf-eq-epl-${s}" class="inf-select" onchange="infSaveEqDirect(${jsArg(id)})" onclick="event.stopPropagation()">${infEplOptions(r.epl)}</select></div>
+    <div class="inf-detail-field"><div class="k">Temp. superficial máx.</div><input id="inf-eq-temp-${s}" class="inf-input" value="${escAttr(r.temp_max||'')}" ${on}></div>
+    <div class="inf-detail-field"><div class="k">Hermeticidad</div><select id="inf-eq-herm-${s}" class="inf-select" onchange="infSaveEqDirect(${jsArg(id)})" onclick="event.stopPropagation()">${infHermOptions(r.hermeticidad)}</select></div>
+    <div class="inf-detail-field"><div class="k">Ext. exterior H [m]</div><input id="inf-eq-eh-${s}" type="number" step="0.01" min="0" class="inf-input" value="${escAttr(r.ext_exterior_h??'')}" ${on}></div>
+    <div class="inf-detail-field"><div class="k">Ext. exterior ↑ [m]</div><input id="inf-eq-es-${s}" type="number" step="0.01" min="0" class="inf-input" value="${escAttr(r.ext_exterior_sup??'')}" ${on}></div>
+    <div class="inf-detail-field"><div class="k">Ext. exterior ↓ [m]</div><input id="inf-eq-ei-${s}" type="number" step="0.01" min="0" class="inf-input" value="${escAttr(r.ext_exterior_inf??'')}" ${on}></div><div></div>
+    <div class="inf-detail-field"><div class="k">Ext. mantenimiento H [m]</div><input id="inf-eq-mh-${s}" type="number" step="0.01" min="0" class="inf-input" value="${escAttr(r.ext_mantenimiento_h??'')}" ${on}></div>
+    <div class="inf-detail-field"><div class="k">Ext. mantenimiento ↑ [m]</div><input id="inf-eq-ms-${s}" type="number" step="0.01" min="0" class="inf-input" value="${escAttr(r.ext_mantenimiento_sup??'')}" ${on}></div>
+    <div class="inf-detail-field"><div class="k">Ext. mantenimiento ↓ [m]</div><input id="inf-eq-mi-${s}" type="number" step="0.01" min="0" class="inf-input" value="${escAttr(r.ext_mantenimiento_inf??'')}" ${on}></div><div></div>
+    <div class="inf-detail-field w4"><div class="k">Criterio / justificación de clasificación</div><textarea id="inf-eq-crit-${s}" class="inf-ta" ${on}>${esc(r.criterio_zona||'')}</textarea></div>
+  </div></div>`;
+}
+
+function infCompDetailsHtml(c){
+  const id=c.id,s=safeDomId(id),ro=isVisita();
+  if(ro) return `<div class="inf-detail-panel" id="inf-detail-comp-${s}"><div class="inf-detail-title">Detalle del componente · solo lectura</div><div class="inf-detail-grid comp">
+    <div class="inf-detail-field"><div class="k">Tipo</div><div>${esc(c.tipo||'—')}</div></div><div class="inf-detail-field"><div class="k">Relación</div><div>${esc(c.relacion_equipo||'—')}</div></div><div class="inf-detail-field"><div class="k">Marca</div><div>${esc(c.marca||'—')}</div></div><div class="inf-detail-field"><div class="k">Modelo</div><div>${esc(c.modelo||'—')}</div></div>
+    <div class="inf-detail-field"><div class="k">Serie</div><div>${esc(c.serie||'—')}</div></div><div class="inf-detail-field"><div class="k">Potencia</div><div>${esc(c.potencia||'—')}</div></div><div class="inf-detail-field"><div class="k">EPL</div><div>${esc(c.epl||'—')}</div></div><div class="inf-detail-field"><div class="k">Hermeticidad</div><div>${esc(c.hermeticidad||'—')}</div></div>
+    <div class="inf-detail-field w4"><div class="k">Criterio / justificación</div><div class="inf-readonly-ta">${esc(c.criterio_zona||'—')}</div></div></div></div>`;
+  const on=`onblur="infSaveCompDirect(${jsArg(id)})" onkeydown="infEditKey(event)" onclick="event.stopPropagation()"`;
+  const zu=c.zona_uso||[];
+  return `<div class="inf-detail-panel" id="inf-detail-comp-${s}" onclick="event.stopPropagation()"><div class="inf-detail-title">Detalle del componente · los cambios se guardan al salir del campo</div><div class="inf-detail-grid comp">
+    <div class="inf-detail-field"><div class="k">Tipo</div><input id="inf-c-tipo-${s}" class="inf-input" value="${escAttr(c.tipo||'')}" ${on}></div>
+    <div class="inf-detail-field"><div class="k">Relación con equipo</div><select id="inf-c-rel-${s}" class="inf-select" onchange="infSaveCompDirect(${jsArg(id)})" onclick="event.stopPropagation()">${infRelacionOptions(c.relacion_equipo)}</select></div>
+    <div class="inf-detail-field"><div class="k">Marca</div><input id="inf-c-marca-${s}" class="inf-input" value="${escAttr(c.marca||'')}" ${on}></div>
+    <div class="inf-detail-field"><div class="k">Modelo</div><input id="inf-c-modelo-${s}" class="inf-input" value="${escAttr(c.modelo||'')}" ${on}></div>
+    <div class="inf-detail-field"><div class="k">N° serie</div><input id="inf-c-serie-${s}" class="inf-input" value="${escAttr(c.serie||'')}" ${on}></div>
+    <div class="inf-detail-field"><div class="k">Potencia / tensión</div><input id="inf-c-pot-${s}" class="inf-input" value="${escAttr(c.potencia||'')}" ${on}></div>
+    <div class="inf-detail-field"><div class="k">EPL / verificación</div><select id="inf-c-epl-${s}" class="inf-select" onchange="infSaveCompDirect(${jsArg(id)})" onclick="event.stopPropagation()">${infEplOptions(c.epl)}</select></div>
+    <div class="inf-detail-field"><div class="k">Temp. superficial máx.</div><input id="inf-c-temp-${s}" class="inf-input" value="${escAttr(c.temp_max||'')}" ${on}></div>
+    <div class="inf-detail-field"><div class="k">Ext. exterior H [m]</div><input id="inf-c-eh-${s}" type="number" step="0.01" min="0" class="inf-input" value="${escAttr(c.ext_exterior_h??'')}" ${on}></div>
+    <div class="inf-detail-field"><div class="k">Ext. exterior ↑ [m]</div><input id="inf-c-es-${s}" type="number" step="0.01" min="0" class="inf-input" value="${escAttr(c.ext_exterior_sup??'')}" ${on}></div>
+    <div class="inf-detail-field"><div class="k">Ext. exterior ↓ [m]</div><input id="inf-c-ei-${s}" type="number" step="0.01" min="0" class="inf-input" value="${escAttr(c.ext_exterior_inf??'')}" ${on}></div>
+    <div class="inf-detail-field"><div class="k">Hermeticidad</div><select id="inf-c-herm-${s}" class="inf-select" onchange="infSaveCompDirect(${jsArg(id)})" onclick="event.stopPropagation()">${infHermOptions(c.hermeticidad)}</select></div>
+    <div class="inf-detail-field w2"><div class="k">Aptitud de uso documentada</div><div class="inf-zu">${['20','21','22'].map(z=>`<label><input id="inf-c-zu-${z}-${s}" type="checkbox" ${zu.includes(z)?'checked':''} onchange="infSaveCompDirect(${jsArg(id)})"> Z${z}</label>`).join('')}</div></div>
+    <div class="inf-detail-field w4"><div class="k">Criterio / justificación de clasificación</div><textarea id="inf-c-crit-${s}" class="inf-ta" ${on}>${esc(c.criterio_zona||'')}</textarea></div>
+  </div></div>`;
+}
+
 function renderFindings(){
   const nc=reportRows().filter(r=>r.conformidad==='NC');
   const el=document.getElementById('nc-sum');
@@ -2700,7 +2979,7 @@ function renderFindings(){
       </div>
       <div id="nc-list" class="nc-list ${ncExpanded?'on':''}">`
       +nc.map(r=>`<div class="nc-item">
-        <div style="font-weight:500;font-size:13px;cursor:pointer;color:#F7C600" onclick="openFromInforme(${jsArg(r.equipo_id)})">${esc(r.tipo==='Componente'?r.principal+' · '+r.nombre:r.nombre)} &#8599;</div>
+        <div style="font-weight:500;font-size:13px;cursor:pointer;color:#F7C600" onclick="${r.tipo==='Componente'?`openSubModal(null,${jsArg(r.equipo_id)},${jsArg(r.id)})`:`openFromInforme(${jsArg(r.equipo_id)})`}">${esc(r.tipo==='Componente'?r.principal+' · '+r.nombre:r.nombre)} &#8599;</div>
         <div style="font-size:10px;color:#aaa;font-family:monospace;margin-bottom:5px">${esc(r.tipo)} · ${esc(pisoLabel(r.piso))}</div>
         <div style="font-size:12px;margin-bottom:3px"><strong>Brechas / Obs.:</strong> ${esc(r.hallazgo||'—')}</div>
         <div style="font-size:12px;color:#6b7280"><strong>Acción:</strong> ${esc(r.accion||'—')}</div>
@@ -2709,130 +2988,89 @@ function renderFindings(){
   }
 
   const findEl=document.getElementById('findings');
+  const ro=isVisita();
+  const allEquip0=allEqs('all');
+  const eqEnCatalogo=new Set(allEquip0.map(e=>e.id));
+  const extras=[];
+  for(const r of allRaw){ if(!eqEnCatalogo.has(r.equipo_id)) extras.push({id:r.equipo_id,n:r.equipo_nombre||r.equipo_id,p:r.piso||'',g:r.grupo||'',z:r.zona||''}); }
+  let allEquip=[...allEquip0,...extras].filter(infEqPasses);
 
-  // Equipos con datos (registro o componentes)
-  const eqIdsWithData=new Set([
-    ...allRaw.map(r=>r.equipo_id),
-    ...allSubRaw.map(c=>c.equipo_id)
-  ]);
-
-  if(!eqIdsWithData.size){
-    findEl.innerHTML='<div style="padding:28px;text-align:center;color:#6b7280">Sin datos registrados.<br><small style="font-family:monospace;font-size:10px">Completa fichas de equipos para ver la tabla.</small></div>';
+  if(!allEquip.length){
+    findEl.innerHTML='<div style="padding:28px;text-align:center;color:#6b7280">Sin equipos que coincidan con el filtro.</div>';
     return;
   }
 
-  // Construir equipos con datos combinando catálogo + equipos dinámicos
-  const allEquip=allEqs('all');
-  // Incluir también equipos que están en allRaw pero no en catálogo local
-  const eqEnCatalogo=new Set(allEquip.map(e=>e.id));
-  const eqsExtra=[];
-  for(const id of eqIdsWithData){
-    if(!eqEnCatalogo.has(id)){
-      const r=recs[id]||{};
-      eqsExtra.push({id, n:r.equipo_nombre||id, p:r.piso||'', g:r.grupo||'', z:r.zona||''});
-    }
-  }
-  const equipWithData=[...allEquip,...eqsExtra].filter(e=>eqIdsWithData.has(e.id));
-
-  // Agrupar por piso
+  const withRecord=allEquip.filter(e=>!!recs[e.id]?.id).length;
   const byFloor={};
-  for(const e of equipWithData){
-    if(!byFloor[e.p]) byFloor[e.p]=[];
-    byFloor[e.p].push(e);
-  }
-
-  // pisoOrder debe declararse DESPUÉS de construir byFloor
+  for(const e of allEquip){ const p=eqPiso(e.id)||e.p||''; if(!byFloor[p]) byFloor[p]=[]; byFloor[p].push(e); }
   const pisoOrder=pisoOrderIds(Object.keys(byFloor));
 
-  let h=`<div class="inf-tree-wrap">`;
-
-  // Barra de controles globales
-  h+=`<div style="padding:7px 14px;background:#2a2f40;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-    <span style="font-family:monospace;font-size:9px;color:#888">ÁRBOL</span>
-    <button onclick="toggleAllPisos(true)" style="background:none;border:1px solid #444;color:#aaa;border-radius:3px;padding:2px 8px;font-size:10px;font-family:monospace;cursor:pointer">&#9660; Expandir todo</button>
-    <button onclick="toggleAllPisos(false)" style="background:none;border:1px solid #444;color:#aaa;border-radius:3px;padding:2px 8px;font-size:10px;font-family:monospace;cursor:pointer">&#9654; Contraer todo</button>
-    <span style="margin-left:auto;font-family:monospace;font-size:9px;color:#666">${eqIdsWithData.size} equipos · ${allSubRaw.length} componentes</span>
+  let h=`<div class="inf-fill-legend"><b>Informe editable:</b> los campos principales se editan directamente. <b>TAB</b> permite avanzar rápidamente y el dato se guarda al salir del campo. “Detalles” abre el resto de la ficha sin abandonar esta vista. El porcentaje es sólo un <b>indicador de llenado</b>, no una evaluación de conformidad ATEX.</div>`;
+  h+=`<div class="inf-tree-wrap">`;
+  h+=`<div class="inf-edit-toolbar">
+    <span style="font:700 9px monospace;color:#F7C600;letter-spacing:1px">REVISIÓN / CIERRE</span>
+    <input class="inf-edit-search" value="${escAttr(infFilterText)}" placeholder="Buscar equipo, TAG, marca, hallazgo…" oninput="infFilterText=this.value;infScheduleFilter()">
+    <select class="inf-edit-filter" onchange="infSetFilterMode(this.value)">
+      ${infSelectOptions(infFilterMode,[['all','Todos'],['incomplete','Con datos incompletos'],['empty','Sin ficha / sin registro'],['NC','NC'],['OBS','OBS'],['NV','NV'],['C','Conformes']])}
+    </select>
+    <button onclick="toggleAllPisos(true)" class="inf-small-btn" style="background:#1e2230;color:#ccc;border-color:#444">&#9660; Expandir pisos</button>
+    <button onclick="toggleAllPisos(false)" class="inf-small-btn" style="background:#1e2230;color:#ccc;border-color:#444">&#9654; Contraer</button>
+    <span class="inf-edit-note">${allEquip.length} equipos visibles · ${withRecord} con ficha · ${allEquip.length-withRecord} sin ficha · ${allSubRaw.length} componentes${ro?' · SOLO LECTURA':''}</span>
   </div>`;
 
-  // Cabecera columnas
   h+=`<div class="inf-col-hd-bar">
-    <div></div>
-    <div>EQUIPO / COMPONENTE</div>
-    <div>ZONA</div>
-    <div>TAG PLANTA</div>
-    <div>FAB.</div>
-    <div>MARCADO Ex</div>
-    <div>ESTADO</div>
-    <div>BRECHAS / OBS.</div>
-    <div>ACCIÓN</div>
+    <div></div><div>EQUIPO / COMPONENTE</div><div>ZONAS I / E / M</div><div>TAG PLANTA</div><div>FAB.</div><div>MARCADO Ex</div><div>ESTADO</div><div>BRECHAS / OBS.</div><div>ACCIÓN</div>
   </div>`;
 
   for(const piso of pisoOrder){
     const eqs=(byFloor[piso]||[]).sort((a,b)=>eqName(a.id).localeCompare(eqName(b.id),'es'));
     if(!eqs.length) continue;
-    const compCount=eqs.reduce((s,e)=>s+(allSubRaw.filter(c=>c.equipo_id===e.id).length),0);
-
-    h+=`<div class="inf-piso-hd" onclick="togglePiso('${piso}')">
-      <span class="inf-piso-arrow" id="ipa-${piso}" style="transform:rotate(-90deg)">&#9660;</span>
-      ${esc(pisoLabel(piso))}
-      <span style="margin-left:auto;font-size:9px;color:#888;font-weight:400;text-transform:none;letter-spacing:0">${eqs.length} equipo${eqs.length!==1?'s':''} · ${compCount} comp.</span>
-    </div>
-    <div id="ipb-${piso}" style="display:none">`;
+    const compCount=eqs.reduce((n,e)=>n+allSubRaw.filter(c=>c.equipo_id===e.id).length,0);
+    h+=`<div class="inf-piso-hd" onclick="togglePiso(${jsArg(piso)})"><span class="inf-piso-arrow" id="ipa-${safeDomId(piso)}">&#9660;</span>${esc(pisoLabel(piso))}<span style="margin-left:auto;font-size:9px;color:#888;font-weight:400;text-transform:none;letter-spacing:0">${eqs.length} equipo${eqs.length!==1?'s':''} · ${compCount} comp.</span></div><div id="ipb-${safeDomId(piso)}" style="display:block">`;
 
     for(const eq of eqs){
-      const r=recs[eq.id]||{};
-      const comps=allSubRaw.filter(c=>c.equipo_id===eq.id);
-      const hasComps=comps.length>0;
-      const nombre=eqName(eq.id);
-      const z=zoneExteriorOf(r,eq.z||'');
-
-      h+=`<div id="iew-${eq.id}">
-        <div class="inf-eq-row" onclick="toggleInfEq('${eq.id}')">
-          <div class="inf-eq-toggle" id="iet-${eq.id}" style="${!hasComps?'color:#ddd':''}">${hasComps?'&#9654;':'·'}</div>
-          <div>
-            <div style="font-weight:600;font-size:12px;color:#0f1117"
-              onclick="event.stopPropagation();openFromInforme('${eq.id}')"
-              onmouseover="this.style.color='#F7C600';this.style.cursor='pointer'" onmouseout="this.style.color='#0f1117'">
-              ${esc(nombre)} <span style="font-size:9px;color:#F7C600">&#8599;</span>
-            </div>
-            ${r.marca?`<div style="font-family:monospace;font-size:9px;color:#aaa">${esc(r.marca)}${r.modelo?' · '+esc(r.modelo):''}</div>`:''}
-            ${fotosBtnHtml(r.fotos||[],'eq-'+eq.id)}
-          </div>
-          <div>${zoneTripleHtml(r,eq.z||'')}</div>
-          <div style="font-family:monospace;font-size:10px;color:#0f1117;font-weight:600">${esc(r.tag_planta||'—')}</div>
-          <div style="font-family:monospace;font-size:10px;color:#6b7280">${esc(r.fecha_fab||'—')}</div>
-          <div style="font-family:monospace;font-size:10px">${esc(r.marcado_ex||'—')}</div>
-          <div><span class="cbadge b${confClass(r.conformidad)}">${esc(r.conformidad||'—')}</span></div>
-          <div style="font-size:11px">${esc(r.hallazgo||'—')}</div>
-          <div style="font-size:11px;color:#6b7280">${esc(r.accion||'—')}</div>
-        </div>`;
+      const id=eq.id,sid=safeDomId(id),r=recs[id]||{},comps=allSubRaw.filter(c=>c.equipo_id===id),hasComps=comps.length>0;
+      const zi=r.zona_interior||'',ze=r.zona_exterior||r.zona||'',zm=r.zona_mantenimiento||'';
+      const hasRecord=!!r.id;
+      if(ro){
+        h+=`<div id="iew-${sid}"><div class="inf-eq-row ${hasRecord?'inf-has-record':'inf-no-record'}" id="inf-row-eq-${sid}">
+          <div class="inf-eq-toggle" id="iet-${sid}" onclick="toggleInfEq(${jsArg(id)})" style="cursor:pointer;${!hasComps?'color:#ddd':''}">${hasComps?'&#9654;':'·'}</div>
+          <div><div style="font-weight:600;font-size:12px">${esc(eqName(id))}</div><div style="font:9px monospace;color:#aaa">${esc(r.marca||'')}${r.modelo?' · '+esc(r.modelo):''}</div><div class="inf-inline-actions">${infCompleteHtml('eq',id,r)}<button class="inf-small-btn" onclick="infToggleDetails('eq',${jsArg(id)})">Detalles</button><button class="inf-small-btn" onclick="openFromInforme(${jsArg(id)})">Ficha / fotos</button></div></div>
+          <div>${zoneTripleHtml(r,'')}</div><div>${esc(r.tag_planta||'—')}</div><div>${esc(r.fecha_fab||'—')}</div><div>${esc(r.marcado_ex||'—')}</div><div><span class="cbadge b${confClass(r.conformidad)}">${esc(r.conformidad||'—')}</span></div><div>${esc(r.hallazgo||'—')}</div><div>${esc(r.accion||'—')}</div></div>${infEqDetailsHtml(eq,r)}`;
+      }else{
+        const on=`onblur="infSaveEqDirect(${jsArg(id)})" onkeydown="infEditKey(event)" onclick="event.stopPropagation()"`;
+        h+=`<div id="iew-${sid}"><div class="inf-eq-row ${hasRecord?'inf-has-record':'inf-no-record'}" id="inf-row-eq-${sid}">
+          <div class="inf-eq-toggle" id="iet-${sid}" onclick="toggleInfEq(${jsArg(id)})" style="cursor:pointer;${!hasComps?'color:#ddd':''}">${hasComps?'&#9654;':'·'}</div>
+          <div><input id="inf-eq-name-${sid}" class="inf-input inf-name-edit" value="${escAttr(eqName(id))}" ${on}><div style="font:8px monospace;color:#9ca3af;margin-top:2px">${esc(eq.g||'')}${!hasRecord?' · sin ficha':''}</div><div class="inf-inline-actions">${infCompleteHtml('eq',id,r)}<span id="${infStateId('eq',id)}" class="inf-save-state"></span><button class="inf-small-btn" onclick="infToggleDetails('eq',${jsArg(id)})">Detalles</button><button class="inf-small-btn" onclick="openFromInforme(${jsArg(id)})">Ficha / fotos</button>${ro?'':`<button class="inf-small-btn purple" onclick="openSubModal('new',${jsArg(id)})">+ componente</button>`}</div></div>
+          <div class="inf-zone-stack"><label>I</label><select id="inf-eq-zi-${sid}" class="inf-select inf-mini" onchange="infSaveEqDirect(${jsArg(id)})" onclick="event.stopPropagation()">${infZoneOptions(zi)}</select><label>E</label><select id="inf-eq-ze-${sid}" class="inf-select inf-mini" onchange="infSaveEqDirect(${jsArg(id)})" onclick="event.stopPropagation()">${infZoneOptions(ze)}</select><label>M</label><select id="inf-eq-zm-${sid}" class="inf-select inf-mini" onchange="infSaveEqDirect(${jsArg(id)})" onclick="event.stopPropagation()">${infZoneOptions(zm,true)}</select></div>
+          <div><input id="inf-eq-tag-${sid}" class="inf-input inf-mini" value="${escAttr(r.tag_planta||'')}" placeholder="TAG" ${on}></div>
+          <div><input id="inf-eq-fab-${sid}" class="inf-input inf-mini" type="number" min="1950" max="2099" value="${escAttr(r.fecha_fab||'')}" placeholder="Año" ${on}></div>
+          <div><input id="inf-eq-mex-${sid}" class="inf-input inf-mini" value="${escAttr(r.marcado_ex||'')}" placeholder="Marcado Ex" ${on}></div>
+          <div><select id="inf-eq-conf-${sid}" class="inf-select inf-mini" onchange="infSaveEqDirect(${jsArg(id)})" onclick="event.stopPropagation()">${infConfOptions(r.conformidad)}</select></div>
+          <div><textarea id="inf-eq-hall-${sid}" class="inf-ta" placeholder="Brechas / observaciones" ${on}>${esc(r.hallazgo||'')}</textarea></div>
+          <div><textarea id="inf-eq-acc-${sid}" class="inf-ta" placeholder="Acción" ${on}>${esc(r.accion||'')}</textarea></div></div>${infEqDetailsHtml(eq,r)}`;
+      }
 
       if(hasComps){
-        h+=`<div class="inf-comp-rows" id="iec-${eq.id}">`;
+        h+=`<div class="inf-comp-rows" id="iec-${sid}">`;
         for(const c of comps){
-          h+=`<div class="inf-comp-row" draggable="true" ondragstart="onCompDragStart(event,'${c.id}','${eq.id}')" ondragend="onCompDragEnd(event)" onclick="openSubModal(null,'${eq.id}','${c.id}')">
-            <div></div>
-            <div>
-              <div style="font-size:11px;color:#5b21b6;display:flex;align-items:center;gap:6px">&#8627; ${esc(c.nombre_comp||c.tipo)}<button onclick="event.stopPropagation();openCompTransfer('${c.id}','${eq.id}')" title="Transferir" style="background:none;border:none;cursor:pointer;color:#a78bfa;font-size:11px;padding:0;opacity:0.6" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6">⇄</button></div>
-              <div style="font-family:monospace;font-size:9px;color:#aaa">${esc(c.tipo||'')}${c.marca?' · '+esc(c.marca):''}${c.modelo?' '+esc(c.modelo):''}</div>
-              ${fotosBtnHtml(c.fotos||[],'comp-'+c.id)}
-            </div>
-            <div>${compZoneTripleHtml(c)}</div>
-            <div style="font-family:monospace;font-size:10px;color:#0f1117;font-weight:600">${esc(c.tag_planta||'—')}</div>
-            <div style="font-family:monospace;font-size:10px;color:#6b7280">${esc(c.fecha_fab||'—')}</div>
-            <div style="font-family:monospace;font-size:10px">${esc(c.marcado_ex||'—')}</div>
-            <div><span class="cbadge b${confClass(c.conformidad)}">${esc(c.conformidad||'—')}</span></div>
-            <div style="font-size:11px">${esc(c.hallazgo||'—')}</div>
-            <div style="font-size:11px;color:#6b7280">${esc(c.accion||'—')}</div>
-          </div>`;
+          const cs=safeDomId(c.id),czi=c.zona_interior||'',cze=c.zona_exterior||c.zona||'',czm=c.zona_mantenimiento||'';
+          if(ro){
+            h+=`<div class="inf-comp-row inf-has-record"><div></div><div><div style="font-size:11px;color:#5b21b6">&#8627; ${esc(c.nombre_comp||c.tipo)}</div><div style="font:9px monospace;color:#aaa">${esc(c.tipo||'')}${c.marca?' · '+esc(c.marca):''}</div><div class="inf-inline-actions">${infCompleteHtml('comp',c.id,c)}<button class="inf-small-btn" onclick="infToggleDetails('comp',${jsArg(c.id)})">Detalles</button><button class="inf-small-btn purple" onclick="openSubModal(null,${jsArg(id)},${jsArg(c.id)})">Ficha / fotos</button></div></div><div>${compZoneTripleHtml(c)}</div><div>${esc(c.tag_planta||'—')}</div><div>${esc(c.fecha_fab||'—')}</div><div>${esc(c.marcado_ex||'—')}</div><div><span class="cbadge b${confClass(c.conformidad)}">${esc(c.conformidad||'—')}</span></div><div>${esc(c.hallazgo||'—')}</div><div>${esc(c.accion||'—')}</div></div>${infCompDetailsHtml(c)}`;
+          }else{
+            const con=`onblur="infSaveCompDirect(${jsArg(c.id)})" onkeydown="infEditKey(event)" onclick="event.stopPropagation()"`;
+            h+=`<div class="inf-comp-row inf-has-record"><div></div><div><div style="display:flex;gap:5px;align-items:center"><span style="color:#7c3aed">&#8627;</span><input id="inf-c-name-${cs}" class="inf-input inf-mini" value="${escAttr(c.nombre_comp||c.tipo||'')}" ${con}></div><div class="inf-inline-actions">${infCompleteHtml('comp',c.id,c)}<span id="${infStateId('comp',c.id)}" class="inf-save-state"></span><button class="inf-small-btn" onclick="infToggleDetails('comp',${jsArg(c.id)})">Detalles</button><button class="inf-small-btn purple" onclick="openSubModal(null,${jsArg(id)},${jsArg(c.id)})">Ficha / fotos</button><button class="inf-small-btn purple" onclick="openCompTransfer(${jsArg(c.id)},${jsArg(id)})">⇄</button></div></div>
+              <div class="inf-zone-stack"><label>I</label><select id="inf-c-zi-${cs}" class="inf-select inf-mini" onchange="infSaveCompDirect(${jsArg(c.id)})">${infZoneOptions(czi)}</select><label>E</label><select id="inf-c-ze-${cs}" class="inf-select inf-mini" onchange="infSaveCompDirect(${jsArg(c.id)})">${infZoneOptions(cze)}</select><label>M</label><select id="inf-c-zm-${cs}" class="inf-select inf-mini" onchange="infSaveCompDirect(${jsArg(c.id)})">${infZoneOptions(czm,true)}</select></div>
+              <div><input id="inf-c-tag-${cs}" class="inf-input inf-mini" value="${escAttr(c.tag_planta||'')}" placeholder="TAG" ${con}></div><div><input id="inf-c-fab-${cs}" class="inf-input inf-mini" type="number" min="1950" max="2099" value="${escAttr(c.fecha_fab||'')}" placeholder="Año" ${con}></div><div><input id="inf-c-mex-${cs}" class="inf-input inf-mini" value="${escAttr(c.marcado_ex||'')}" placeholder="Marcado Ex" ${con}></div><div><select id="inf-c-conf-${cs}" class="inf-select inf-mini" onchange="infSaveCompDirect(${jsArg(c.id)})">${infConfOptions(c.conformidad)}</select></div><div><textarea id="inf-c-hall-${cs}" class="inf-ta" placeholder="Brechas / observaciones" ${con}>${esc(c.hallazgo||'')}</textarea></div><div><textarea id="inf-c-acc-${cs}" class="inf-ta" placeholder="Acción" ${con}>${esc(c.accion||'')}</textarea></div></div>${infCompDetailsHtml(c)}`;
+          }
         }
         h+=`</div>`;
       }
-      h+=`</div>`; // iew
+      h+=`</div>`;
     }
-    h+=`</div>`; // ipb
+    h+=`</div>`;
   }
-  h+=`</div>`; // inf-tree-wrap
+  h+=`</div>`;
   findEl.innerHTML=h;
 }
 
