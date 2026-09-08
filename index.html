@@ -2462,7 +2462,7 @@ async function duplicateEq(){
         marca:c.marca||'', modelo:c.modelo||'',
         serie:c.serie||'', tag_planta:c.tag_planta||'', potencia:c.potencia||'',
         fecha_fab:c.fecha_fab||null, marcado_ex:c.marcado_ex||'', epl:c.epl||'',
-        zona:c.zona_exterior||c.zona||'', relacion_equipo:c.relacion_equipo||'', zona_interior:c.zona_interior||'', zona_exterior:c.zona_exterior||c.zona||'', zona_mantenimiento:c.zona_mantenimiento||'', ext_exterior_h:c.ext_exterior_h??null, ext_exterior_sup:c.ext_exterior_sup??null, ext_exterior_inf:c.ext_exterior_inf??null, hermeticidad:c.hermeticidad||'', criterio_zona:c.criterio_zona||'', zona_uso:c.zona_uso||[], temp_max:c.temp_max||'',
+        zona:c.zona_exterior||c.zona||'', relacion_equipo:normalizeRelacionEquipo(c.relacion_equipo), zona_interior:c.zona_interior||'', zona_exterior:c.zona_exterior||c.zona||'', zona_mantenimiento:c.zona_mantenimiento||'', ext_exterior_h:c.ext_exterior_h??null, ext_exterior_sup:c.ext_exterior_sup??null, ext_exterior_inf:c.ext_exterior_inf??null, hermeticidad:c.hermeticidad||'', criterio_zona:c.criterio_zona||'', zona_uso:c.zona_uso||[], temp_max:c.temp_max||'',
         conformidad:c.conformidad||'', hallazgo:c.hallazgo||'', accion:c.accion||'',
         fotos:c.fotos||[], inspector_id:session.user.id,
         inspector_nombre:profile?.full_name||session.user.email,
@@ -2773,6 +2773,10 @@ function infRelacionOptions(v){
     ['','— seleccionar —'],['interior','Interior'],['exterior','Exterior'],['interfaz','Interfaz interior/exterior'],['proceso_propio','Proceso con volumen interno propio'],['no_definido','No determinado']
   ]);
 }
+function normalizeRelacionEquipo(v){
+  const x=String(v??'').trim();
+  return ['interior','exterior','interfaz','proceso_propio','no_definido'].includes(x)?x:null;
+}
 function infInputValue(id){ const el=document.getElementById(id); return el?el.value.trim():''; }
 function infNumValue(id){ const v=infInputValue(id); if(v==='') return null; const n=Number(v.replace(',','.')); return Number.isFinite(n)&&n>=0?n:null; }
 function infEditKey(e){
@@ -2898,7 +2902,7 @@ async function infSaveCompDirect(compId){
       const payload={
         tipo:infInputValue(`inf-c-tipo-${sid}`),nombre_comp:infInputValue(`inf-c-name-${sid}`)||infInputValue(`inf-c-tipo-${sid}`),
         marca:infInputValue(`inf-c-marca-${sid}`),modelo:infInputValue(`inf-c-modelo-${sid}`),serie:infInputValue(`inf-c-serie-${sid}`),tag_planta:infInputValue(`inf-c-tag-${sid}`),potencia:infInputValue(`inf-c-pot-${sid}`),fecha_fab:infInputValue(`inf-c-fab-${sid}`)||null,
-        marcado_ex:infInputValue(`inf-c-mex-${sid}`),epl:infInputValue(`inf-c-epl-${sid}`),relacion_equipo:infInputValue(`inf-c-rel-${sid}`),
+        marcado_ex:infInputValue(`inf-c-mex-${sid}`),epl:infInputValue(`inf-c-epl-${sid}`),relacion_equipo:normalizeRelacionEquipo(infInputValue(`inf-c-rel-${sid}`)),
         zona:infInputValue(`inf-c-ze-${sid}`),zona_interior:infInputValue(`inf-c-zi-${sid}`),zona_exterior:infInputValue(`inf-c-ze-${sid}`),zona_mantenimiento:infInputValue(`inf-c-zm-${sid}`),
         ext_exterior_h:infNumValue(`inf-c-eh-${sid}`),ext_exterior_sup:infNumValue(`inf-c-es-${sid}`),ext_exterior_inf:infNumValue(`inf-c-ei-${sid}`),
         hermeticidad:infInputValue(`inf-c-herm-${sid}`),criterio_zona:infInputValue(`inf-c-crit-${sid}`),zona_uso:zu,temp_max:infInputValue(`inf-c-temp-${sid}`),
@@ -3565,7 +3569,7 @@ async function saveComp(){
       marcado_ex:document.getElementById('sm-mex').value.trim(),
       epl:document.getElementById('sm-epl').value,
       zona:document.getElementById('sm-zona-ext').value, // legado: conserva compatibilidad
-      relacion_equipo:document.getElementById('sm-relacion').value,
+      relacion_equipo:normalizeRelacionEquipo(document.getElementById('sm-relacion').value),
       zona_interior:document.getElementById('sm-zona-int').value,
       zona_exterior:document.getElementById('sm-zona-ext').value,
       zona_mantenimiento:document.getElementById('sm-zona-mant').value,
@@ -5746,6 +5750,7 @@ async function ctExecute(toEqId){
       const {id:_omit, fotos:_f, created_at:_c, updated_at:_u, ...rest}=comp;
       const newComp={...rest, equipo_id:toEqId, fotos:[], proyecto_id:projectId(),
         inspector_id:session.user.id, inspector_nombre:profile?.full_name||session.user.email};
+      newComp.relacion_equipo=normalizeRelacionEquipo(newComp.relacion_equipo);
       const saved=await must(sb.from('componentes').insert(newComp).select().single());
       if(!subRecs[toEqId]) subRecs[toEqId]=[];
       subRecs[toEqId].push(saved);
