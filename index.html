@@ -429,7 +429,7 @@ input[type=file]{display:none}
 @media(max-width:700px){.atex-kpis{grid-template-columns:1fr 1fr}.pid-table{min-width:950px}}
 
 
-/* ══ INFORME EDITABLE v3.2 ══ */
+/* ══ INFORME EDITABLE v3.3 ══ */
 .inf-edit-toolbar{padding:8px 12px;background:#202536;display:flex;align-items:center;gap:8px;flex-wrap:wrap;border-bottom:1px solid #343a4e}
 .inf-edit-search{background:#111827!important;color:#e5e7eb!important;border:1px solid #3b4255!important;min-width:250px;max-width:360px;font-family:monospace;font-size:10px!important;padding:6px 9px!important}
 .inf-edit-filter{background:#111827;color:#d1d5db;border:1px solid #3b4255;border-radius:4px;padding:6px 9px;font:10px monospace}
@@ -467,6 +467,34 @@ input[type=file]{display:none}
 .inf-fill-legend{background:#fffdf0;border:1px solid #f5d76e;border-left:3px solid #F7C600;border-radius:4px;padding:8px 10px;margin-bottom:10px;font-size:10px;color:#6b5a00;line-height:1.45}
 @media(max-width:900px){.inf-detail-grid,.inf-detail-grid.comp{grid-template-columns:repeat(2,minmax(130px,1fr))}.inf-detail-field.w4{grid-column:1/-1}}
 @media(max-width:620px){.inf-detail-grid,.inf-detail-grid.comp{grid-template-columns:1fr}.inf-detail-field.w2,.inf-detail-field.w4{grid-column:auto}.inf-edit-note{width:100%;margin-left:0}}
+
+/* ══ INFORME v3.3 · zonas visibles + decisión cliente + plantillas rápidas ══ */
+.inf-zone-select{font:800 10px monospace!important;min-width:54px!important;border-width:2px!important;text-align:center;padding:3px 2px!important;transition:background .12s,color .12s,border-color .12s}
+.inf-zone-select.inf-z20{background:#ede9fe!important;color:#5b21b6!important;border-color:#7c3aed!important}
+.inf-zone-select.inf-z21{background:#fef3c7!important;color:#92400e!important;border-color:#d97706!important}
+.inf-zone-select.inf-z22{background:#d1fae5!important;color:#065f46!important;border-color:#059669!important}
+.inf-zone-select.inf-zng{background:#f3f4f6!important;color:#374151!important;border-color:#9ca3af!important}
+.inf-zone-select.inf-znd{background:#dbeafe!important;color:#1e40af!important;border-color:#2563eb!important}
+.inf-zone-select.inf-zna{background:#e5e7eb!important;color:#6b7280!important;border-color:#9ca3af!important}
+.inf-zone-select.inf-zblank{background:#fff!important;color:#9ca3af!important;border-color:#d8d5cd!important}
+.inf-quick-select{width:100%;border:1px solid #e4dfd2;border-radius:3px;background:#fffdf0;color:#7c6400;font:700 8px monospace;padding:3px 4px;margin-bottom:3px;min-height:22px}
+.inf-quick-select.action{background:#f5f3ff;color:#5b21b6;border-color:#ddd6fe}
+.inf-decision-bar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:8px 10px;background:#fff;border:1px solid #ddd9d0;border-radius:5px;margin-bottom:10px}
+.inf-decision-title{font:800 9px monospace;letter-spacing:1px;color:#374151;margin-right:3px}
+.inf-decision-chip{border:1px solid #d1d5db;border-radius:12px;background:#fff;padding:4px 9px;font:700 9px monospace;cursor:pointer;white-space:nowrap}
+.inf-decision-chip:hover{box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.inf-decision-chip.rep{background:#fee2e2;color:#991b1b;border-color:#fca5a5}
+.inf-decision-chip.rec{background:#fef3c7;color:#92400e;border-color:#fde68a}
+.inf-decision-chip.ok{background:#d1fae5;color:#065f46;border-color:#a7f3d0}
+.inf-decision-chip.pen{background:#f3f4f6;color:#4b5563;border-color:#d1d5db}
+.inf-decision-badge{display:inline-flex;align-items:center;border-radius:3px;padding:2px 5px;font:800 8px monospace;white-space:nowrap}
+.inf-decision-badge.rep{background:#fee2e2;color:#991b1b}
+.inf-decision-badge.rec{background:#fef3c7;color:#92400e}
+.inf-decision-badge.ok{background:#d1fae5;color:#065f46}
+.inf-decision-badge.pen{background:#f3f4f6;color:#6b7280}
+/* Dar más espacio real a la triple zona */
+.inf-col-hd-bar,.inf-eq-row{grid-template-columns:22px 1.9fr .78fr .85fr .48fr 1.05fr .58fr 1.55fr 1.5fr}
+.inf-comp-row{grid-template-columns:22px 1.9fr .78fr .85fr .48fr 1.05fr .58fr 1.55fr 1.5fr}
 
 </style>
 </head>
@@ -2731,7 +2759,7 @@ async function toggleInfFotos(rowId, fotos){
 
 
 // ════════════════════════════════════════════════════════════════════════════
-// INFORME EDITABLE v3.2
+// INFORME EDITABLE v3.3
 // La tabla Informe funciona como planilla de revisión. Guardado por fila al
 // salir del campo (blur) o al cambiar un selector. La cola serial por entidad
 // evita inserciones duplicadas si el usuario avanza rápidamente con TAB.
@@ -2749,6 +2777,86 @@ function infZoneOptions(v, allowNA=false){
   const arr=[['','—'],['20','Z20'],['21','Z21'],['22','Z22'],['NG','NG'],['ND','ND']];
   if(allowNA) arr.push(['NA','NA']);
   return infSelectOptions(v,arr);
+}
+
+function infZoneCss(v){
+  return ({'20':'inf-z20','21':'inf-z21','22':'inf-z22','NG':'inf-zng','ND':'inf-znd','NA':'inf-zna','':'inf-zblank'})[String(v??'')]||'inf-zblank';
+}
+function infZoneChanged(el,kind,id){
+  if(el){ el.className='inf-select inf-mini inf-zone-select '+infZoneCss(el.value); }
+  return kind==='eq'?infSaveEqDirect(id):infSaveCompDirect(id);
+}
+const INF_OBS_PRESETS=[
+  'Sin brecha identificada.',
+  'Equipo sin marcado ATEX visible.',
+  'Marcado Ex no visible o ilegible.',
+  'Marcado Ex no adecuado para la zona de instalación.',
+  'Solo se observa señalización o referencia de zona; no se verifica certificación Ex del equipo.',
+  'Equipo sin documentación de certificación disponible.',
+  'Certificación pendiente de antecedentes del fabricante o proveedor.',
+  'Equipo instalado en zona clasificada sin evidencia suficiente de aptitud Ex.',
+  'Equipo no eléctrico / mecánico; marcado Ex no aplica.',
+  'Requiere verificar hermeticidad o estanqueidad en operación normal.',
+  'Requiere confirmar clasificación de la zona de instalación.',
+  'Se observa acumulación de polvo; revisar limpieza y posibilidad de resuspensión.'
+];
+const INF_ACC_PRESETS=[
+  'CAMBIAR EQUIPO — Reemplazar por equipo certificado y apto para la zona de instalación.',
+  'EVALUAR RE-CERTIFICACIÓN — Evaluar factibilidad de re-certificación y trazabilidad documental del equipo existente.',
+  'CONFORME — Mantener en servicio; no se requiere acción correctiva ATEX.',
+  'SOLICITAR DOCUMENTACIÓN — Solicitar certificado ATEX/IECEx o declaración de conformidad al fabricante o proveedor.',
+  'VERIFICAR MARCADO — Verificar placa, certificado y correspondencia documental con el equipo instalado.',
+  'ADECUAR INSTALACIÓN — Corregir la instalación y efectuar nueva inspección ATEX.',
+  'REUBICAR — Reubicar fuera del área clasificada o reducir la exposición a la zona peligrosa.',
+  'REVISAR HERMETICIDAD — Verificar/corregir sellos y estanqueidad para controlar emisiones de polvo.',
+  'INCORPORAR A PLAN DE REEMPLAZO — Programar sustitución por equipo con aptitud Ex demostrada.',
+  'NO APLICA — Sin acción ATEX específica para este elemento.'
+];
+function infPresetOptions(kind){
+  const arr=kind==='hall'?INF_OBS_PRESETS:INF_ACC_PRESETS;
+  const label=kind==='hall'?'⚡ Observación rápida…':'⚡ Acción rápida…';
+  return `<option value="">${esc(label)}</option>`+arr.map(v=>`<option value="${escAttr(v)}">${esc(v)}</option>`).join('');
+}
+function infApplyPreset(kind,id,field,val){
+  if(!val||isVisita()) return;
+  const sid=safeDomId(id),prefix=kind==='eq'?'inf-eq-':'inf-c-';
+  const target=document.getElementById(prefix+(field==='hall'?'hall-':'acc-')+sid);
+  if(!target) return;
+  const cur=target.value.trim();
+  if(!cur) target.value=val;
+  else if(!cur.includes(val)) target.value=cur+'\n'+val;
+  if(kind==='eq') infSaveEqDirect(id); else infSaveCompDirect(id);
+}
+function infDecisionOf(r){
+  r=r||{};
+  const a=String(r.accion||'').toLowerCase();
+  const e=String(r.epl||'').toLowerCase();
+  if(a.includes('cambiar equipo')||a.includes('reemplaz')||e.includes('requiere reemplazo')) return 'reemplazar';
+  if(a.includes('re-cert')||a.includes('recert')) return 'recertificar';
+  if(a.includes('conforme —')||a.includes('conforme -')) return 'conforme';
+  const pendingWords=['solicitar','verificar','evaluar','pendiente','revisar','adecuar','reubicar','plan de reemplazo'];
+  if(r.conformidad==='C'&&!pendingWords.some(x=>a.includes(x))) return 'conforme';
+  return 'pendiente';
+}
+function infDecisionMeta(k){
+  return ({reemplazar:['CAMBIAR','rep'],recertificar:['EVAL. RE-CERT.','rec'],conforme:['CONFORME','ok'],pendiente:['PENDIENTE','pen']})[k]||['PENDIENTE','pen'];
+}
+function infDecisionBadgeHtml(r,id){
+  const k=infDecisionOf(r),m=infDecisionMeta(k);
+  return `<span id="inf-dec-${safeDomId(id)}" class="inf-decision-badge ${m[1]}" title="Decisión resumida para cliente; se deriva de Acción, EPL y Estado">${m[0]}</span>`;
+}
+function infDecisionCounts(){
+  const c={reemplazar:0,recertificar:0,conforme:0,pendiente:0};
+  allEqs('all').forEach(e=>{c[infDecisionOf(recs[e.id]||{})]++;});
+  return c;
+}
+function infRefreshDecisionSummary(){
+  const c=infDecisionCounts();
+  for(const [k,v] of Object.entries(c)){const el=document.getElementById('inf-dc-'+k);if(el)el.textContent=v;}
+}
+function infRefreshDecisionBadge(eqId){
+  const el=document.getElementById('inf-dec-'+safeDomId(eqId)); if(!el)return;
+  const k=infDecisionOf(recs[eqId]||{}),m=infDecisionMeta(k); el.className='inf-decision-badge '+m[1];el.textContent=m[0];
 }
 function infConfOptions(v){
   return infSelectOptions(v,[['','—'],['C','C'],['NC','NC'],['OBS','OBS'],['NV','NV'],['NA','NA']]);
@@ -2835,6 +2943,10 @@ function infEqPasses(eq){
   const r=recs[eq.id]||{}, comps=allSubRaw.filter(c=>c.equipo_id===eq.id);
   if(infFilterMode==='incomplete') return infEqFill(eq.id).pct<100 || comps.some(c=>infCompFill(c).pct<100);
   if(infFilterMode==='empty') return !r.id;
+  if(infFilterMode==='dec_replace') return infDecisionOf(r)==='reemplazar';
+  if(infFilterMode==='dec_recert') return infDecisionOf(r)==='recertificar';
+  if(infFilterMode==='dec_conforme') return infDecisionOf(r)==='conforme';
+  if(infFilterMode==='dec_pending') return infDecisionOf(r)==='pendiente';
   if(['NC','OBS','NV','C'].includes(infFilterMode)) return r.conformidad===infFilterMode || comps.some(c=>c.conformidad===infFilterMode);
   return true;
 }
@@ -2886,7 +2998,7 @@ async function infSaveEqDirect(eqId){
       else saved=await must(sb.from('registros').insert(payload).select().single());
       recs[eqId]={...saved,profiles:{full_name:profile?.full_name}};
       const idx=allRaw.findIndex(x=>x.equipo_id===eqId); if(idx>=0) allRaw[idx]=recs[eqId]; else allRaw.push(recs[eqId]);
-      infSetSaveState('eq',eqId,'saved'); infRefreshFill('eq',eqId);
+      infSetSaveState('eq',eqId,'saved'); infRefreshFill('eq',eqId); infRefreshDecisionBadge(eqId); infRefreshDecisionSummary();
       const row=document.getElementById(`inf-row-eq-${sid}`); if(row){row.classList.remove('inf-no-record');row.classList.add('inf-has-record');}
     }catch(e){ infSetSaveState('eq',eqId,'error',e.message); toast('Error guardando desde Informe: '+e.message,'err'); }
   });
@@ -3009,13 +3121,15 @@ function renderFindings(){
   for(const e of allEquip){ const p=eqPiso(e.id)||e.p||''; if(!byFloor[p]) byFloor[p]=[]; byFloor[p].push(e); }
   const pisoOrder=pisoOrderIds(Object.keys(byFloor));
 
+  const dc=infDecisionCounts();
   let h=`<div class="inf-fill-legend"><b>Informe editable:</b> los campos principales se editan directamente. <b>TAB</b> permite avanzar rápidamente y el dato se guarda al salir del campo. “Detalles” abre el resto de la ficha sin abandonar esta vista. El porcentaje es sólo un <b>indicador de llenado</b>, no una evaluación de conformidad ATEX.</div>`;
+  h+=`<div class="inf-decision-bar"><span class="inf-decision-title">DECISIÓN PARA CLIENTE</span><button class="inf-decision-chip rep" onclick="infSetFilterMode('dec_replace')">Cambiar equipo <b id="inf-dc-reemplazar">${dc.reemplazar}</b></button><button class="inf-decision-chip rec" onclick="infSetFilterMode('dec_recert')">Evaluar re-certificación <b id="inf-dc-recertificar">${dc.recertificar}</b></button><button class="inf-decision-chip ok" onclick="infSetFilterMode('dec_conforme')">Conformes <b id="inf-dc-conforme">${dc.conforme}</b></button><button class="inf-decision-chip pen" onclick="infSetFilterMode('dec_pending')">Pendientes <b id="inf-dc-pendiente">${dc.pendiente}</b></button><span style="font:8px monospace;color:#9ca3af;margin-left:auto">Resumen de equipos principales</span></div>`;
   h+=`<div class="inf-tree-wrap">`;
   h+=`<div class="inf-edit-toolbar">
     <span style="font:700 9px monospace;color:#F7C600;letter-spacing:1px">REVISIÓN / CIERRE</span>
     <input class="inf-edit-search" value="${escAttr(infFilterText)}" placeholder="Buscar equipo, TAG, marca, hallazgo…" oninput="infFilterText=this.value;infScheduleFilter()">
     <select class="inf-edit-filter" onchange="infSetFilterMode(this.value)">
-      ${infSelectOptions(infFilterMode,[['all','Todos'],['incomplete','Con datos incompletos'],['empty','Sin ficha / sin registro'],['NC','NC'],['OBS','OBS'],['NV','NV'],['C','Conformes']])}
+      ${infSelectOptions(infFilterMode,[['all','Todos'],['incomplete','Con datos incompletos'],['empty','Sin ficha / sin registro'],['dec_replace','Cliente · Cambiar equipo'],['dec_recert','Cliente · Evaluar re-certificación'],['dec_conforme','Cliente · Conforme'],['dec_pending','Cliente · Pendiente'],['NC','NC'],['OBS','OBS'],['NV','NV'],['C','Conformidad C']])}
     </select>
     <button onclick="toggleAllPisos(true)" class="inf-small-btn" style="background:#1e2230;color:#ccc;border-color:#444">&#9660; Expandir pisos</button>
     <button onclick="toggleAllPisos(false)" class="inf-small-btn" style="background:#1e2230;color:#ccc;border-color:#444">&#9654; Contraer</button>
@@ -3045,14 +3159,14 @@ function renderFindings(){
         const on=`onblur="infSaveEqDirect(${jsArg(id)})" onkeydown="infEditKey(event)" onclick="event.stopPropagation()"`;
         h+=`<div id="iew-${sid}"><div class="inf-eq-row ${hasRecord?'inf-has-record':'inf-no-record'}" id="inf-row-eq-${sid}">
           <div class="inf-eq-toggle" id="iet-${sid}" onclick="toggleInfEq(${jsArg(id)})" style="cursor:pointer;${!hasComps?'color:#ddd':''}">${hasComps?'&#9654;':'·'}</div>
-          <div><input id="inf-eq-name-${sid}" class="inf-input inf-name-edit" value="${escAttr(eqName(id))}" ${on}><div style="font:8px monospace;color:#9ca3af;margin-top:2px">${esc(eq.g||'')}${!hasRecord?' · sin ficha':''}</div><div class="inf-inline-actions">${infCompleteHtml('eq',id,r)}<span id="${infStateId('eq',id)}" class="inf-save-state"></span><button class="inf-small-btn" onclick="infToggleDetails('eq',${jsArg(id)})">Detalles</button><button class="inf-small-btn" onclick="openFromInforme(${jsArg(id)})">Ficha / fotos</button>${ro?'':`<button class="inf-small-btn purple" onclick="openSubModal('new',${jsArg(id)})">+ componente</button>`}</div></div>
-          <div class="inf-zone-stack"><label>I</label><select id="inf-eq-zi-${sid}" class="inf-select inf-mini" onchange="infSaveEqDirect(${jsArg(id)})" onclick="event.stopPropagation()">${infZoneOptions(zi)}</select><label>E</label><select id="inf-eq-ze-${sid}" class="inf-select inf-mini" onchange="infSaveEqDirect(${jsArg(id)})" onclick="event.stopPropagation()">${infZoneOptions(ze)}</select><label>M</label><select id="inf-eq-zm-${sid}" class="inf-select inf-mini" onchange="infSaveEqDirect(${jsArg(id)})" onclick="event.stopPropagation()">${infZoneOptions(zm,true)}</select></div>
+          <div><input id="inf-eq-name-${sid}" class="inf-input inf-name-edit" value="${escAttr(eqName(id))}" ${on}><div style="font:8px monospace;color:#9ca3af;margin-top:2px">${esc(eq.g||'')}${!hasRecord?' · sin ficha':''}</div><div class="inf-inline-actions">${infCompleteHtml('eq',id,r)}${infDecisionBadgeHtml(r,id)}<span id="${infStateId('eq',id)}" class="inf-save-state"></span><button class="inf-small-btn" onclick="infToggleDetails('eq',${jsArg(id)})">Detalles</button><button class="inf-small-btn" onclick="openFromInforme(${jsArg(id)})">Ficha / fotos</button>${ro?'':`<button class="inf-small-btn purple" onclick="openSubModal('new',${jsArg(id)})">+ componente</button>`}</div></div>
+          <div class="inf-zone-stack"><label>I</label><select id="inf-eq-zi-${sid}" class="inf-select inf-mini inf-zone-select ${infZoneCss(zi)}" onchange="infZoneChanged(this,'eq',${jsArg(id)})" onclick="event.stopPropagation()">${infZoneOptions(zi)}</select><label>E</label><select id="inf-eq-ze-${sid}" class="inf-select inf-mini inf-zone-select ${infZoneCss(ze)}" onchange="infZoneChanged(this,'eq',${jsArg(id)})" onclick="event.stopPropagation()">${infZoneOptions(ze)}</select><label>M</label><select id="inf-eq-zm-${sid}" class="inf-select inf-mini inf-zone-select ${infZoneCss(zm)}" onchange="infZoneChanged(this,'eq',${jsArg(id)})" onclick="event.stopPropagation()">${infZoneOptions(zm,true)}</select></div>
           <div><input id="inf-eq-tag-${sid}" class="inf-input inf-mini" value="${escAttr(r.tag_planta||'')}" placeholder="TAG" ${on}></div>
           <div><input id="inf-eq-fab-${sid}" class="inf-input inf-mini" type="number" min="1950" max="2099" value="${escAttr(r.fecha_fab||'')}" placeholder="Año" ${on}></div>
           <div><input id="inf-eq-mex-${sid}" class="inf-input inf-mini" value="${escAttr(r.marcado_ex||'')}" placeholder="Marcado Ex" ${on}></div>
           <div><select id="inf-eq-conf-${sid}" class="inf-select inf-mini" onchange="infSaveEqDirect(${jsArg(id)})" onclick="event.stopPropagation()">${infConfOptions(r.conformidad)}</select></div>
-          <div><textarea id="inf-eq-hall-${sid}" class="inf-ta" placeholder="Brechas / observaciones" ${on}>${esc(r.hallazgo||'')}</textarea></div>
-          <div><textarea id="inf-eq-acc-${sid}" class="inf-ta" placeholder="Acción" ${on}>${esc(r.accion||'')}</textarea></div></div>${infEqDetailsHtml(eq,r)}`;
+          <div><select class="inf-quick-select" onchange="infApplyPreset('eq',${jsArg(id)},'hall',this.value);this.selectedIndex=0" onclick="event.stopPropagation()">${infPresetOptions('hall')}</select><textarea id="inf-eq-hall-${sid}" class="inf-ta" placeholder="Brechas / observaciones" ${on}>${esc(r.hallazgo||'')}</textarea></div>
+          <div><select class="inf-quick-select action" onchange="infApplyPreset('eq',${jsArg(id)},'acc',this.value);this.selectedIndex=0" onclick="event.stopPropagation()">${infPresetOptions('acc')}</select><textarea id="inf-eq-acc-${sid}" class="inf-ta" placeholder="Acción" ${on}>${esc(r.accion||'')}</textarea></div></div>${infEqDetailsHtml(eq,r)}`;
       }
 
       if(hasComps){
@@ -3064,8 +3178,8 @@ function renderFindings(){
           }else{
             const con=`onblur="infSaveCompDirect(${jsArg(c.id)})" onkeydown="infEditKey(event)" onclick="event.stopPropagation()"`;
             h+=`<div class="inf-comp-row inf-has-record"><div></div><div><div style="display:flex;gap:5px;align-items:center"><span style="color:#7c3aed">&#8627;</span><input id="inf-c-name-${cs}" class="inf-input inf-mini" value="${escAttr(c.nombre_comp||c.tipo||'')}" ${con}></div><div class="inf-inline-actions">${infCompleteHtml('comp',c.id,c)}<span id="${infStateId('comp',c.id)}" class="inf-save-state"></span><button class="inf-small-btn" onclick="infToggleDetails('comp',${jsArg(c.id)})">Detalles</button><button class="inf-small-btn purple" onclick="openSubModal(null,${jsArg(id)},${jsArg(c.id)})">Ficha / fotos</button><button class="inf-small-btn purple" onclick="openCompTransfer(${jsArg(c.id)},${jsArg(id)})">⇄</button></div></div>
-              <div class="inf-zone-stack"><label>I</label><select id="inf-c-zi-${cs}" class="inf-select inf-mini" onchange="infSaveCompDirect(${jsArg(c.id)})">${infZoneOptions(czi)}</select><label>E</label><select id="inf-c-ze-${cs}" class="inf-select inf-mini" onchange="infSaveCompDirect(${jsArg(c.id)})">${infZoneOptions(cze)}</select><label>M</label><select id="inf-c-zm-${cs}" class="inf-select inf-mini" onchange="infSaveCompDirect(${jsArg(c.id)})">${infZoneOptions(czm,true)}</select></div>
-              <div><input id="inf-c-tag-${cs}" class="inf-input inf-mini" value="${escAttr(c.tag_planta||'')}" placeholder="TAG" ${con}></div><div><input id="inf-c-fab-${cs}" class="inf-input inf-mini" type="number" min="1950" max="2099" value="${escAttr(c.fecha_fab||'')}" placeholder="Año" ${con}></div><div><input id="inf-c-mex-${cs}" class="inf-input inf-mini" value="${escAttr(c.marcado_ex||'')}" placeholder="Marcado Ex" ${con}></div><div><select id="inf-c-conf-${cs}" class="inf-select inf-mini" onchange="infSaveCompDirect(${jsArg(c.id)})">${infConfOptions(c.conformidad)}</select></div><div><textarea id="inf-c-hall-${cs}" class="inf-ta" placeholder="Brechas / observaciones" ${con}>${esc(c.hallazgo||'')}</textarea></div><div><textarea id="inf-c-acc-${cs}" class="inf-ta" placeholder="Acción" ${con}>${esc(c.accion||'')}</textarea></div></div>${infCompDetailsHtml(c)}`;
+              <div class="inf-zone-stack"><label>I</label><select id="inf-c-zi-${cs}" class="inf-select inf-mini inf-zone-select ${infZoneCss(czi)}" onchange="infZoneChanged(this,'comp',${jsArg(c.id)})">${infZoneOptions(czi)}</select><label>E</label><select id="inf-c-ze-${cs}" class="inf-select inf-mini inf-zone-select ${infZoneCss(cze)}" onchange="infZoneChanged(this,'comp',${jsArg(c.id)})">${infZoneOptions(cze)}</select><label>M</label><select id="inf-c-zm-${cs}" class="inf-select inf-mini inf-zone-select ${infZoneCss(czm)}" onchange="infZoneChanged(this,'comp',${jsArg(c.id)})">${infZoneOptions(czm,true)}</select></div>
+              <div><input id="inf-c-tag-${cs}" class="inf-input inf-mini" value="${escAttr(c.tag_planta||'')}" placeholder="TAG" ${con}></div><div><input id="inf-c-fab-${cs}" class="inf-input inf-mini" type="number" min="1950" max="2099" value="${escAttr(c.fecha_fab||'')}" placeholder="Año" ${con}></div><div><input id="inf-c-mex-${cs}" class="inf-input inf-mini" value="${escAttr(c.marcado_ex||'')}" placeholder="Marcado Ex" ${con}></div><div><select id="inf-c-conf-${cs}" class="inf-select inf-mini" onchange="infSaveCompDirect(${jsArg(c.id)})">${infConfOptions(c.conformidad)}</select></div><div><select class="inf-quick-select" onchange="infApplyPreset('comp',${jsArg(c.id)},'hall',this.value);this.selectedIndex=0">${infPresetOptions('hall')}</select><textarea id="inf-c-hall-${cs}" class="inf-ta" placeholder="Brechas / observaciones" ${con}>${esc(c.hallazgo||'')}</textarea></div><div><select class="inf-quick-select action" onchange="infApplyPreset('comp',${jsArg(c.id)},'acc',this.value);this.selectedIndex=0">${infPresetOptions('acc')}</select><textarea id="inf-c-acc-${cs}" class="inf-ta" placeholder="Acción" ${con}>${esc(c.accion||'')}</textarea></div></div>${infCompDetailsHtml(c)}`;
           }
         }
         h+=`</div>`;
