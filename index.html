@@ -3425,11 +3425,13 @@ async function printRegistroFotografico(){
       const def=getEqDef(eqId)||{};
       const r=recs[eqId]||{};
       const comps=(subRecs[eqId]||[]).map(c=>({...c}));
-      const eqFotos=await Promise.all((r.fotos||[]).map(async path=>({path,url:await signedPhotoUrl(path)})));
+      const eqFotoPaths=(r.fotos||[]);
+      const eqFotos=await Promise.all(eqFotoPaths.slice(0,4).map(async path=>({path,url:await signedPhotoUrl(path)})));
       const compsConFotos=[];
       for(const c of comps){
-        const fotos=await Promise.all((c.fotos||[]).map(async path=>({path,url:await signedPhotoUrl(path)})));
-        compsConFotos.push({...c,_signedFotos:fotos.filter(f=>f.url)});
+        const compFotoPaths=(c.fotos||[]);
+        const fotos=await Promise.all(compFotoPaths.slice(0,2).map(async path=>({path,url:await signedPhotoUrl(path)})));
+        compsConFotos.push({...c,_signedFotos:fotos.filter(f=>f.url),_totalFotos:compFotoPaths.length});
       }
       fichas.push({
         id:eqId,
@@ -3443,6 +3445,7 @@ async function printRegistroFotografico(){
         hermeticidad:r.hermeticidad||'', criterio_zona:r.criterio_zona||'',
         registro:r,
         fotos:eqFotos.filter(f=>f.url),
+        total_fotos:eqFotoPaths.length,
         componentes:compsConFotos
       });
     }
@@ -3464,66 +3467,99 @@ function buildRegistroFotograficoHtml(fichas){
   const fecha=document.getElementById('i-fecha')?.value||new Date().toISOString().slice(0,10);
   const area=document.getElementById('i-area')?.value||curProyecto?.planta||'—';
   const rev=document.getElementById('i-rev')?.value||'—';
-  const totalFotos=fichas.reduce((s,f)=>s+f.fotos.length+f.componentes.reduce((a,c)=>a+(c._signedFotos?.length||0),0),0);
-  const totalComps=fichas.reduce((s,f)=>s+f.componentes.length,0);
 
-  const fotoGrid=(fotos,prefix)=>{
+  const totalFotosIncluidas=fichas.reduce((s,f)=>s+f.fotos.length+f.componentes.reduce((a,c)=>a+(c._signedFotos?.length||0),0),0);
+  const totalFotosDisponibles=fichas.reduce((s,f)=>s+(f.total_fotos||0)+f.componentes.reduce((a,c)=>a+(c._totalFotos||0),0),0);
+  const totalComps=fichas.reduce((s,f)=>s+f.componentes.length,0);
+  const decCounts={reemplazar:0,recertificar:0,conforme:0,pendiente:0};
+  fichas.forEach(f=>{ decCounts[infDecisionOf(f.registro||{})]++; });
+  const pendientesCliente=fichas.filter(f=>{
+    const r=f.registro||{};
+    return !String(r.serie||'').trim() || !String(r.fecha_fab||'').trim();
+  }).length;
+
+  const zoneText=z=>!z?'—':(z==='NG'?'No clasificado':z==='ND'?'No determinada':z==='NA'?'No aplica':'Zona '+z);
+  const rfDecisionMeta=k=>({
+    reemplazar:{label:'CAMBIAR EQUIPO',cls:'d-rep'},
+    recertificar:{label:'EVALUAR RE-CERTIFICACIÓN',cls:'d-rec'},
+    conforme:{label:'CONFORME',cls:'d-ok'},
+    pendiente:{label:'PENDIENTE DE EVALUACIÓN',cls:'d-pen'}
+  }[k]||{label:'PENDIENTE DE EVALUACIÓN',cls:'d-pen'});
+  const missingClient=v=>{
+    const t=String(v??'').trim();
+    return t?esc(t):'<span class="pending-client">PENDIENTE CLIENTE</span>';
+  };
+  const standardValue=v=>{
+    const t=String(v??'').trim();
+    return t?esc(t):'—';
+  };
+
+  const fotoGrid=(fotos,prefix,totalAvailable)=>{
     if(!fotos?.length) return '<div class="nofoto">Sin fotografías asociadas.</div>';
-    return `<div class="photos">${fotos.map((f,i)=>`<figure><img src="${escAttr(f.url)}" alt="${escAttr(prefix+' '+(i+1))}"><figcaption>${esc(prefix)} ${i+1}</figcaption></figure>`).join('')}</div>`;
+    const extra=Math.max(0,(totalAvailable||fotos.length)-fotos.length);
+    return `<div class="photos">${fotos.map((f,i)=>`<figure><img src="${escAttr(f.url)}" alt="${escAttr(prefix+' '+(i+1))}"><figcaption>${esc(prefix)} ${i+1}</figcaption></figure>`).join('')}</div>${extra?`<div class="morephotos">Se muestran ${fotos.length} de ${totalAvailable} fotografías asociadas. Las restantes permanecen disponibles en SUSTENTA Ex.</div>`:''}`;
   };
 
   const fichaHtml=fichas.map((f,idx)=>{
     const r=f.registro||{};
     const conf=r.conformidad||'';
-    const compHtml=f.componentes.length?f.componentes.map(c=>`
-      <div class="comp">
-        <div class="comp-hd"><strong>${esc(c.nombre_comp||c.tipo||'Componente')}</strong><span>${esc(c.tipo||'—')} · ${c.conformidad?`Estado ${esc(c.conformidad)}`:'Sin estado'}</span></div>
-        <div class="mini-grid">
-          <div><b>Marca / Modelo</b>${esc([c.marca,c.modelo].filter(Boolean).join(' · ')||'—')}</div>
-          <div><b>TAG / Serie</b>${esc([c.tag_planta,c.serie].filter(Boolean).join(' · ')||'—')}</div>
-          <div><b>Relación con equipo</b>${esc(({interior:'Interior',exterior:'Exterior',interfaz:'Interfaz interior/exterior',proceso_propio:'Proceso con volumen propio',no_definido:'No determinado'}[c.relacion_equipo])||'—')}</div><div><b>Clasificación I/E/M</b>${esc(compZoneTripleText(c))}</div><div><b>Extensión exterior H/Sup/Inf</b>${esc([c.ext_exterior_h,c.ext_exterior_sup,c.ext_exterior_inf].map(v=>v===null||v===undefined||v===''?'—':v+' m').join(' / '))}</div><div><b>Hermeticidad</b>${esc(c.hermeticidad||'—')}</div>
-          <div><b>Marcado Ex</b>${esc(c.marcado_ex||'—')}</div>
-          <div><b>EPL / Verificación</b>${esc(c.epl||'—')}</div>
-          <div><b>Aptitud documentada</b>${esc((c.zona_uso||[]).map(z=>'Z'+z).join(', ')||'—')}</div>
+    const dec=rfDecisionMeta(infDecisionOf(r));
+    const compHtml=f.componentes.length?f.componentes.map(c=>{
+      const cdec=rfDecisionMeta(infDecisionOf(c));
+      return `<div class="comp">
+        <div class="comp-hd">
+          <div><strong>${esc(c.nombre_comp||c.tipo||'Componente')}</strong><div class="comp-sub">${esc(c.tipo||'Componente')}</div></div>
+          <div class="comp-status"><span class="conf-badge c-${escAttr(c.conformidad||'none')}">${esc(c.conformidad||'SIN ESTADO')}</span><span class="decision ${cdec.cls}">${esc(cdec.label)}</span></div>
         </div>
-        ${c.hallazgo?`<div class="textrow"><b>Brechas / Observaciones:</b> ${esc(c.hallazgo)}</div>`:''}
-        ${c.accion?`<div class="textrow"><b>Acción:</b> ${esc(c.accion)}</div>`:''}
-        ${fotoGrid(c._signedFotos||[],'Foto componente')}
-      </div>`).join(''):'<div class="muted">Sin componentes registrados.</div>';
+        <div class="mini-grid compact">
+          <div><b>Marca</b>${standardValue(c.marca)}</div>
+          <div><b>Modelo</b>${standardValue(c.modelo)}</div>
+          <div><b>N.º de serie</b>${missingClient(c.serie)}</div>
+          <div><b>TAG Planta</b>${standardValue(c.tag_planta)}</div>
+          <div><b>Año fabricación</b>${missingClient(c.fecha_fab)}</div>
+          <div><b>Marcado Ex</b>${standardValue(c.marcado_ex)}</div>
+          <div><b>Zona interior</b>${esc(zoneText(c.zona_interior||''))}</div>
+          <div><b>Zona exterior</b>${esc(zoneText(c.zona_exterior||c.zona||''))}</div>
+        </div>
+        <div class="situation"><div><b>Hallazgo principal</b><span>${esc(c.hallazgo||'—')}</span></div><div><b>Acción requerida</b><span>${esc(c.accion||'—')}</span></div></div>
+        ${fotoGrid(c._signedFotos||[],'Foto componente',c._totalFotos||0)}
+      </div>`;
+    }).join(''):'<div class="muted">Sin componentes registrados.</div>';
 
     return `<section class="eqsheet">
       <div class="sheet-head">
-        <div>
+        <div class="head-main">
           <div class="eyebrow">REGISTRO ${idx+1} DE ${fichas.length}</div>
           <h1>${esc(f.nombre)}</h1>
-          <div class="sub">${esc(pisoLabel(f.piso))} · ${esc(f.grupo||'Sin grupo')} · ${esc(zoneTripleText(f))}</div>
+          <div class="sub"><b>Ubicación:</b> ${esc(pisoLabel(f.piso))} &nbsp;·&nbsp; <b>Servicio / función:</b> ${esc(f.grupo||'—')}</div>
         </div>
-        <div class="status ${conf?'st-'+conf:''}">${esc(conf||'SIN ESTADO')}</div>
+        <div class="head-status"><span class="conf-badge c-${escAttr(conf||'none')}">${esc(conf||'SIN ESTADO')}</span><span class="decision ${dec.cls}">${esc(dec.label)}</span></div>
       </div>
-      <div class="data-grid">
-        <div><b>Marca</b>${esc(r.marca||'—')}</div>
-        <div><b>Modelo</b>${esc(r.modelo||'—')}</div>
-        <div><b>N° serie</b>${esc(r.serie||'—')}</div>
-        <div><b>TAG planta</b>${esc(r.tag_planta||'—')}</div>
-        <div><b>Potencia / Tensión</b>${esc(r.potencia||'—')}</div>
-        <div><b>Año fabricación</b>${esc(r.fecha_fab||'—')}</div>
-        <div><b>Marcado Ex</b>${esc(r.marcado_ex||'—')}</div>
-        <div><b>EPL / Estado verificación</b>${esc(r.epl||'—')}</div>
-        <div><b>Temp. superficial máx.</b>${esc(r.temp_max||'—')}</div>
-        <div><b>Zona interior</b>${f.zona_interior?esc(f.zona_interior==='NG'?'NG':'Zona '+f.zona_interior):'—'}</div>
-        <div><b>Zona exterior normal</b>${f.zona_exterior?esc(f.zona_exterior==='NG'?'NG':'Zona '+f.zona_exterior):'—'}</div>
-        <div><b>Extensión exterior</b>${esc(extText(f.ext_exterior_h,f.ext_exterior_sup,f.ext_exterior_inf)||'—')}</div>
-        <div><b>Zona mantenimiento</b>${f.zona_mantenimiento?esc(['NG','ND','NA'].includes(f.zona_mantenimiento)?f.zona_mantenimiento:'Zona '+f.zona_mantenimiento):'—'}</div>
-        <div><b>Extensión mantenimiento</b>${esc(extText(f.ext_mantenimiento_h,f.ext_mantenimiento_sup,f.ext_mantenimiento_inf)||'—')}</div>
-        <div><b>Hermeticidad</b>${esc(f.hermeticidad||'—')}</div>
+
+      <div class="section-title">Identificación del equipo</div>
+      <div class="data-grid identity-grid">
+        <div><b>Marca</b>${standardValue(r.marca)}</div>
+        <div><b>Modelo</b>${standardValue(r.modelo)}</div>
+        <div><b>N.º de serie</b>${missingClient(r.serie)}</div>
+        <div><b>TAG Planta</b>${standardValue(r.tag_planta)}</div>
+        <div><b>Año fabricación</b>${missingClient(r.fecha_fab)}</div>
+        <div><b>Marcado Ex</b>${standardValue(r.marcado_ex)}</div>
       </div>
-      ${f.criterio_zona?`<div class="textrow"><b>Criterio de clasificación:</b> ${esc(f.criterio_zona)}</div>`:''}
-      <div class="textrow"><b>Brechas / Observaciones:</b> ${esc(r.hallazgo||'—')}</div>
-      <div class="textrow"><b>Acción correctiva:</b> ${esc(r.accion||'—')}</div>
-      <h2>Fotografías del equipo <span>${f.fotos.length}</span></h2>
-      ${fotoGrid(f.fotos,'Foto equipo')}
-      <h2>Componentes asociados <span>${f.componentes.length}</span></h2>
-      ${compHtml}
+
+      <div class="section-title">Situación ATEX resumida</div>
+      <div class="atex-summary">
+        <div><b>Zona interior</b><strong>${esc(zoneText(f.zona_interior))}</strong></div>
+        <div><b>Zona exterior</b><strong>${esc(zoneText(f.zona_exterior))}</strong></div>
+        <div><b>Conformidad</b><strong>${esc(conf||'Sin estado')}</strong></div>
+        <div class="decision-cell"><b>Decisión técnica</b><span class="decision ${dec.cls}">${esc(dec.label)}</span></div>
+      </div>
+
+      <div class="situation major"><div><b>Hallazgo principal</b><span>${esc(r.hallazgo||'—')}</span></div><div><b>Acción requerida</b><span>${esc(r.accion||'—')}</span></div></div>
+
+      <div class="section-title">Fotografías del equipo <span>${Math.min(f.fotos.length,4)}${f.total_fotos>4?' / '+f.total_fotos:''}</span></div>
+      ${fotoGrid(f.fotos,'Foto equipo',f.total_fotos||0)}
+
+      ${f.componentes.length?`<div class="section-title comp-title">Componentes asociados <span>${f.componentes.length}</span></div>${compHtml}`:''}
       <div class="trace">Registro actualizado por ${esc(r.inspector_nombre||'—')}${r.updated_at?' · '+esc(new Date(r.updated_at).toLocaleString('es-CL')):''}</div>
     </section>`;
   }).join('');
@@ -3531,18 +3567,19 @@ function buildRegistroFotograficoHtml(fichas){
   return `<!doctype html>
 <html lang="es"><head><meta charset="utf-8"><title>Registro fotográfico - ${esc(curProyecto?.nombre||'Proyecto ATEX')}</title>
 <style>
-@page{size:A4 portrait;margin:11mm}
-*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;color:#111827;background:#fff;font-size:9.5px;line-height:1.35}
+@page{size:A4 portrait;margin:10mm}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;color:#111827;background:#fff;font-size:9.4px;line-height:1.35}
 .toolbar{position:sticky;top:0;z-index:10;background:#111827;color:#fff;padding:9px 14px;display:flex;justify-content:space-between;align-items:center}.toolbar button{background:#F7C600;border:0;border-radius:4px;padding:7px 14px;font-weight:700;cursor:pointer}
-.coverpage{min-height:260mm;display:flex;flex-direction:column;justify-content:center;page-break-after:always;border-top:7px solid #F7C600;padding:22mm 12mm}.brand{font-size:30px;font-weight:900;letter-spacing:3px}.brand span{background:#F7C600;padding:4px 8px;border-radius:4px;font-size:15px}.coverpage h1{font-size:27px;margin:20px 0 6px}.cover-meta{margin-top:25px;display:grid;grid-template-columns:1fr 1fr;gap:10px}.cover-meta div{border:1px solid #d1d5db;border-radius:5px;padding:10px}.cover-meta b,.data-grid b,.mini-grid b{display:block;color:#6b7280;font-size:7.5px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:3px;font-family:Consolas,monospace}.cover-stats{display:flex;gap:10px;margin-top:18px}.cover-stats div{background:#f3f4f6;border-radius:5px;padding:9px 14px}.cover-stats strong{font-size:18px;display:block}
-.eqsheet{page-break-after:always;padding:0 1mm}.eqsheet:last-child{page-break-after:auto}.sheet-head{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #F7C600;padding-bottom:8px;margin-bottom:10px;gap:12px}.eyebrow{font:700 8px Consolas,monospace;color:#6b7280;letter-spacing:1px}.sheet-head h1{font-size:17px;margin:2px 0 3px}.sub{color:#6b7280;font:9px Consolas,monospace}.status{font:700 9px Consolas,monospace;border:1px solid #d1d5db;border-radius:4px;padding:5px 8px;white-space:nowrap}.st-C{background:#d1fae5;color:#065f46}.st-NC{background:#fee2e2;color:#991b1b}.st-OBS{background:#fef3c7;color:#92400e}.st-NV{background:#dbeafe;color:#1e40af}.st-NA{background:#f3f4f6;color:#374151}
-.data-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:8px}.data-grid>div,.mini-grid>div{border:1px solid #e5e7eb;border-radius:4px;padding:6px;min-height:37px}.textrow{border-left:3px solid #d1d5db;background:#f9fafb;padding:6px 8px;margin:5px 0}.textrow b{margin-right:4px}
-h2{font-size:10px;text-transform:uppercase;letter-spacing:.8px;border-bottom:1px solid #d1d5db;padding-bottom:4px;margin:11px 0 6px}h2 span{color:#6b7280;font-family:Consolas,monospace}
-.photos{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px}.photos figure{margin:0;border:1px solid #d1d5db;border-radius:4px;overflow:hidden;break-inside:avoid}.photos img{width:100%;height:49mm;object-fit:contain;background:#f3f4f6;display:block}.photos figcaption{padding:3px 5px;color:#6b7280;font:7.5px Consolas,monospace}.nofoto,.muted{border:1px dashed #d1d5db;border-radius:4px;padding:8px;color:#9ca3af;font-family:Consolas,monospace}
-.comp{border:1px solid #ddd6fe;border-left:3px solid #7c3aed;border-radius:4px;padding:7px;margin:7px 0;break-inside:avoid}.comp-hd{display:flex;justify-content:space-between;gap:8px;margin-bottom:5px}.comp-hd strong{font-size:10px}.comp-hd span{font:8px Consolas,monospace;color:#6b7280}.mini-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}.comp .photos img{height:37mm}.trace{margin-top:8px;text-align:right;color:#9ca3af;font:7.5px Consolas,monospace}
+.coverpage{min-height:267mm;display:flex;flex-direction:column;justify-content:center;page-break-after:always;border-top:7px solid #F7C600;padding:18mm 12mm}.brand{font-size:30px;font-weight:900;letter-spacing:3px}.brand span{background:#F7C600;padding:4px 8px;border-radius:4px;font-size:15px}.coverpage h1{font-size:27px;margin:20px 0 6px}.cover-meta{margin-top:24px;display:grid;grid-template-columns:1fr 1fr;gap:9px}.cover-meta div{border:1px solid #d1d5db;border-radius:5px;padding:9px}.cover-meta b,.data-grid b,.mini-grid b,.atex-summary b{display:block;color:#6b7280;font-size:7.3px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:3px;font-family:Consolas,monospace}.cover-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}.cover-stats div{background:#f3f4f6;border-radius:5px;padding:9px 11px}.cover-stats strong{font-size:17px;display:block}.cover-note{margin-top:18px;border-left:3px solid #F7C600;background:#fffbea;padding:9px 11px;color:#6b5a00;font-size:8.5px}
+.eqsheet{page-break-after:always;padding:0 1mm}.eqsheet:last-child{page-break-after:auto}.sheet-head{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #F7C600;padding-bottom:8px;margin-bottom:10px;gap:14px}.head-main{flex:1}.eyebrow{font:700 8px Consolas,monospace;color:#6b7280;letter-spacing:1px}.sheet-head h1{font-size:17px;margin:2px 0 3px}.sub{color:#6b7280;font:8.8px Consolas,monospace}.head-status,.comp-status{display:flex;flex-direction:column;align-items:flex-end;gap:4px}.conf-badge{font:800 8px Consolas,monospace;border-radius:3px;padding:3px 7px;border:1px solid #d1d5db;white-space:nowrap}.c-C{background:#d1fae5;color:#065f46;border-color:#a7f3d0}.c-NC{background:#fee2e2;color:#991b1b;border-color:#fca5a5}.c-OBS{background:#fef3c7;color:#92400e;border-color:#fde68a}.c-NV{background:#dbeafe;color:#1e40af;border-color:#bfdbfe}.c-NA,.c-none{background:#f3f4f6;color:#4b5563}.decision{display:inline-block;font:800 8px Consolas,monospace;border-radius:3px;padding:4px 7px;white-space:nowrap}.d-rep{background:#991b1b;color:#fff}.d-rec{background:#f59e0b;color:#111}.d-ok{background:#059669;color:#fff}.d-pen{background:#6b7280;color:#fff}
+.section-title{font:800 8px Consolas,monospace;letter-spacing:.8px;text-transform:uppercase;color:#374151;border-bottom:1px solid #d1d5db;padding-bottom:4px;margin:10px 0 6px}.section-title span{color:#9ca3af}.data-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:8px}.data-grid>div,.mini-grid>div{border:1px solid #e5e7eb;border-radius:4px;padding:6px;min-height:36px}.pending-client{display:inline-block;background:#fef3c7;color:#92400e;border:1px solid #fde68a;border-radius:3px;padding:2px 6px;font:800 7.5px Consolas,monospace}
+.atex-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px}.atex-summary>div{border:1px solid #e5e7eb;border-radius:4px;padding:7px;min-height:43px}.atex-summary strong{font-size:10px}.decision-cell .decision{margin-top:1px}
+.situation{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:7px 0}.situation>div{border-left:3px solid #d1d5db;background:#f9fafb;padding:7px 8px}.situation b{display:block;font:800 7.5px Consolas,monospace;text-transform:uppercase;color:#6b7280;margin-bottom:3px}.situation span{font-size:9px}.situation.major>div:first-child{border-left-color:#F7C600}.situation.major>div:last-child{border-left-color:#111827}
+.photos{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:5px}.photos figure{margin:0;border:1px solid #d1d5db;border-radius:4px;overflow:hidden;break-inside:avoid}.photos img{width:100%;height:61mm;object-fit:contain;background:#f3f4f6;display:block}.photos figcaption{padding:3px 5px;color:#6b7280;font:7.5px Consolas,monospace}.morephotos{font:7.5px Consolas,monospace;color:#6b7280;margin:2px 0 8px}.nofoto,.muted{border:1px dashed #d1d5db;border-radius:4px;padding:8px;color:#9ca3af;font-family:Consolas,monospace}
+.comp-title{margin-top:13px}.comp{border:1px solid #ddd6fe;border-left:3px solid #7c3aed;border-radius:4px;padding:7px;margin:7px 0;break-inside:avoid}.comp-hd{display:flex;justify-content:space-between;gap:8px;margin-bottom:5px}.comp-hd strong{font-size:10px}.comp-sub{font:7.5px Consolas,monospace;color:#6b7280;margin-top:2px}.mini-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}.comp .photos img{height:42mm}.comp .situation{margin-top:5px}.trace{margin-top:8px;text-align:right;color:#9ca3af;font:7.5px Consolas,monospace}
 @media print{.toolbar{display:none}.coverpage{min-height:270mm}}
 </style></head><body>
-<div class="toolbar"><span>Registro fotográfico listo · ${fichas.length} equipos · ${totalFotos} fotos</span><button onclick="window.print()">Imprimir / Guardar PDF</button></div>
+<div class="toolbar"><span>Registro fotográfico listo · ${fichas.length} equipos · ${totalFotosIncluidas} fotos incluidas${totalFotosDisponibles>totalFotosIncluidas?' de '+totalFotosDisponibles:''}</span><button onclick="window.print()">Imprimir / Guardar PDF</button></div>
 <section class="coverpage">
   <div class="brand">SUSTENTA <span>Ex</span></div>
   <h1>Registro fotográfico de equipos Ex</h1>
@@ -3551,8 +3588,12 @@ h2{font-size:10px;text-transform:uppercase;letter-spacing:.8px;border-bottom:1px
     <div><b>Inspector</b>${esc(inspector)}</div><div><b>Fecha</b>${esc(fecha)}</div>
     <div><b>Área / Instalación</b>${esc(area)}</div><div><b>Revisión</b>${esc(rev)}</div>
   </div>
-  <div class="cover-stats"><div><strong>${fichas.length}</strong>Equipos</div><div><strong>${totalComps}</strong>Componentes</div><div><strong>${totalFotos}</strong>Fotografías</div></div>
-  <div style="margin-top:auto;color:#6b7280;font:8px Consolas,monospace">Registro generado desde SUSTENTA Ex · La clasificación distingue zona interior, exterior en operación normal y mantenimiento/apertura; la aptitud del equipo se verifica separadamente mediante marcado y evidencia documental.</div>
+  <div class="cover-stats">
+    <div><strong>${fichas.length}</strong>Equipos</div><div><strong style="color:#991b1b">${decCounts.reemplazar}</strong>Cambiar equipo</div><div><strong style="color:#b45309">${decCounts.recertificar}</strong>Evaluar re-certificación</div>
+    <div><strong style="color:#047857">${decCounts.conforme}</strong>Conformes</div><div><strong>${decCounts.pendiente}</strong>Pendientes de evaluación</div><div><strong>${pendientesCliente}</strong>Con identificación pendiente</div>
+  </div>
+  <div class="cover-note"><b>Información pendiente:</b> cuando el N.º de serie o el año de fabricación no fueron levantados, el registro los identifica como <b>PENDIENTE CLIENTE</b> para facilitar su posterior completitud. El registro fotográfico presenta una síntesis del equipo y su situación; los detalles de extensiones, mantenimiento, hermeticidad, EPL y aptitud documental permanecen disponibles en SUSTENTA Ex y en el informe técnico.</div>
+  <div style="margin-top:auto;color:#6b7280;font:8px Consolas,monospace">Registro generado desde SUSTENTA Ex · Se muestran hasta 4 fotografías por equipo y hasta 2 por componente. Las fotografías no incluidas en el PDF permanecen almacenadas en la aplicación.</div>
 </section>
 ${fichaHtml}
 <script>
