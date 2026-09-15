@@ -936,7 +936,7 @@ input[type=file]{display:none}
       <div id="findings" style="overflow-x:auto"><div style="padding:28px;text-align:center;color:#6b7280">Sin datos</div></div>
       <div style="display:flex;gap:10px;margin-top:22px;flex-wrap:wrap">
         <button class="btn-dark btn-lg btn-print btn-export-hide" onclick="printInforme()">PDF / Imprimir</button>
-        <button class="btn-dark btn-lg btn-export-hide" onclick="printRegistroFotografico()" style="background:#1e2230">📷 Registro fotográfico</button>
+        <button class="btn-dark btn-lg btn-export-hide" onclick="printRegistroFotografico()" style="background:#1e2230">📷 Registro fotográfico por piso</button>
         <button class="btn-dark btn-lg btn-export-hide" onclick="exportCSV()">⬇ CSV</button>
         <button class="btn-dark btn-lg btn-export-hide" onclick="copyMD()">📋 Markdown</button>
       </div>
@@ -3403,23 +3403,100 @@ async function signedPhotoUrl(path, ttl=3600){
   }
 }
 
-async function printRegistroFotografico(){
+function registroPisosDisponibles(){
   const eqIds=[...inspectedEqIds()];
-  if(!eqIds.length){ toast('No hay equipos registrados para el informe fotográfico','err'); return; }
+  const by=new Map();
+  for(const eqId of eqIds){
+    const def=getEqDef(eqId)||{};
+    const r=recs[eqId]||{};
+    const piso=eqPiso(eqId)||r.piso||def.p||'sin_ubicacion';
+    if(!by.has(piso)) by.set(piso,{id:piso,label:pisoLabel(piso),equipos:[],fotos:0,componentes:0});
+    const item=by.get(piso);
+    item.equipos.push(eqId);
+    item.fotos+=(r.fotos||[]).length;
+    const comps=subRecs[eqId]||[];
+    item.componentes+=comps.length;
+    item.fotos+=comps.reduce((n,c)=>n+(c.fotos||[]).length,0);
+  }
+  const order=pisoOrderIds([...by.keys()]);
+  return [...by.values()].sort((a,b)=>{
+    const ia=order.indexOf(a.id), ib=order.indexOf(b.id);
+    return (ia<0?999:ia)-(ib<0?999:ib) || a.label.localeCompare(b.label,'es');
+  });
+}
+
+function closeRegistroPisos(){
+  const bg=document.getElementById('rf-floor-bg');
+  if(bg) bg.remove();
+  document.body.style.overflow='';
+}
+
+function printRegistroFotografico(){
+  const pisos=registroPisosDisponibles();
+  if(!pisos.length){ toast('No hay equipos registrados para el informe fotográfico','err'); return; }
+  closeRegistroPisos();
+  const bg=document.createElement('div');
+  bg.id='rf-floor-bg';
+  bg.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.62);z-index:420;padding:16px;overflow-y:auto;display:flex;align-items:flex-start;justify-content:center';
+  const modal=document.createElement('div');
+  modal.className='modal';
+  modal.style.cssText='max-width:640px;border-top-color:#F7C600;margin:auto';
+  modal.innerHTML=`
+    <div class="modal-head" style="background:#0f1117">
+      <div style="flex:1">
+        <div style="font:700 10px monospace;color:#F7C600;letter-spacing:1.3px;text-transform:uppercase;margin-bottom:4px">REGISTRO FOTOGRÁFICO</div>
+        <div style="font-size:16px;font-weight:700">Generar por piso</div>
+        <div style="font:10px monospace;color:#9ca3af;margin-top:4px">Se cargarán únicamente las fotografías del piso seleccionado.</div>
+      </div>
+      <button id="rf-close" style="background:none;border:none;color:#777;font-size:20px;cursor:pointer">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="background:#fffdf0;border:1px solid #f5d76e;border-left:3px solid #F7C600;border-radius:4px;padding:9px 11px;font-size:11px;color:#6b5a00;line-height:1.45">
+        Esta modalidad evita generar simultáneamente cientos de páginas e imágenes. Cada archivo PDF tendrá su propia portada y resumen del piso.
+      </div>
+      <div id="rf-floor-list" style="display:flex;flex-direction:column;gap:7px"></div>
+    </div>
+    <div class="modal-foot"><button class="btn-out" id="rf-cancel">Cancelar</button></div>`;
+  bg.appendChild(modal);
+  document.body.appendChild(bg);
+  document.body.style.overflow='hidden';
+  bg.addEventListener('click',e=>{ if(e.target===bg) closeRegistroPisos(); });
+  modal.querySelector('#rf-close').onclick=closeRegistroPisos;
+  modal.querySelector('#rf-cancel').onclick=closeRegistroPisos;
+  const list=modal.querySelector('#rf-floor-list');
+  pisos.forEach(p=>{
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:12px;border:1px solid #ddd9d0;border-radius:6px;background:#fff;padding:10px 12px';
+    const info=document.createElement('div');
+    info.style.cssText='flex:1;min-width:0';
+    info.innerHTML=`<div style="font-size:13px;font-weight:700;color:#111827">${esc(p.label)}</div><div style="font:10px monospace;color:#6b7280;margin-top:3px">${p.equipos.length} equipos · ${p.componentes} componentes · ${p.fotos} fotos disponibles</div>`;
+    const btn=document.createElement('button');
+    btn.className='btn-save';
+    btn.textContent='GENERAR PDF';
+    btn.style.whiteSpace='nowrap';
+    btn.onclick=()=>generateRegistroFotograficoPiso(p.id);
+    row.append(info,btn);
+    list.appendChild(row);
+  });
+}
+
+async function generateRegistroFotograficoPiso(pisoId){
+  const defPiso=pisoLabel(pisoId);
+  const eqIds=[...inspectedEqIds()].filter(eqId=>{
+    const def=getEqDef(eqId)||{};
+    const r=recs[eqId]||{};
+    return (eqPiso(eqId)||r.piso||def.p||'sin_ubicacion')===pisoId;
+  });
+  if(!eqIds.length){ toast('No hay equipos registrados en '+defPiso,'err'); return; }
+  closeRegistroPisos();
   const win=window.open('','_blank');
   if(!win){ toast('Permite ventanas emergentes para generar el registro fotográfico','err'); return; }
   win.document.open();
-  win.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Preparando registro fotográfico…</title><style>body{font-family:Arial;padding:40px;color:#111827}.spin{display:inline-block;width:18px;height:18px;border:2px solid #ddd;border-top-color:#F7C600;border-radius:50%;animation:s .7s linear infinite;vertical-align:middle;margin-right:10px}@keyframes s{to{transform:rotate(360deg)}}</style></head><body><span class="spin"></span>Preparando registro fotográfico y cargando imágenes…</body></html>`);
+  win.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Preparando ${esc(defPiso)}…</title><style>body{font-family:Arial;padding:40px;color:#111827}.spin{display:inline-block;width:18px;height:18px;border:2px solid #ddd;border-top-color:#F7C600;border-radius:50%;animation:s .7s linear infinite;vertical-align:middle;margin-right:10px}@keyframes s{to{transform:rotate(360deg)}}</style></head><body><span class="spin"></span>Preparando registro fotográfico de <b>${esc(defPiso)}</b> y cargando sólo sus imágenes…</body></html>`);
   win.document.close();
 
   try {
-    const order=pisoOrderIds(eqIds.map(eqPiso));
-    eqIds.sort((a,b)=>{
-      const pa=order.indexOf(eqPiso(a)), pb=order.indexOf(eqPiso(b));
-      if(pa!==pb) return (pa<0?99:pa)-(pb<0?99:pb);
-      return eqName(a).localeCompare(eqName(b),'es');
-    });
-
+    eqIds.sort((a,b)=>eqName(a).localeCompare(eqName(b),'es'));
     const fichas=[];
     for(const eqId of eqIds){
       const def=getEqDef(eqId)||{};
@@ -3451,7 +3528,7 @@ async function printRegistroFotografico(){
     }
 
     win.document.open();
-    win.document.write(buildRegistroFotograficoHtml(fichas));
+    win.document.write(buildRegistroFotograficoHtml(fichas,defPiso));
     win.document.close();
     win.focus();
   } catch(e){
@@ -3462,7 +3539,7 @@ async function printRegistroFotografico(){
   }
 }
 
-function buildRegistroFotograficoHtml(fichas){
+function buildRegistroFotograficoHtml(fichas,scopeLabel=''){
   const inspector=document.getElementById('i-insp')?.value||profile?.full_name||session?.user?.email||'—';
   const fecha=document.getElementById('i-fecha')?.value||new Date().toISOString().slice(0,10);
   const area=document.getElementById('i-area')?.value||curProyecto?.planta||'—';
@@ -3565,7 +3642,7 @@ function buildRegistroFotograficoHtml(fichas){
   }).join('');
 
   return `<!doctype html>
-<html lang="es"><head><meta charset="utf-8"><title>Registro fotográfico - ${esc(curProyecto?.nombre||'Proyecto ATEX')}</title>
+<html lang="es"><head><meta charset="utf-8"><title>Registro fotográfico${scopeLabel?' - '+esc(scopeLabel):''} - ${esc(curProyecto?.nombre||'Proyecto ATEX')}</title>
 <style>
 @page{size:A4 portrait;margin:10mm}
 *{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;color:#111827;background:#fff;font-size:9.4px;line-height:1.35}
@@ -3579,10 +3656,11 @@ function buildRegistroFotograficoHtml(fichas){
 .comp-title{margin-top:13px}.comp{border:1px solid #ddd6fe;border-left:3px solid #7c3aed;border-radius:4px;padding:7px;margin:7px 0;break-inside:avoid}.comp-hd{display:flex;justify-content:space-between;gap:8px;margin-bottom:5px}.comp-hd strong{font-size:10px}.comp-sub{font:7.5px Consolas,monospace;color:#6b7280;margin-top:2px}.mini-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}.comp .photos img{height:42mm}.comp .situation{margin-top:5px}.trace{margin-top:8px;text-align:right;color:#9ca3af;font:7.5px Consolas,monospace}
 @media print{.toolbar{display:none}.coverpage{min-height:270mm}}
 </style></head><body>
-<div class="toolbar"><span>Registro fotográfico listo · ${fichas.length} equipos · ${totalFotosIncluidas} fotos incluidas${totalFotosDisponibles>totalFotosIncluidas?' de '+totalFotosDisponibles:''}</span><button onclick="window.print()">Imprimir / Guardar PDF</button></div>
+<div class="toolbar"><span>Registro fotográfico${scopeLabel?' · '+esc(scopeLabel):''} · ${fichas.length} equipos · ${totalFotosIncluidas} fotos incluidas${totalFotosDisponibles>totalFotosIncluidas?' de '+totalFotosDisponibles:''}</span><button onclick="window.print()">Imprimir / Guardar PDF</button></div>
 <section class="coverpage">
   <div class="brand">SUSTENTA <span>Ex</span></div>
   <h1>Registro fotográfico de equipos Ex</h1>
+  ${scopeLabel?`<div style="font-size:20px;font-weight:800;color:#b45309;margin:2px 0 8px">${esc(scopeLabel)}</div>`:''}
   <div class="sub">${esc(curProyecto?.nombre||'Proyecto ATEX')} · ${esc(curProyecto?.cliente||'—')} · ${esc(curProyecto?.planta||'—')}</div>
   <div class="cover-meta">
     <div><b>Inspector</b>${esc(inspector)}</div><div><b>Fecha</b>${esc(fecha)}</div>
@@ -3597,7 +3675,7 @@ function buildRegistroFotograficoHtml(fichas){
 </section>
 ${fichaHtml}
 <script>
-window.addEventListener('load',()=>{const imgs=[...document.images];Promise.all(imgs.map(img=>img.complete?Promise.resolve():new Promise(r=>{img.onload=r;img.onerror=r}))).then(()=>document.title='Registro fotográfico - '+${JSON.stringify(curProyecto?.nombre||'Proyecto ATEX')});});
+window.addEventListener('load',()=>{const imgs=[...document.images];Promise.all(imgs.map(img=>img.complete?Promise.resolve():new Promise(r=>{img.onload=r;img.onerror=r}))).then(()=>document.title='Registro fotográfico${scopeLabel?' - '+scopeLabel:''} - '+${JSON.stringify(curProyecto?.nombre||'Proyecto ATEX')});});
 <\/script>
 </body></html>`;
 }
