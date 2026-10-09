@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- SUSTENTA Ex v3.2 · Informe editable + clasificación interior / exterior / mantenimiento -->
+<!-- SUSTENTA_Ex_ATEX_Multiproyecto_v4_0 -->
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -470,6 +470,9 @@ input[type=file]{display:none}
 
 /* ══ INFORME v3.3 · zonas visibles + decisión cliente + plantillas rápidas ══ */
 .inf-zone-select{font:800 10px monospace!important;min-width:54px!important;border-width:2px!important;text-align:center;padding:3px 2px!important;transition:background .12s,color .12s,border-color .12s}
+.inf-zone-select.inf-z0{background:#fee2e2!important;color:#991b1b!important;border-color:#b91c1c!important}
+.inf-zone-select.inf-z1{background:#ffedd5!important;color:#9a3412!important;border-color:#ea580c!important}
+.inf-zone-select.inf-z2{background:#dbeafe!important;color:#1e40af!important;border-color:#2563eb!important}
 .inf-zone-select.inf-z20{background:#ede9fe!important;color:#5b21b6!important;border-color:#7c3aed!important}
 .inf-zone-select.inf-z21{background:#fef3c7!important;color:#92400e!important;border-color:#d97706!important}
 .inf-zone-select.inf-z22{background:#d1fae5!important;color:#065f46!important;border-color:#059669!important}
@@ -495,6 +498,15 @@ input[type=file]{display:none}
 /* Dar más espacio real a la triple zona */
 .inf-col-hd-bar,.inf-eq-row{grid-template-columns:22px 1.9fr .78fr .85fr .48fr 1.05fr .58fr 1.55fr 1.5fr}
 .inf-comp-row{grid-template-columns:22px 1.9fr .78fr .85fr .48fr 1.05fr .58fr 1.55fr 1.5fr}
+
+
+/* ══ V4 MULTIPROYECTO / GAS ══ */
+.eq-card.z0{border-left-color:#b91c1c}.eq-card.z1{border-left-color:#ea580c}.eq-card.z2{border-left-color:#2563eb}
+.z0p{background:#fee2e2;color:#991b1b}.z1p{background:#ffedd5;color:#9a3412}.z2p{background:#dbeafe;color:#1e40af}
+.profile-badge{display:inline-flex;align-items:center;gap:5px;font:700 8px monospace;padding:2px 7px;border-radius:3px;background:#1e2230;color:#cbd5e1;border:1px solid #2a2f40}
+.profile-badge.gas{color:#93c5fd}.profile-badge.polvo{color:#fde68a}.profile-badge.hibrida{color:#c4b5fd}
+.vi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.vi-item{border:1px solid #ddd9d0;border-radius:5px;padding:8px;background:#fafaf8}.vi-item .field-lbl{margin-bottom:5px}.vi-card{background:#fff;border:1px solid #ddd9d0;border-left:4px solid #0ea5e9;border-radius:6px;padding:11px 13px;margin-bottom:8px}.vi-meta{font:9px monospace;color:#6b7280;margin-top:3px}.vi-progress{font:700 9px monospace;padding:2px 7px;border-radius:3px;background:#e0f2fe;color:#075985}
+@media(max-width:700px){.vi-grid{grid-template-columns:1fr}}
 
 </style>
 </head>
@@ -547,7 +559,26 @@ input[type=file]{display:none}
         <div><div class="field-lbl">Cliente</div><input class="field-input" id="np-cliente" placeholder="Ej: CMPC, Copec…"></div>
         <div><div class="field-lbl">Planta / Instalación</div><input class="field-input" id="np-planta" placeholder="Ej: Planta Santiago"></div>
       </div>
-      <div><div class="field-lbl">Descripción</div><textarea class="field-ta" id="np-desc" placeholder="Norma aplicable, alcance…" style="min-height:52px"></textarea></div>
+      <div><div class="field-lbl">Descripción</div><textarea class="field-ta" id="np-desc" placeholder="Alcance general del proyecto…" style="min-height:52px"></textarea></div>
+      <div style="font-size:10px;font-weight:700;color:#F7C600;letter-spacing:1.4px;text-transform:uppercase;border-bottom:1px solid #ddd9d0;padding-bottom:5px">Perfil ATEX del proyecto</div>
+      <div>
+        <div class="field-lbl">Plantilla inicial</div>
+        <select class="field-sel" id="np-plantilla" onchange="applyProjectTemplate(this.value)">
+          <option value="configurable">Proyecto vacío / configurable</option>
+          <option value="inspeccion_gas_60079_17">Inspección ATEX · Gas · UNE-EN 60079-17</option>
+          <option value="inspeccion_polvo_60079_17">Inspección ATEX · Polvo · UNE-EN 60079-17</option>
+          <option value="clasificacion_polvo_60079_10_2">Clasificación · Polvo · UNE-EN 60079-10-2</option>
+          <option value="clasificacion_gas_60079_10_1">Clasificación · Gas · UNE-EN 60079-10-1</option>
+        </select>
+      </div>
+      <div class="two-col">
+        <div><div class="field-lbl">Atmósfera</div><select class="field-sel" id="np-atmosfera"><option value="polvo">Polvo combustible</option><option value="gas">Gas / vapor</option><option value="hibrida">Híbrida</option></select></div>
+        <div><div class="field-lbl">Tipo de trabajo</div><select class="field-sel" id="np-trabajo"><option value="inspeccion">Inspección ATEX</option><option value="clasificacion">Clasificación de emplazamientos</option><option value="clasificacion_inspeccion">Clasificación + inspección</option></select></div>
+      </div>
+      <div class="two-col">
+        <div><div class="field-lbl">Normativa principal</div><input class="field-input" id="np-norma" placeholder="Ej.: UNE-EN 60079-17:2014"></div>
+        <div><div class="field-lbl">Grado de inspección</div><select class="field-sel" id="np-grado"><option value="">No aplica / definir después</option><option value="visual">Visual</option><option value="cercana">Cercana</option><option value="detallada">Detallada</option></select></div>
+      </div>
       <!-- Tipo de ubicación -->
       <div>
         <div class="field-lbl">Tipo de agrupación de equipos</div>
@@ -562,7 +593,7 @@ input[type=file]{display:none}
         <input class="field-input" id="np-tipo-custom" placeholder="Nombre personalizado (ej: Nave, Módulo…)" style="display:none;margin-top:8px">
       </div>
       <!-- Ubicaciones iniciales -->
-      <div>
+      <div id="np-ubicaciones-wrap">
         <div class="field-lbl">Ubicaciones iniciales <span style="color:#aaa;font-weight:400;text-transform:none;letter-spacing:0">(una por línea)</span></div>
         <textarea class="field-ta" id="np-ubicaciones" placeholder="Ej:&#10;Subterráneo&#10;Primer piso&#10;Segundo piso&#10;Hangar" style="min-height:100px;font-family:monospace;font-size:12px"></textarea>
         <div style="font-size:10px;color:#aaa;margin-top:4px;font-family:monospace">Podrás agregar, editar y reordenar ubicaciones después</div>
@@ -810,7 +841,7 @@ input[type=file]{display:none}
       <div style="width:100%;height:1px;background:linear-gradient(90deg,transparent,#F7C600,transparent);margin-bottom:20px;opacity:.4"></div>
       <div style="font-family:monospace;font-size:18px;font-weight:700;letter-spacing:4px;color:#fff;text-align:center">LEVANTAMIENTO</div>
       <div style="font-family:monospace;font-size:10px;color:#F7C600;letter-spacing:2px;text-align:center;margin-top:6px;text-transform:uppercase">Equipos Ex · Clasificación ATEX</div>
-      <div style="font-size:11px;color:#555;margin-top:8px;text-align:center">CCU Chile · Planta Temuco · Edificio Molino</div>
+      <div style="font-size:11px;color:#555;margin-top:8px;text-align:center">Gestión ATEX multiproyecto · Gas / Polvo</div>
     </div>
     <div class="login-body">
       <div id="auth-msg" class="msg"></div>
@@ -823,7 +854,7 @@ input[type=file]{display:none}
     <div style="padding:12px 28px;border-top:1px solid #ddd9d0;text-align:center;font-size:10px;color:#aaa;display:flex;align-items:center;justify-content:center;gap:6px">
       <span style="color:#F7C600;font-weight:700;font-size:10px">SUSTENTA</span>
       <span>·</span>
-      <span>UNE-EN 60079-10-2:2010 · IEC 60079-10-2:2009</span>
+      <span>IEC / UNE-EN 60079 · Configuración por proyecto</span>
     </div>
   </div>
 </div>
@@ -841,6 +872,7 @@ input[type=file]{display:none}
     </div>
     <div style="display:flex;align-items:center;gap:8px">
       <span class="proy-active-pill" onclick="volverProyectos()" id="proy-pill" title="Cambiar proyecto">◈ <span id="proy-pill-name">—</span></span>
+      <button id="btn-proy-config" onclick="openProyectoConfig()" style="background:none;border:1px solid #2a2f40;border-radius:4px;color:#F7C600;font-size:10px;font-family:monospace;padding:4px 8px;cursor:pointer" title="Configurar proyecto">⚙ Proyecto</button>
       <span id="user-lbl" style="font-family:monospace;font-size:10px;color:#c0c8d8"></span>
       <button onclick="openSearch()" style="background:none;border:1px solid #2a2f40;color:#888;font-size:11px;cursor:pointer;border-radius:4px;padding:4px 10px;font-family:monospace;display:flex;align-items:center;gap:5px" title="Ctrl+K">
         🔍 <span style="display:none" id="srch-hint">Ctrl+K</span>
@@ -860,21 +892,7 @@ input[type=file]{display:none}
   <!-- TAB EQUIPOS -->
   <div id="tab-eq">
     <div class="page-wrap">
-      <div class="filter-bar">
-        <span style="font-size:10px;color:#aaa;font-family:monospace">PISO</span>
-        <span class="chip on" onclick="setFloor('all',this)">TODOS</span>
-        <span class="chip" onclick="setFloor('1sub',this)">SUBTERRÁNEO</span>
-        <span class="chip" onclick="setFloor('1',this)">P1</span>
-        <span class="chip" onclick="setFloor('2',this)">P2</span>
-        <span class="chip" onclick="setFloor('3',this)">P3</span>
-        <span class="chip" onclick="setFloor('4',this)">P4</span>
-        <span class="chip" onclick="setFloor('5',this)">P5</span>
-        <span class="chip" onclick="setFloor('6',this)">P6</span>
-        <span class="chip" onclick="setFloor('7',this)">P7</span>
-        <span class="chip" onclick="setFloor('hangar',this)">HANGAR</span>
-        <span id="eq-cnt" style="font-size:10px;color:#aaa;font-family:monospace"></span>
-        <button onclick="openUbModal()" id="btn-gest-ub" style="display:none;background:none;border:1px solid #ddd9d0;border-radius:4px;padding:4px 10px;font-size:10px;font-family:monospace;cursor:pointer;color:#6b7280;margin-left:auto">⚙ Gestionar ubicaciones</button>
-      </div>
+      <div class="filter-bar" id="eq-filter-bar"></div>
       <div id="eq-list"></div>
     </div>
   </div>
@@ -888,8 +906,8 @@ input[type=file]{display:none}
             <span style="font-size:14px;font-weight:900;color:#F7C600;letter-spacing:2px">SUSTENTA</span>
             <span style="background:#F7C600;color:#111;font-size:8px;font-weight:900;padding:1px 5px;border-radius:2px">Ex</span>
           </div>
-          <div style="font-size:15px;font-weight:600">Edificio de Molino — Recepción y Molienda</div>
-          <div style="font-family:monospace;font-size:10px;color:#888;margin-top:3px">UNE-EN 60079-10-2:2010 · IEC 60079-10-2:2009</div>
+          <div id="summary-project-title" style="font-size:15px;font-weight:600">Proyecto ATEX</div>
+          <div id="summary-project-norm" style="font-family:monospace;font-size:10px;color:#888;margin-top:3px">Normativa del proyecto</div>
         </div>
         <div style="text-align:right">
           <div style="font-family:monospace;font-size:10px;color:#888">AVANCE</div>
@@ -922,7 +940,7 @@ input[type=file]{display:none}
         <div class="two-col" style="gap:14px">
           <div><div class="field-lbl">Inspector</div><input class="field-input" id="i-insp" placeholder="Nombre y cargo"></div>
           <div><div class="field-lbl">Fecha</div><input class="field-input" id="i-fecha" type="date"></div>
-          <div><div class="field-lbl">Área</div><input class="field-input" id="i-area" value="Edificio de Molino — Recepción y Molienda"></div>
+          <div><div class="field-lbl">Área / alcance</div><input class="field-input" id="i-area" placeholder="Área, instalación o alcance"></div>
           <div><div class="field-lbl">Revisión N°</div><input class="field-input" id="i-rev" placeholder="1"></div>
           <div style="grid-column:1/-1"><div class="field-lbl">Conclusiones</div><textarea class="field-ta" id="i-concl" placeholder="Principales brechas y recomendaciones…" style="min-height:80px"></textarea></div>
         </div>
@@ -936,7 +954,7 @@ input[type=file]{display:none}
       <div id="findings" style="overflow-x:auto"><div style="padding:28px;text-align:center;color:#6b7280">Sin datos</div></div>
       <div style="display:flex;gap:10px;margin-top:22px;flex-wrap:wrap">
         <button class="btn-dark btn-lg btn-print btn-export-hide" onclick="printInforme()">PDF / Imprimir</button>
-        <button class="btn-dark btn-lg btn-export-hide" onclick="printRegistroFotografico()" style="background:#1e2230">📷 Registro fotográfico por piso</button>
+        <button class="btn-dark btn-lg btn-export-hide" onclick="printRegistroFotografico()" style="background:#1e2230" id="btn-regfoto">📷 Registro fotográfico</button>
         <button class="btn-dark btn-lg btn-export-hide" onclick="exportCSV()">⬇ CSV</button>
         <button class="btn-dark btn-lg btn-export-hide" onclick="copyMD()">📋 Markdown</button>
       </div>
@@ -969,14 +987,14 @@ input[type=file]{display:none}
   <div id="tab-atex" style="display:none">
     <div class="page-wrap">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px">
-        <div><div style="font-size:17px;font-weight:700">Clasificación de Emplazamientos / Zonas por Equipo</div>
-        <div style="font:10px monospace;color:#888;margin-top:3px">P&ID → equipo levantado → zona interior / exterior / mantenimiento → aptitud Ex</div></div>
+        <div><div id="atex-title" style="font-size:17px;font-weight:700">Gestión ATEX del proyecto</div>
+        <div id="atex-subtitle" style="font:10px monospace;color:#888;margin-top:3px">Equipo → clasificación → aptitud Ex</div></div>
         <div class="atex-toolbar">
           <button class="btn-dark" onclick="autoAsociarPidSeguros()">⚙ Autoasignar A</button>
           <button class="btn-dark" onclick="exportPidCSV()" style="background:#374151">⬇ Matriz P&ID</button>
         </div>
       </div>
-      <div class="atex-help"><b>Criterio de trabajo:</b> TAG Planta conserva lo observado en terreno. La referencia P&ID se almacena por separado. Las asociaciones A pueden confirmarse automáticamente; B y C quedan como sugerencias para revisión. Una Zona 20 interna no genera por sí sola una Zona 22 exterior. Para esta etapa se adopta una clasificación simplificada por equipo: interior, exterior en operación normal y mantenimiento/apertura, usando la fuente principal o condición de mayor peligro de forma conservadora.</div>
+      <div class="atex-help" id="atex-help"><b>Criterio de trabajo:</b> configuración según perfil del proyecto.</div>
       <div class="atex-kpis">
         <div class="atex-kpi"><b id="ak-confirm">0</b><span>Vínculos confirmados</span></div>
         <div class="atex-kpi"><b id="ak-sug">0</b><span>Sugerencias por revisar</span></div>
@@ -986,7 +1004,7 @@ input[type=file]{display:none}
       <div class="atex-switch">
         <button id="atex-sw-pid" class="on" onclick="switchAtexView('pid')">CONCILIACIÓN P&ID</button>
         <button id="atex-sw-fe" onclick="switchAtexView('fe')">ZONAS POR EQUIPO</button>
-        <button id="atex-sw-polvo" onclick="switchAtexView('polvo')">CARACTERIZACIÓN POLVO</button>
+        <button id="atex-sw-polvo" onclick="switchAtexView(projectThirdAtexView())">CARACTERIZACIÓN POLVO</button>
       </div>
       <div id="atex-view-pid">
         <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap"><input id="pid-filter" class="field-input" placeholder="Buscar equipo, TAG o referencia P&ID…" oninput="renderPidConciliacion()" style="max-width:380px"><select id="pid-status-filter" class="field-sel" onchange="renderPidConciliacion()" style="width:190px"><option value="all">Todos los estados</option><option value="confirmado">Confirmados</option><option value="sugerido">Sugeridos</option><option value="pendiente">Sin referencia</option></select></div>
@@ -995,6 +1013,10 @@ input[type=file]{display:none}
       <div id="atex-view-fe" style="display:none"><div class="atex-help" style="margin-bottom:10px"><b>Enfoque simplificado:</b> se registra por equipo la condición interior, la envolvente exterior predominante en operación normal y la condición de mantenimiento/apertura. Las extensiones se ingresan manualmente y pueden ser diferentes en horizontal, vertical superior y vertical inferior.</div><div id="fuentes-list"></div></div>
       <div id="atex-view-polvo" style="display:none">
         <div class="card"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><div><b>Caracterización de polvos</b><div style="font-size:11px;color:#888;margin-top:3px">Registra ensayos propios, bibliografía o estado no determinado.</div></div><button class="btn-save" onclick="openPolvoModal()">＋ Sustancia</button></div><div id="polvos-list" style="margin-top:12px"></div></div>
+      </div>
+      <div id="atex-view-inspeccion" style="display:none">
+        <div class="atex-help"><b>UNE-EN 60079-17:</b> registro de inspección visual por equipo. El checklist no reemplaza una inspección cercana o detallada; registra exclusivamente la condición observable dentro del grado definido para el proyecto.</div>
+        <div id="visinsp-list"></div>
       </div>
     </div>
   </div>
@@ -1639,6 +1661,19 @@ input[type=file]{display:none}
  </div><div class="modal-foot"><button class="btn-out" onclick="closeFuenteModal()">Cancelar</button><button class="btn-save" onclick="saveFuenteEmision()">GUARDAR FUENTE</button></div></div>
 </div>
 
+<!-- MODAL INSPECCIÓN VISUAL V4 -->
+<div id="visinsp-bg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.62);z-index:360;padding:16px;overflow-y:auto;align-items:flex-start;justify-content:center">
+  <div class="modal" style="max-width:760px;border-top-color:#0ea5e9">
+    <div class="modal-head" style="background:#082f49"><div style="flex:1"><div style="font:700 10px monospace;color:#7dd3fc;letter-spacing:1px">INSPECCIÓN VISUAL · UNE-EN 60079-17</div><div id="vi-title" style="font-size:15px;font-weight:700;margin-top:3px"></div><div id="vi-meta" style="font:9px monospace;color:#93c5fd;margin-top:3px"></div></div><button onclick="closeVisualInspection()" style="background:none;border:none;color:#94a3b8;font-size:20px;cursor:pointer">✕</button></div>
+    <div class="modal-body">
+      <div class="atex-help" style="margin:0"><b>Alcance:</b> inspección visual. Registrar sólo condiciones observables sin desmontaje ni medición especializada.</div>
+      <div class="vi-grid" id="vi-checks"></div>
+      <div class="two-col"><div><div class="field-lbl">Resultado general</div><select id="vi-conf" class="field-sel"><option value="">— sin definir —</option><option value="C">C — Conforme</option><option value="NC">NC — No conforme</option><option value="OBS">OBS — Observación</option><option value="NV">NV — No verificable</option><option value="NA">NA — No aplica</option></select></div><div><div class="field-lbl">Observación general</div><textarea id="vi-obs" class="field-ta" style="min-height:55px"></textarea></div></div>
+    </div>
+    <div class="modal-foot"><button class="btn-out" onclick="closeVisualInspection()">Cancelar</button><button class="btn-save" onclick="saveVisualInspection()" style="background:#0ea5e9">GUARDAR INSPECCIÓN VISUAL</button></div>
+  </div>
+</div>
+
 <!-- MODAL POLVO -->
 <div id="polvo-bg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:350;padding:16px;overflow-y:auto;align-items:flex-start;justify-content:center"><div class="modal" style="max-width:650px"><div class="modal-head"><div><div class="field-lbl">CARACTERIZACIÓN</div><div style="font-weight:700">Sustancia / polvo combustible</div></div><button onclick="closePolvoModal()" style="background:none;border:none;color:#888;font-size:20px">✕</button></div><div class="modal-body"><div class="two-col"><div><div class="field-lbl">Nombre</div><input id="po-name" class="field-input" placeholder="Polvo de malta"></div><div><div class="field-lbl">Grupo</div><select id="po-grupo" class="field-sel"><option value="">No determinado</option><option>IIIA</option><option>IIIB</option><option>IIIC</option></select></div></div><div class="two-col"><div><div class="field-lbl">Kst [bar·m/s]</div><input id="po-kst" class="field-input" type="number" step="0.1"></div><div><div class="field-lbl">Pmax [bar]</div><input id="po-pmax" class="field-input" type="number" step="0.01"></div><div><div class="field-lbl">MIT nube [°C]</div><input id="po-mitn" class="field-input" type="number"></div><div><div class="field-lbl">MIT capa [°C]</div><input id="po-mitc" class="field-input" type="number"></div></div><div><div class="field-lbl">Fuente / estado</div><input id="po-fuente" class="field-input" placeholder="No ensayado / bibliografía / fabricante…"></div></div><div class="modal-foot"><button class="btn-out" onclick="closePolvoModal()">Cancelar</button><button class="btn-save" onclick="savePolvo()">GUARDAR</button></div></div></div>
 
@@ -1688,7 +1723,7 @@ function mdCell(v){
 }
 
 function getEqDef(id){
-  const base=EQ.find(e=>e.id===id);
+  const base=usesLegacyCatalog()?EQ.find(e=>e.id===id):null;
   const extra=equiposExtra.find(e=>e.id===id);
   const dyn=proyEquipos.find(e=>e.id===id);
   return base || (extra ? {
@@ -1709,13 +1744,69 @@ function pctFrom(total){
 function projectId(){
   return curProyecto?.id || 'ccu-temuco-molino';
 }
-
-function pisoLabel(piso){
-  return proyUbicaciones.find(u=>u.id===piso)?.nombre || FL[piso] || piso || '—';
+function projectAtmosphere(){ return String(curProyecto?.atmosfera_tipo||'polvo').toLowerCase(); }
+function projectWork(){ return String(curProyecto?.tipo_trabajo||'clasificacion_inspeccion').toLowerCase(); }
+function projectNorm(){ return curProyecto?.normativa_principal || (projectAtmosphere()==='gas'?'UNE-EN 60079-17:2014':'UNE-EN 60079-10-2:2010 · IEC 60079-10-2:2009'); }
+function projectInspectionGrade(){ return String(curProyecto?.grado_inspeccion||'').toLowerCase(); }
+function isGasProject(){ return projectAtmosphere()==='gas'; }
+function isDustProject(){ return projectAtmosphere()==='polvo'; }
+function isHybridProject(){ return projectAtmosphere()==='hibrida'; }
+function usesLegacyCatalog(){ return projectId()==='ccu-temuco-molino' || curProyecto?.plantilla_proyecto==='polvo_molino_legacy'; }
+function projectLocationType(){ return curProyecto?.tipo_ubicacion||'Ubicación'; }
+function projectThirdAtexView(){ return (isGasProject() && projectWork().includes('inspeccion')) ? 'inspeccion' : 'polvo'; }
+function projectProfileLabel(){
+  const atm={gas:'Gas / vapor',polvo:'Polvo',hibrida:'Híbrida'}[projectAtmosphere()]||projectAtmosphere();
+  const work={inspeccion:'Inspección',clasificacion:'Clasificación',clasificacion_inspeccion:'Clasificación + inspección'}[projectWork()]||projectWork();
+  return `${atm} · ${work}${projectInspectionGrade()?' · '+projectInspectionGrade():''}`;
+}
+function zoneValues(){
+  if(isGasProject()) return [['0','Zona 0'],['1','Zona 1'],['2','Zona 2'],['NG','No peligroso / no clasificado'],['ND','No determinada']];
+  if(isHybridProject()) return [['0','Zona 0'],['1','Zona 1'],['2','Zona 2'],['20','Zona 20'],['21','Zona 21'],['22','Zona 22'],['NG','No peligroso / no clasificado'],['ND','No determinada']];
+  return [['20','Zona 20'],['21','Zona 21'],['22','Zona 22'],['NG','No peligroso / no clasificado'],['ND','No determinada']];
+}
+function refreshZoneSelect(id, includeNA=false){
+  const el=document.getElementById(id); if(!el) return;
+  const old=el.value;
+  let opts=[['','— clasificar —'],...zoneValues()]; if(includeNA) opts.push(['NA','No aplica']);
+  el.innerHTML=opts.map(([v,t])=>`<option value="${v}">${t}</option>`).join('');
+  if(opts.some(x=>x[0]===old)) el.value=old;
+}
+function refreshEplSelect(id){
+  const el=document.getElementById(id); if(!el)return; const old=el.value;
+  const common=[['','— seleccionar —'],['Sin marcado Ex — requiere reemplazo','Sin marcado Ex — requiere reemplazo'],['Marcado no visible / ilegible','Marcado no visible / ilegible'],['No verificable — sin placa o antecedentes suficientes','No verificable — sin placa o antecedentes suficientes'],['Equipo no eléctrico / mecánico','Equipo no eléctrico / mecánico']];
+  const prof=isGasProject()?[['EPL Ga / Cat. 1G — Muy alta','EPL Ga / Cat. 1G — Muy alta'],['EPL Gb / Cat. 2G — Alta','EPL Gb / Cat. 2G — Alta'],['EPL Gc / Cat. 3G — Mejorada','EPL Gc / Cat. 3G — Mejorada']]:[['EPL Da / Cat. 1D — Muy alta','EPL Da / Cat. 1D — Muy alta'],['EPL Db / Cat. 2D — Alta','EPL Db / Cat. 2D — Alta'],['EPL Dc / Cat. 3D — Mejorada','EPL Dc / Cat. 3D — Mejorada']];
+  const opts=[...prof,...common]; el.innerHTML=opts.map(([v,t])=>`<option value="${escAttr(v)}">${esc(t)}</option>`).join(''); if(opts.some(x=>x[0]===old))el.value=old;
+}
+function profileUseZones(){ return isGasProject()?['0','1','2']:(isHybridProject()?['0','1','2','20','21','22']:['20','21','22']); }
+function renderZonaUsoProfile(){
+  const wrap=document.querySelector('.zona-uso-wrap'); if(!wrap)return; const vals=profileUseZones();
+  wrap.innerHTML=vals.map(z=>`<label class="zona-uso-opt" id="zuo-${z}"><input type="checkbox" value="${z}" onchange="updateZonaUso(this,'${z}')"> Z${z}</label>`).join('');
+}
+function applyProjectProfileUI(){
+  const title=document.getElementById('summary-project-title'); if(title) title.textContent=curProyecto?.nombre||'Proyecto ATEX';
+  const norm=document.getElementById('summary-project-norm'); if(norm) norm.textContent=`${projectNorm()} · ${projectProfileLabel()}`;
+  const area=document.getElementById('i-area'); if(area && !area.dataset.userEdited) area.value=curProyecto?.planta||curProyecto?.nombre||'';
+  const rf=document.getElementById('btn-regfoto'); if(rf) rf.textContent=`📷 Registro fotográfico por ${projectLocationType()}`;
+  const at=document.getElementById('atex-title'), sub=document.getElementById('atex-subtitle'), help=document.getElementById('atex-help'), third=document.getElementById('atex-sw-polvo');
+  if(at) at.textContent=(isGasProject()&&projectWork().includes('inspeccion'))?'Inspección ATEX / Zonas por Equipo':'Clasificación de Emplazamientos / Zonas por Equipo';
+  if(sub) sub.textContent=isGasProject()?'Equipo levantado → Zona 0/1/2 → marcado Ex → inspección':'P&ID → equipo levantado → zona interior / exterior / mantenimiento → aptitud Ex';
+  if(help) help.innerHTML=isGasProject()?`<b>Perfil Gas:</b> ${esc(projectNorm())}. Zonas 0/1/2, EPL Ga/Gb/Gc y clase de temperatura según marcado. ${projectWork().includes('inspeccion')?'El grado configurado es <b>'+esc(projectInspectionGrade()||'no definido')+'</b>; el checklist registra sólo condiciones observables dentro de ese alcance.':''}`:`<b>Perfil Polvo:</b> TAG Planta conserva lo observado. Zonas 20/21/22 y EPL Da/Db/Dc. Una zona interna no determina automáticamente la exterior.`;
+  if(third) third.textContent=(isGasProject()&&projectWork().includes('inspeccion'))?'INSPECCIÓN VISUAL':'CARACTERIZACIÓN POLVO';
+  ['f-zona-int','f-zona-ext','sm-zona-int','sm-zona-ext','fz-int-zona','fz-ext-zona','en-zona'].forEach(id=>refreshZoneSelect(id,false));
+  ['f-zona-mant','sm-zona-mant'].forEach(id=>refreshZoneSelect(id,true));
+  ['f-epl','sm-epl','insp-epl'].forEach(refreshEplSelect);
+  const fm=document.getElementById('f-mex'), sm=document.getElementById('sm-mex');
+  if(fm)fm.placeholder=isGasProject()?'Ej.: Ex db IIB T4 Gb':'Ej.: Ex tb IIIC T120°C Db IP6X'; if(sm)sm.placeholder=fm?.placeholder||'';
+  renderZonaUsoProfile(); renderEqFilterBar();
 }
 
+function pisoLabel(piso){
+  return proyUbicaciones.find(u=>u.id===piso)?.nombre || (usesLegacyCatalog()?FL[piso]:null) || piso || '—';
+}
+
+
 function pisoOrderIds(extraIds=[]){
-  const ids=proyUbicaciones.length ? proyUbicaciones.map(u=>u.id) : Object.keys(FL);
+  const ids=proyUbicaciones.length ? proyUbicaciones.map(u=>u.id) : (usesLegacyCatalog()?Object.keys(FL):[]);
   for(const id of extraIds){
     if(id && !ids.includes(id)) ids.push(id);
   }
@@ -1900,6 +1991,7 @@ async function loadApp(){
   document.getElementById('user-lbl').textContent=name;
   document.getElementById('i-insp').value=name;
   document.getElementById('i-fecha').value=new Date().toISOString().slice(0,10);
+  const ia=document.getElementById('i-area'); if(ia&&!ia.dataset.bound){ia.addEventListener('input',()=>ia.dataset.userEdited='1');ia.dataset.bound='1';}
   // Guardar perfil global y mostrar icono admin si es admin
   perfilActual = profile;
   const adminIcon=document.getElementById('admin-icon');
@@ -1921,7 +2013,7 @@ async function loadApp(){
   } catch(e){ proyEquipos=[]; }
   // Mostrar u ocultar botón gestión ubicaciones
   const btnGestUb=document.getElementById('btn-gest-ub');
-  if(btnGestUb) btnGestUb.style.display=proyUbicaciones.length?'block':'none';
+  if(btnGestUb) btnGestUb.style.display='block';
   // Datos inspección
   try {
     const data=await must(sb.from('registros').select('*, profiles(full_name)').eq('proyecto_id',pid).order('updated_at',{ascending:false}));
@@ -1947,6 +2039,8 @@ async function loadApp(){
     const ep=await must(sb.from('equipos_piso').select('id,piso').eq('proyecto_id',pid));
     if(ep){ customPisos={}; ep.forEach(r=>{ customPisos[r.id]=r.piso; }); }
   } catch(e){}
+  floorF='all';
+  applyProjectProfileUI();
   renderEq();
   applyPermissions();
   loader(0);
@@ -2026,7 +2120,7 @@ async function loadAndRenderInforme(){
 
 //  EQUIPOS
 function zpillHtml(z){
-  const cls={20:'z20p',21:'z21p',22:'z22p',NG:'zdp',ND:'zdp',NA:'zdp','':'zdp'}[z]||'zdp';
+  const cls={0:'z0p',1:'z1p',2:'z2p',20:'z20p',21:'z21p',22:'z22p',NG:'zdp',ND:'zdp',NA:'zdp','':'zdp'}[z]||'zdp';
   const txt=z==='NG'?'NG':z==='ND'?'ND':z==='NA'?'NA':z?'Z'+esc(z):'—';
   return `<span class="zpill ${cls}">${txt}</span>`;
 }
@@ -2086,11 +2180,11 @@ function eqPiso(eqId){
     const ub=proyUbicaciones.find(u=>u.id===dyn.ubicacion_id);
     return ub?ub.id:dyn.ubicacion_id||'';
   }
-  return (EQ.find(e=>e.id===eqId)||{}).p||(equiposExtra.find(e=>e.id===eqId)||{}).piso||'';
+  return (usesLegacyCatalog()?(EQ.find(e=>e.id===eqId)||{}).p:'')||(equiposExtra.find(e=>e.id===eqId)||{}).piso||'';
 }
 function eqName(eqId){
   return customNames[eqId]
-    || (EQ.find(e=>e.id===eqId)||{}).n
+    || (usesLegacyCatalog()?(EQ.find(e=>e.id===eqId)||{}).n:null)
     || (equiposExtra.find(e=>e.id===eqId)||{}).nombre
     || (proyEquipos.find(e=>e.id===eqId)||{}).nombre
     || eqId;
@@ -2098,7 +2192,7 @@ function eqName(eqId){
 
 // Devuelve lista combinada EQ + equiposExtra filtrada por piso y ocultos
 function allEqs(floorFilter){
-  const base=EQ.filter(e=>!hiddenEqs.has(e.id));
+  const base=usesLegacyCatalog()?EQ.filter(e=>!hiddenEqs.has(e.id)):[];
   const extra=equiposExtra.filter(e=>!hiddenEqs.has(e.id)).map(e=>({id:e.id,n:e.nombre,p:e.piso,g:e.grupo||'',z:e.zona||'',_extra:true}));
   // Equipos dinámicos (creados en proyecto)
   const dyn=proyEquipos.filter(e=>!hiddenEqs.has(e.id)).map(e=>{
@@ -2193,6 +2287,14 @@ function reportRows(){
   return rows;
 }
 
+function renderEqFilterBar(){
+  const bar=document.getElementById('eq-filter-bar'); if(!bar)return;
+  const tipo=projectLocationType();
+  let locs=proyUbicaciones.map(u=>({id:u.id,nombre:u.nombre}));
+  if(!locs.length && usesLegacyCatalog()) locs=Object.entries(FL).map(([id,nombre])=>({id,nombre}));
+  const chipName=x=>{ if(usesLegacyCatalog()&&FL[x.id]){ const short={'1sub':'SUBTERRÁNEO','1':'P1','2':'P2','3':'P3','4':'P4','5':'P5','6':'P6','7':'P7','hangar':'HANGAR'}[x.id]; return short||x.nombre;} return x.nombre; };
+  bar.innerHTML=`<span style="font-size:10px;color:#aaa;font-family:monospace;text-transform:uppercase">${esc(tipo)}</span><span class="chip ${floorF==='all'?'on':''}" onclick="setFloor('all',this)">TODOS</span>${locs.map(x=>`<span class="chip ${floorF===x.id?'on':''}" onclick="setFloor(${jsArg(x.id)},this)">${esc(chipName(x))}</span>`).join('')}<span id="eq-cnt" style="font-size:10px;color:#aaa;font-family:monospace"></span><button onclick="openUbModal()" id="btn-gest-ub" style="background:none;border:1px solid #ddd9d0;border-radius:4px;padding:4px 10px;font-size:10px;font-family:monospace;cursor:pointer;color:#6b7280;margin-left:auto">⚙ Gestionar ${esc(tipo)}s</button>`;
+}
 function renderEq(){
   const list=document.getElementById('eq-list');
   const items=allEqs(floorF);
@@ -2220,7 +2322,7 @@ function renderEq(){
     for(const eq of flItems){
       const r=recs[eq.id]||{};
       const z=zoneExteriorOf(r,eq.z||'');
-      const zClass=['20','21','22'].includes(String(z))?' z'+z:'';
+      const zClass=['0','1','2','20','21','22'].includes(String(z))?' z'+z:'';
       const conf=eqConf(eq.id);
       const comps=subRecs[eq.id]||[];
       const cc=comps.length;
@@ -2774,13 +2876,13 @@ function infSelectOptions(value, items){
   return items.map(([v,l])=>`<option value="${escAttr(v)}" ${String(v)===value?'selected':''}>${esc(l)}</option>`).join('');
 }
 function infZoneOptions(v, allowNA=false){
-  const arr=[['','—'],['20','Z20'],['21','Z21'],['22','Z22'],['NG','NG'],['ND','ND']];
+  const arr=[['','—'],...zoneValues().map(([z])=>[z,z==='NG'?'NG':z==='ND'?'ND':'Z'+z])];
   if(allowNA) arr.push(['NA','NA']);
   return infSelectOptions(v,arr);
 }
 
 function infZoneCss(v){
-  return ({'20':'inf-z20','21':'inf-z21','22':'inf-z22','NG':'inf-zng','ND':'inf-znd','NA':'inf-zna','':'inf-zblank'})[String(v??'')]||'inf-zblank';
+  return ({'0':'inf-z0','1':'inf-z1','2':'inf-z2','20':'inf-z20','21':'inf-z21','22':'inf-z22','NG':'inf-zng','ND':'inf-znd','NA':'inf-zna','':'inf-zblank'})[String(v??'')]||'inf-zblank';
 }
 function infZoneChanged(el,kind,id){
   if(el){ el.className='inf-select inf-mini inf-zone-select '+infZoneCss(el.value); }
@@ -2862,16 +2964,12 @@ function infConfOptions(v){
   return infSelectOptions(v,[['','—'],['C','C'],['NC','NC'],['OBS','OBS'],['NV','NV'],['NA','NA']]);
 }
 function infEplOptions(v){
-  return infSelectOptions(v,[
-    ['','— seleccionar —'],
-    ['EPL Da / Cat. 1D — Muy alta','EPL Da / Cat. 1D — Muy alta'],
-    ['EPL Db / Cat. 2D — Alta','EPL Db / Cat. 2D — Alta'],
-    ['EPL Dc / Cat. 3D — Mejorada','EPL Dc / Cat. 3D — Mejorada'],
-    ['Sin marcado Ex — requiere reemplazo','Sin marcado Ex — requiere reemplazo'],
-    ['Marcado no visible / ilegible','Marcado no visible / ilegible'],
-    ['No verificable — sin placa o antecedentes suficientes','No verificable — sin placa o antecedentes suficientes'],
-    ['Equipo no eléctrico / mecánico','Equipo no eléctrico / mecánico']
-  ]);
+  const prof=isGasProject()?[
+    ['EPL Ga / Cat. 1G — Muy alta','EPL Ga / Cat. 1G — Muy alta'],['EPL Gb / Cat. 2G — Alta','EPL Gb / Cat. 2G — Alta'],['EPL Gc / Cat. 3G — Mejorada','EPL Gc / Cat. 3G — Mejorada']
+  ]:[
+    ['EPL Da / Cat. 1D — Muy alta','EPL Da / Cat. 1D — Muy alta'],['EPL Db / Cat. 2D — Alta','EPL Db / Cat. 2D — Alta'],['EPL Dc / Cat. 3D — Mejorada','EPL Dc / Cat. 3D — Mejorada']
+  ];
+  return infSelectOptions(v,[['','— seleccionar —'],...prof,['Sin marcado Ex — requiere reemplazo','Sin marcado Ex — requiere reemplazo'],['Marcado no visible / ilegible','Marcado no visible / ilegible'],['No verificable — sin placa o antecedentes suficientes','No verificable — sin placa o antecedentes suficientes'],['Equipo no eléctrico / mecánico','Equipo no eléctrico / mecánico']]);
 }
 function infHermOptions(v){
   return infSelectOptions(v,[['','— evaluar —'],['Estanco','Estanco'],['Operativamente estanco','Operativamente estanco'],['No estanco','No estanco'],['Desconocido / no verificable','Desconocido / no verificable'],['No aplica','No aplica']]);
@@ -3010,7 +3108,7 @@ async function infSaveCompDirect(compId){
     infSetSaveState('comp',compId,'saving');
     try{
       const c=allSubRaw.find(x=>x.id===compId); if(!c) throw new Error('Componente no encontrado');
-      const sid=safeDomId(compId),zu=['20','21','22'].filter(z=>document.getElementById(`inf-c-zu-${z}-${sid}`)?.checked);
+      const sid=safeDomId(compId),zu=profileUseZones().filter(z=>document.getElementById(`inf-c-zu-${z}-${sid}`)?.checked);
       const payload={
         tipo:infInputValue(`inf-c-tipo-${sid}`),nombre_comp:infInputValue(`inf-c-name-${sid}`)||infInputValue(`inf-c-tipo-${sid}`),
         marca:infInputValue(`inf-c-marca-${sid}`),modelo:infInputValue(`inf-c-modelo-${sid}`),serie:infInputValue(`inf-c-serie-${sid}`),tag_planta:infInputValue(`inf-c-tag-${sid}`),potencia:infInputValue(`inf-c-pot-${sid}`),fecha_fab:infInputValue(`inf-c-fab-${sid}`)||null,
@@ -3078,7 +3176,7 @@ function infCompDetailsHtml(c){
     <div class="inf-detail-field"><div class="k">Ext. exterior ↑ [m]</div><input id="inf-c-es-${s}" type="number" step="0.01" min="0" class="inf-input" value="${escAttr(c.ext_exterior_sup??'')}" ${on}></div>
     <div class="inf-detail-field"><div class="k">Ext. exterior ↓ [m]</div><input id="inf-c-ei-${s}" type="number" step="0.01" min="0" class="inf-input" value="${escAttr(c.ext_exterior_inf??'')}" ${on}></div>
     <div class="inf-detail-field"><div class="k">Hermeticidad</div><select id="inf-c-herm-${s}" class="inf-select" onchange="infSaveCompDirect(${jsArg(id)})" onclick="event.stopPropagation()">${infHermOptions(c.hermeticidad)}</select></div>
-    <div class="inf-detail-field w2"><div class="k">Aptitud de uso documentada</div><div class="inf-zu">${['20','21','22'].map(z=>`<label><input id="inf-c-zu-${z}-${s}" type="checkbox" ${zu.includes(z)?'checked':''} onchange="infSaveCompDirect(${jsArg(id)})"> Z${z}</label>`).join('')}</div></div>
+    <div class="inf-detail-field w2"><div class="k">Aptitud de uso documentada</div><div class="inf-zu">${profileUseZones().map(z=>`<label><input id="inf-c-zu-${z}-${s}" type="checkbox" ${zu.includes(z)?'checked':''} onchange="infSaveCompDirect(${jsArg(id)})"> Z${z}</label>`).join('')}</div></div>
     <div class="inf-detail-field w4"><div class="k">Criterio / justificación de clasificación</div><textarea id="inf-c-crit-${s}" class="inf-ta" ${on}>${esc(c.criterio_zona||'')}</textarea></div>
   </div></div>`;
 }
@@ -3267,13 +3365,13 @@ function exportCSV(){
   }
   const blob=new Blob(['\ufeff'+rows.map(r=>r.map(csvCell).join(',')).join('\n')],{type:'text/csv;charset=utf-8'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
-  a.download=`ATEX_CCU_${new Date().toISOString().slice(0,10)}.csv`; a.click();
+  a.download=`ATEX_${(curProyecto?.nombre||'Proyecto').replace(/[^\w-]+/g,'_')}_${new Date().toISOString().slice(0,10)}.csv`; a.click();
   toast('CSV descargado &#10003;','ok');
 }
 
 function copyMD(){
-  let md=`# Informe ATEX — ${curProyecto?.nombre||'Proyecto ATEX'}\n\n**Cliente:** ${curProyecto?.cliente||'—'}  \n**Planta:** ${curProyecto?.planta||'—'}  \n**Inspector:** ${document.getElementById('i-insp').value||'—'}  \n**Fecha:** ${document.getElementById('i-fecha').value||'—'}  \n**Norma:** UNE-EN 60079-10-2:2010\n\n`;
-  md+=`| Tipo | Equipo / Componente | Piso | Zonas | Fabricación | Marcado Ex | Estado | Hallazgo |\n|---|---|---|---|---|---|---|---|\n`;
+  let md=`# Informe ATEX — ${curProyecto?.nombre||'Proyecto ATEX'}\n\n**Cliente:** ${curProyecto?.cliente||'—'}  \n**Planta:** ${curProyecto?.planta||'—'}  \n**Inspector:** ${document.getElementById('i-insp').value||'—'}  \n**Fecha:** ${document.getElementById('i-fecha').value||'—'}  \n**Norma:** ${projectNorm()}\n\n`;
+  md+=`| Tipo | Equipo / Componente | ${projectLocationType()} | Zonas | Fabricación | Marcado Ex | Estado | Hallazgo |\n|---|---|---|---|---|---|---|---|\n`;
   for(const r of reportRows()){
     const tipo=r.tipo==='Equipo'?'**Equipo**':'&#8627; Comp.';
     const nombre=r.tipo==='Equipo'?`**${mdCell(r.nombre)}**`:mdCell(r.nombre);
@@ -3351,6 +3449,15 @@ tbody tr:nth-child(even){background:#f9fafb}
 .small{color:#6b7280;font-size:8px}
 .footer{margin-top:14px;color:#6b7280;font-size:8px;text-align:right}
 @media print{button{display:none}}
+
+/* ══ V4 MULTIPROYECTO / GAS ══ */
+.eq-card.z0{border-left-color:#b91c1c}.eq-card.z1{border-left-color:#ea580c}.eq-card.z2{border-left-color:#2563eb}
+.z0p{background:#fee2e2;color:#991b1b}.z1p{background:#ffedd5;color:#9a3412}.z2p{background:#dbeafe;color:#1e40af}
+.profile-badge{display:inline-flex;align-items:center;gap:5px;font:700 8px monospace;padding:2px 7px;border-radius:3px;background:#1e2230;color:#cbd5e1;border:1px solid #2a2f40}
+.profile-badge.gas{color:#93c5fd}.profile-badge.polvo{color:#fde68a}.profile-badge.hibrida{color:#c4b5fd}
+.vi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.vi-item{border:1px solid #ddd9d0;border-radius:5px;padding:8px;background:#fafaf8}.vi-item .field-lbl{margin-bottom:5px}.vi-card{background:#fff;border:1px solid #ddd9d0;border-left:4px solid #0ea5e9;border-radius:6px;padding:11px 13px;margin-bottom:8px}.vi-meta{font:9px monospace;color:#6b7280;margin-top:3px}.vi-progress{font:700 9px monospace;padding:2px 7px;border-radius:3px;background:#e0f2fe;color:#075985}
+@media(max-width:700px){.vi-grid{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -3358,7 +3465,7 @@ tbody tr:nth-child(even){background:#f9fafb}
     <div>
       <div class="brand">SUSTENTA <span>Ex</span></div>
       <div class="title">Informe ATEX - Levantamiento de Equipos Ex</div>
-      <div class="sub">UNE-EN 60079-10-2:2010 · IEC 60079-10-2:2009</div>
+      <div class="sub">${esc(projectNorm())} · ${esc(projectProfileLabel())}</div>
     </div>
     <div class="sub" style="text-align:right">${esc(curProyecto?.cliente||'—')} · ${esc(curProyecto?.planta||'—')}<br>${esc(curProyecto?.nombre||'Proyecto ATEX')}</div>
   </section>
@@ -3382,7 +3489,7 @@ tbody tr:nth-child(even){background:#f9fafb}
   <h2>Tabla completa</h2>
   <table>
     <thead>
-      <tr><th>Tipo</th><th>Equipo / Componente</th><th>Equipo principal</th><th>Piso</th><th>Zonas / instalación</th><th>TAG</th><th>Marcado Ex</th><th>Estado</th><th>Brechas / Obs.</th><th>Accion</th></tr>
+      <tr><th>Tipo</th><th>Equipo / Componente</th><th>Equipo principal</th><th>${esc(projectLocationType())}</th><th>Zonas / instalación</th><th>TAG</th><th>Marcado Ex</th><th>Estado</th><th>Brechas / Obs.</th><th>Accion</th></tr>
     </thead>
     <tbody>${tableHtml}</tbody>
   </table>
@@ -3445,14 +3552,14 @@ function printRegistroFotografico(){
     <div class="modal-head" style="background:#0f1117">
       <div style="flex:1">
         <div style="font:700 10px monospace;color:#F7C600;letter-spacing:1.3px;text-transform:uppercase;margin-bottom:4px">REGISTRO FOTOGRÁFICO</div>
-        <div style="font-size:16px;font-weight:700">Generar por piso</div>
-        <div style="font:10px monospace;color:#9ca3af;margin-top:4px">Se cargarán únicamente las fotografías del piso seleccionado.</div>
+        <div style="font-size:16px;font-weight:700">Generar por ${esc(projectLocationType())}</div>
+        <div style="font:10px monospace;color:#9ca3af;margin-top:4px">Se cargarán únicamente las fotografías de la agrupación seleccionada.</div>
       </div>
       <button id="rf-close" style="background:none;border:none;color:#777;font-size:20px;cursor:pointer">✕</button>
     </div>
     <div class="modal-body">
       <div style="background:#fffdf0;border:1px solid #f5d76e;border-left:3px solid #F7C600;border-radius:4px;padding:9px 11px;font-size:11px;color:#6b5a00;line-height:1.45">
-        Esta modalidad evita generar simultáneamente cientos de páginas e imágenes. Cada archivo PDF tendrá su propia portada y resumen del piso.
+        Esta modalidad evita generar simultáneamente cientos de páginas e imágenes. Cada archivo PDF tendrá su propia portada y resumen de la agrupación seleccionada.
       </div>
       <div id="rf-floor-list" style="display:flex;flex-direction:column;gap:7px"></div>
     </div>
@@ -3722,7 +3829,7 @@ async function openSubModal(mode, parentEqId, compId){
   sv('sm-hall',comp.hallazgo); sv('sm-acc',comp.accion);
   // Zona uso checkboxes
   const zonaUso=comp.zona_uso||[];
-  ['20','21','22'].forEach(z=>{
+  profileUseZones().forEach(z=>{
     const cb=document.querySelector(`#zuo-${z} input`);
     const opt=document.getElementById(`zuo-${z}`);
     if(cb){ cb.checked=zonaUso.includes(z); if(opt) opt.classList.toggle(`sel-${z}`,cb.checked); }
@@ -3787,7 +3894,7 @@ async function saveComp(){
       await must(sb.storage.from('atex-fotos').upload(path,f,{contentType:f.type}));
       newPaths.push(path);
     }
-    const zonaUso=['20','21','22'].filter(z=>{
+    const zonaUso=profileUseZones().filter(z=>{
       const cb=document.querySelector(`#zuo-${z} input`);
       return cb&&cb.checked;
     });
@@ -4511,7 +4618,7 @@ async function printCicloInforme(cicloId){
     <div><span class="lbl">No conformidades</span><strong style="color:#dc2626">${NC}</strong></div>
     <div><span class="lbl">Aprobado por</span>${esc(c.aprobado_nombre||'Pendiente')}</div>
   </div>
-  <table><thead><tr><th>Equipo</th><th>Piso</th><th>Base</th><th>Nuevo estado</th><th>Acción verificada</th><th>Hallazgo</th><th>Acción</th><th>Inspector</th></tr></thead>
+  <table><thead><tr><th>Equipo</th><th>${esc(projectLocationType())}</th><th>Base</th><th>Nuevo estado</th><th>Acción verificada</th><th>Hallazgo</th><th>Acción</th><th>Inspector</th></tr></thead>
   <tbody>${rows}</tbody></table>
   <div style="margin-top:12px;font-size:8px;color:#9ca3af;text-align:right">Generado ${new Date().toLocaleString('es-CL')}</div>
   </body></html>`);
@@ -4783,7 +4890,7 @@ async function onPisoDrop(e,toUbId){
 
 //  GESTIÓN UBICACIONES
 function openUbModal(){
-  const tipoUb=curProyecto?.tipo_ubicacion||'Piso';
+  const tipoUb=projectLocationType();
   document.getElementById('ub-modal-title').textContent=`${tipoUb}s del proyecto`;
   renderUbList();
   document.getElementById('ub-modal-bg').classList.add('on');
@@ -4806,7 +4913,7 @@ async function addUbicacion(){
   if(!nombre){toast('Escribe el nombre de la ubicación','err');return;}
   try {
     const saved=await must(sb.from('proyecto_ubicaciones').insert({proyecto_id:curProyecto.id,nombre,orden:proyUbicaciones.length}).select().single());
-    proyUbicaciones.push(saved); inp.value=''; renderUbList(); renderEq();
+    proyUbicaciones.push(saved); inp.value=''; renderUbList(); renderEqFilterBar(); renderEq();
     document.getElementById('btn-gest-ub').style.display='block';
     toast(`${nombre} agregado &#10003;`,'ok');
   } catch(e){toast('Error: '+e.message,'err');}
@@ -4816,7 +4923,7 @@ async function renameUb(ubId,actual){
   try {
     await must(sb.from('proyecto_ubicaciones').update({nombre:nuevo}).eq('proyecto_id',curProyecto.id).eq('id',ubId));
     const ub=proyUbicaciones.find(u=>u.id===ubId); if(ub) ub.nombre=nuevo;
-    renderUbList(); renderEq(); toast('Renombrado &#10003;','ok');
+    renderUbList(); renderEqFilterBar(); renderEq(); toast('Renombrado &#10003;','ok');
   } catch(e){toast('Error: '+e.message,'err');}
 }
 async function deleteUb(ubId){
@@ -4826,7 +4933,7 @@ async function deleteUb(ubId){
   try {
     await must(sb.from('proyecto_ubicaciones').delete().eq('proyecto_id',curProyecto.id).eq('id',ubId));
     proyUbicaciones=proyUbicaciones.filter(u=>u.id!==ubId);
-    renderUbList(); renderEq(); toast('Eliminado &#10003;','ok');
+    if(floorF===ubId) floorF='all'; renderUbList(); renderEqFilterBar(); renderEq(); toast('Eliminado &#10003;','ok');
   } catch(e){toast('Error: '+e.message,'err');}
 }
 
@@ -4843,7 +4950,7 @@ function openEqNuevo(ubId, ubNombre, origen='eq'){
   const ubRow=document.getElementById('en-ub-row');
   const ubSel=document.getElementById('en-ub-sel');
   if(origen==='inf'){
-    const tipoUb=curProyecto?.tipo_ubicacion||'Piso';
+    const tipoUb=projectLocationType();
     document.querySelector('#en-ub-row .field-lbl').textContent=tipoUb;
     const pisos=pisoOrderIds();
     ubSel.innerHTML=`<option value="">— Sin ${tipoUb.toLowerCase()} —</option>`+
@@ -4870,7 +4977,7 @@ async function saveEqNuevo(){
       ? (document.getElementById('en-ub-sel').value || null)
       : curUbIdNuevoEq;
     // Detectar si es piso del catálogo estático (FL) o ubicacion_id UUID
-    const isFlPiso = ubSelVal && Object.keys(FL).includes(ubSelVal);
+    const isFlPiso = usesLegacyCatalog() && ubSelVal && Object.keys(FL).includes(ubSelVal);
     const ubId = isFlPiso ? null : ubSelVal;
     for(let i=1;i<=cantidad;i++){
       const id='deq_'+Date.now()+'_'+Math.random().toString(36).slice(2,6);
@@ -4957,7 +5064,7 @@ function renderProyectoGrid(statsMap, lista=null){
     return `<div class="proy-card" onclick="selectProyecto('${p.id}')">
       <div class="proy-card-badge">ATEX</div>
       <div class="proy-card-name">${esc(p.nombre)}</div>
-      <div class="proy-card-sub">${esc(p.cliente||'')}${p.planta?' · '+esc(p.planta):''}</div>
+      <div class="proy-card-sub">${esc(p.cliente||'')}${p.planta?' · '+esc(p.planta):''}</div><div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px"><span class="profile-badge ${escAttr(p.atmosfera_tipo||'polvo')}">${esc((p.atmosfera_tipo||'polvo').toUpperCase())}</span>${p.tipo_trabajo?`<span class="profile-badge">${esc(p.tipo_trabajo.replace('_',' + '))}</span>`:''}${p.grado_inspeccion?`<span class="profile-badge">${esc(p.grado_inspeccion)}</span>`:''}</div>
       ${p.descripcion?`<div style="font-size:10px;color:#b0b8c8;margin-top:5px;line-height:1.5">${esc(p.descripcion)}</div>`:''}
       <div class="proy-card-meta">
         <span class="proy-card-stat">&#128203; ${count} ítem${count!==1?'s':''}</span>
@@ -4989,20 +5096,37 @@ function volverProyectos(){
   document.getElementById('app').style.display='none';
   showProyectos();
 }
+let _npMode='new', _npEditId=null;
+function applyProjectTemplate(v){
+  const set=(id,val)=>{const e=document.getElementById(id);if(e)e.value=val;};
+  if(v==='inspeccion_gas_60079_17'){set('np-atmosfera','gas');set('np-trabajo','inspeccion');set('np-norma','UNE-EN 60079-17:2014');set('np-grado','visual'); const el=[...document.querySelectorAll('.tipo-ub-opt')].find(x=>x.dataset.v==='Área'); if(el)selectTipoUb(el);}
+  if(v==='inspeccion_polvo_60079_17'){set('np-atmosfera','polvo');set('np-trabajo','inspeccion');set('np-norma','UNE-EN 60079-17:2014');set('np-grado','visual');}
+  if(v==='clasificacion_polvo_60079_10_2'){set('np-atmosfera','polvo');set('np-trabajo','clasificacion');set('np-norma','UNE-EN 60079-10-2:2010 / IEC 60079-10-2:2009');set('np-grado','');}
+  if(v==='clasificacion_gas_60079_10_1'){set('np-atmosfera','gas');set('np-trabajo','clasificacion');set('np-norma','UNE-EN 60079-10-1');set('np-grado','');}
+}
+function openProyectoConfig(){ if(!curProyecto)return; openNuevoProy('edit',curProyecto); }
 function selectTipoUb(el){
   document.querySelectorAll('.tipo-ub-opt').forEach(o=>o.classList.remove('sel'));
   el.classList.add('sel'); _tipoUbSel=el.dataset.v;
   document.getElementById('np-tipo-custom').style.display=_tipoUbSel==='_custom'?'block':'none';
 }
 function openNuevoProy(modo='new', proy=null){
-  _tipoUbSel='Piso';
-  document.querySelectorAll('.tipo-ub-opt').forEach(o=>o.classList.toggle('sel',o.dataset.v==='Piso'));
-  document.getElementById('np-tipo-custom').style.display='none';
-  ['np-nombre','np-cliente','np-planta','np-desc','np-ubicaciones','np-tipo-custom'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  document.getElementById('np-sv').textContent='CREAR PROYECTO';
-  document.getElementById('np-title-lbl').textContent='Crear proyecto ATEX';
-  document.getElementById('nuevo-proy-bg').classList.add('on');
-  document.body.style.overflow='hidden';
+  _npMode=modo; _npEditId=modo==='edit'?(proy?.id||curProyecto?.id):null;
+  const p=proy||curProyecto||{};
+  _tipoUbSel=modo==='edit'?(p.tipo_ubicacion||'Piso'):'Piso';
+  document.querySelectorAll('.tipo-ub-opt').forEach(o=>o.classList.toggle('sel',o.dataset.v===_tipoUbSel));
+  const isPreset=[...document.querySelectorAll('.tipo-ub-opt')].some(o=>o.dataset.v===_tipoUbSel);
+  if(!isPreset){ _tipoUbSel='_custom'; document.querySelectorAll('.tipo-ub-opt').forEach(o=>o.classList.toggle('sel',o.dataset.v==='_custom')); }
+  document.getElementById('np-tipo-custom').style.display=_tipoUbSel==='_custom'?'block':'none';
+  const set=(id,val='')=>{const el=document.getElementById(id);if(el)el.value=val??'';};
+  set('np-nombre',modo==='edit'?p.nombre:''); set('np-cliente',modo==='edit'?p.cliente:''); set('np-planta',modo==='edit'?p.planta:''); set('np-desc',modo==='edit'?p.descripcion:'');
+  set('np-plantilla',modo==='edit'?(p.plantilla_proyecto||'configurable'):'configurable'); set('np-atmosfera',modo==='edit'?(p.atmosfera_tipo||'polvo'):'polvo'); set('np-trabajo',modo==='edit'?(p.tipo_trabajo||'clasificacion_inspeccion'):'clasificacion_inspeccion'); set('np-norma',modo==='edit'?(p.normativa_principal||''):''); set('np-grado',modo==='edit'?(p.grado_inspeccion||''):'');
+  set('np-tipo-custom',(!isPreset&&modo==='edit')?p.tipo_ubicacion:''); set('np-ubicaciones','');
+  const wrap=document.getElementById('np-ubicaciones-wrap'); if(wrap) wrap.style.display=modo==='edit'?'none':'block';
+  document.getElementById('np-sv').textContent=modo==='edit'?'GUARDAR CONFIGURACIÓN':'CREAR PROYECTO';
+  document.getElementById('np-title-lbl').textContent=modo==='edit'?'Configurar proyecto ATEX':'Crear proyecto ATEX';
+  const del=document.getElementById('np-del-btn'); if(del)del.style.display=modo==='edit'?'inline-block':'none';
+  document.getElementById('nuevo-proy-bg').classList.add('on'); document.body.style.overflow='hidden';
 }
 function closeNuevoProy(){ document.getElementById('nuevo-proy-bg').classList.remove('on'); document.body.style.overflow=''; }
 async function deleteProyecto(){
@@ -5019,36 +5143,27 @@ async function deleteProyecto(){
   } catch(e){ toast('Error: '+e.message,'err'); }
 }
 async function saveNuevoProy(){
-  if(!canDo('editProyecto')){ toast('Sin permiso para crear proyectos','err'); return; }
-  const nombre=document.getElementById('np-nombre').value.trim();
-  if(!nombre){toast('El nombre es obligatorio','err');return;}
+  if(!canDo('editProyecto')){ toast('Sin permiso para crear o configurar proyectos','err'); return; }
+  const nombre=document.getElementById('np-nombre').value.trim(); if(!nombre){toast('El nombre es obligatorio','err');return;}
   const tipoUb=_tipoUbSel==='_custom'?(document.getElementById('np-tipo-custom').value.trim()||'Ubicación'):_tipoUbSel;
-  const btn=document.getElementById('np-sv'); btn.disabled=1; btn.textContent='Creando…';
+  const payload={nombre,cliente:document.getElementById('np-cliente').value.trim()||null,planta:document.getElementById('np-planta').value.trim()||null,descripcion:document.getElementById('np-desc').value.trim()||null,tipo_ubicacion:tipoUb,atmosfera_tipo:document.getElementById('np-atmosfera').value,tipo_trabajo:document.getElementById('np-trabajo').value,normativa_principal:document.getElementById('np-norma').value.trim()||null,grado_inspeccion:document.getElementById('np-grado').value||null,plantilla_proyecto:document.getElementById('np-plantilla').value||'configurable',activo:true};
+  const btn=document.getElementById('np-sv'); btn.disabled=1; btn.textContent=_npMode==='edit'?'Guardando…':'Creando…';
   try {
-    const id='proy_'+nombre.toLowerCase().replace(/[^a-z0-9]/g,'_').replace(/_+/g,'_').slice(0,28)+'_'+Date.now().toString().slice(-4);
-    const proy=await must(sb.from('proyectos').insert({
-      id,nombre,
-      cliente:document.getElementById('np-cliente').value.trim()||null,
-      planta:document.getElementById('np-planta').value.trim()||null,
-      descripcion:document.getElementById('np-desc').value.trim()||null,
-      tipo_ubicacion:tipoUb, activo:true,
-      created_by:profile?.full_name||session.user.email
-    }).select().single());
-    // Crear ubicaciones iniciales
-    const ubText=document.getElementById('np-ubicaciones').value.trim();
-    if(ubText){
-      const lineas=ubText.split('\n').map(l=>l.trim()).filter(Boolean);
-      if(lineas.length){
-        const ubRows=lineas.map((nombre,i)=>({proyecto_id:id,nombre,orden:i}));
-        await must(sb.from('proyecto_ubicaciones').insert(ubRows));
-      }
+    if(_npMode==='edit'&&_npEditId){
+      await must(sb.from('proyectos').update({...payload,updated_at:new Date().toISOString()}).eq('id',_npEditId));
+      if(curProyecto?.id===_npEditId){curProyecto={...curProyecto,...payload};}
+      toast('Configuración del proyecto guardada ✓','ok'); closeNuevoProy(); if(curProyecto?.id===_npEditId){applyProjectProfileUI();renderEq();} else await showProyectos();
+    } else {
+      const id='proy_'+nombre.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'_').replace(/_+/g,'_').slice(0,28)+'_'+Date.now().toString().slice(-4);
+      await must(sb.from('proyectos').insert({id,...payload,created_by:profile?.full_name||session.user.email}).select().single());
+      const ubText=document.getElementById('np-ubicaciones').value.trim(); if(ubText){const lineas=ubText.split('\n').map(l=>l.trim()).filter(Boolean);if(lineas.length)await must(sb.from('proyecto_ubicaciones').insert(lineas.map((nombre,i)=>({proyecto_id:id,nombre,orden:i}))));}
+      toast('Proyecto creado ✓','ok'); closeNuevoProy(); await showProyectos();
     }
-    toast('Proyecto creado &#10003;','ok'); closeNuevoProy(); await showProyectos();
   } catch(e){toast('Error: '+e.message,'err');}
-  btn.disabled=0; btn.textContent='CREAR PROYECTO';
+  btn.disabled=0; btn.textContent=_npMode==='edit'?'GUARDAR CONFIGURACIÓN':'CREAR PROYECTO';
 }
 
-// ═══════════════════════════════════════════════════════════
+// ═
 //  SISTEMA DE PERMISOS
 // ═══════════════════════════════════════════════════════════
 const PERMISOS = {
@@ -6045,14 +6160,14 @@ async function loadAtexModule(){
   }catch(e){toast('No se pudo cargar clasificación: '+e.message,'err');}
   renderAtexAll(); loader(0);
 }
-function renderAtexAll(){renderPidConciliacion();renderFuentes();renderPolvos();updateAtexKpis();}
+function renderAtexAll(){renderPidConciliacion();renderFuentes();renderPolvos();renderInspeccionVisual();updateAtexKpis();}
 function updateAtexKpis(){
  const entities=[...allEqs('all').map(e=>['equipo',e.id]),...allSubRaw.map(c=>['componente',c.id])];
  const confirmed=pidLinks.filter(x=>x.estado==='confirmado').length, sug=pidLinks.filter(x=>x.estado==='sugerido'||x.estado==='revisar').length;
  const linked=new Set(pidLinks.filter(x=>x.ref_pid||x.estado==='no_representado').map(x=>pidLinkKey(x.entidad_tipo,x.entidad_id)));
  document.getElementById('ak-confirm').textContent=confirmed;document.getElementById('ak-sug').textContent=sug;document.getElementById('ak-unres').textContent=Math.max(0,entities.length-linked.size);document.getElementById('ak-fe').textContent=allEqs('all').filter(e=>{const r=recs[e.id]||{};return !!(r.zona_interior||r.zona_exterior||r.zona_mantenimiento||r.zona)}).length;
 }
-function switchAtexView(v){['pid','fe','polvo'].forEach(x=>{document.getElementById('atex-view-'+x).style.display=x===v?'block':'none';document.getElementById('atex-sw-'+x).classList.toggle('on',x===v)});}
+function switchAtexView(v){['pid','fe','polvo','inspeccion'].forEach(x=>{const view=document.getElementById('atex-view-'+x);if(view)view.style.display=x===v?'block':'none';const btn=x==='inspeccion'?document.getElementById('atex-sw-polvo'):document.getElementById('atex-sw-'+x);if(btn)btn.classList.toggle('on',x===v||(x==='polvo'&&v==='inspeccion'))});}
 function pidEntities(){
  const a=allEqs('all').map(e=>{const r=recs[e.id]||{};return{tipo:'equipo',id:e.id,nombre:eqName(e.id),padre:'',piso:eqPiso(e.id),tag:r.tag_planta||'',zona:zoneExteriorOf(r,'')}});
  allSubRaw.forEach(c=>a.push({tipo:'componente',id:c.id,nombre:c.nombre_comp||c.tipo||'Componente',padre:eqName(c.equipo_id),piso:(recs[c.equipo_id]||{}).piso||eqPiso(c.equipo_id),tag:c.tag_planta||'',zona:compZoneTripleText(c)})); return a;
@@ -6085,6 +6200,22 @@ function feEquipoChanged(){const id=document.getElementById('fe-eq').value,l=fin
 function openFuenteModal(id=null){curFuenteId=id;const sel=document.getElementById('fe-eq');sel.innerHTML=allEqs('all').map(e=>`<option value="${escAttr(e.id)}">${esc(eqName(e.id))} · ${esc(pisoLabel(eqPiso(e.id)))}</option>`).join('');const f=id?fuentesEmision.find(x=>x.id===id):null;if(f){sel.value=f.equipo_id;document.getElementById('fe-ref').value=f.ref_pid||'';document.getElementById('fe-code').value=f.codigo||'';document.getElementById('fe-material').value=f.material||'Polvo de malta';document.getElementById('fe-name').value=f.nombre||'';document.getElementById('fe-tipo').value=f.tipo_fuente||'Interior de equipo';document.getElementById('fe-cond').value=f.condicion_operacion||'Operación normal';document.getElementById('fe-grado').value=f.grado_escape||'No determinado';document.getElementById('fe-herm').value=f.hermeticidad||'No determinado';document.getElementById('fe-asp').value=f.aspiracion||'No aplica';document.getElementById('fe-status').value=f.estado||'preliminar';document.getElementById('fe-just').value=f.justificacion||'';const zi=zonasAtex.find(z=>z.fuente_id===id&&z.tipo_zona==='interna'),ze=zonasAtex.find(z=>z.fuente_id===id&&z.tipo_zona==='exterior');document.getElementById('fz-int-zona').value=zi?.zona||'ND';document.getElementById('fz-ext-zona').value=ze?.zona||'NG';document.getElementById('fz-ext-h').value=ze?.extension_horizontal??'';document.getElementById('fz-ext-v').value=ze?.extension_vertical??'';document.getElementById('fz-ext-geo').value=ze?.geometria||'Localizada';document.getElementById('fz-ext-origen').value=ze?.origen_medicion||'';}else{['fe-ref','fe-code','fe-name','fe-just','fz-ext-h','fz-ext-v','fz-ext-origen'].forEach(x=>document.getElementById(x).value='');document.getElementById('fz-int-zona').value='ND';document.getElementById('fz-ext-zona').value='NG';document.getElementById('fz-ext-geo').value='Localizada';feEquipoChanged();}document.getElementById('fuente-bg').style.display='flex';}
 function closeFuenteModal(){document.getElementById('fuente-bg').style.display='none';curFuenteId=null;}
 async function saveFuenteEmision(){const eq=document.getElementById('fe-eq').value;if(!eq||!document.getElementById('fe-name').value.trim()){toast('Selecciona equipo y describe la fuente','err');return;}let code=document.getElementById('fe-code').value.trim();if(!code){const ref=document.getElementById('fe-ref').value.trim()||'SINPID';code=`FE-${ref}-${String(fuentesEmision.length+1).padStart(2,'0')}`;}const payload={proyecto_id:projectId(),codigo:code,equipo_id:eq,ref_pid:document.getElementById('fe-ref').value.trim(),nombre:document.getElementById('fe-name').value.trim(),material:document.getElementById('fe-material').value,tipo_fuente:document.getElementById('fe-tipo').value,condicion_operacion:document.getElementById('fe-cond').value,grado_escape:document.getElementById('fe-grado').value,hermeticidad:document.getElementById('fe-herm').value,aspiracion:document.getElementById('fe-asp').value,estado:document.getElementById('fe-status').value,justificacion:document.getElementById('fe-just').value.trim(),updated_by:profile?.full_name||session.user.email,updated_at:new Date().toISOString()};try{let f;if(curFuenteId)f=await must(sb.from('fuentes_emision').update(payload).eq('id',curFuenteId).select().single());else f=await must(sb.from('fuentes_emision').insert(payload).select().single());const baseZ={proyecto_id:projectId(),fuente_id:f.id,updated_at:new Date().toISOString()};const zi={...baseZ,tipo_zona:'interna',zona:document.getElementById('fz-int-zona').value,extension_horizontal:null,extension_vertical:null,geometria:'Volumen interior',origen_medicion:'Interior del equipo'};const ze={...baseZ,tipo_zona:'exterior',zona:document.getElementById('fz-ext-zona').value,extension_horizontal:document.getElementById('fz-ext-h').value||null,extension_vertical:document.getElementById('fz-ext-v').value||null,geometria:document.getElementById('fz-ext-geo').value,origen_medicion:document.getElementById('fz-ext-origen').value.trim()};for(const zp of [zi,ze]){const old=zonasAtex.find(z=>z.fuente_id===f.id&&z.tipo_zona===zp.tipo_zona);if(old)await must(sb.from('zonas_atex').update(zp).eq('id',old.id));else await must(sb.from('zonas_atex').insert(zp));}toast('Fuente y clasificación interna/exterior guardadas','ok');closeFuenteModal();await loadAtexModule();}catch(e){toast('Error: '+e.message,'err')}}
+const VISUAL_ITEMS=[
+  ['envolvente','Integridad de envolvente / carcasa'],['entradas','Entradas de cables y prensaestopas'],['cierres','Tapas, pernos y elementos de cierre'],['tierra','Puesta a tierra / equipotencialidad'],['corrosion','Corrosión, daño o deterioro visible'],['cables','Cables y canalizaciones visibles'],['marcado','Identificación y marcado Ex legible'],['sellos','Sellos, obturadores y uniones visibles'],['modificaciones','Modificaciones o intervenciones evidentes'],['montaje','Montaje y condición mecánica general']
+];
+let curVisualEq=null;
+function visualStatusLabel(v){return {C:'C',NC:'NC',OBS:'OBS',NV:'NV',NA:'NA'}[v]||'—';}
+function renderInspeccionVisual(){
+  const box=document.getElementById('visinsp-list'); if(!box)return;
+  if(!(isGasProject()&&projectWork().includes('inspeccion'))){box.innerHTML='<div class="card" style="color:#6b7280">Este panel se activa para proyectos configurados como Inspección ATEX de gas/vapor.</div>';return;}
+  const eqs=allEqs('all').sort((a,b)=>pisoLabel(eqPiso(a.id)).localeCompare(pisoLabel(eqPiso(b.id)),'es')||eqName(a.id).localeCompare(eqName(b.id),'es'));
+  if(!eqs.length){box.innerHTML=`<div class="card" style="text-align:center;color:#6b7280;padding:28px">Sin equipos. Configura ${esc(projectLocationType())}s y agrega los equipos de la instalación.</div>`;return;}
+  box.innerHTML=eqs.map(e=>{const r=recs[e.id]||{},j=r.inspeccion_visual||{},n=VISUAL_ITEMS.filter(([k])=>j[k]).length;return `<div class="vi-card"><div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start"><div><b>${esc(eqName(e.id))}</b><div class="vi-meta">${esc(pisoLabel(eqPiso(e.id)))} · TAG ${esc(r.tag_planta||'—')} · ${esc(projectNorm())}</div></div><div style="display:flex;gap:7px;align-items:center"><span class="vi-progress">${n}/${VISUAL_ITEMS.length}</span><span class="cbadge b${confClass(r.conformidad)}">${esc(r.conformidad||'—')}</span><button class="doc-btn" onclick="openVisualInspection(${jsArg(e.id)})">Checklist visual</button></div></div></div>`}).join('');
+}
+function openVisualInspection(eqId){curVisualEq=eqId;const r=recs[eqId]||{},j=r.inspeccion_visual||{};document.getElementById('vi-title').textContent=eqName(eqId);document.getElementById('vi-meta').textContent=`${pisoLabel(eqPiso(eqId))} · ${projectNorm()} · Grado ${projectInspectionGrade()||'visual'}`;document.getElementById('vi-checks').innerHTML=VISUAL_ITEMS.map(([k,l])=>`<div class="vi-item"><div class="field-lbl">${esc(l)}</div><select class="field-sel" id="vi-${k}"><option value="">— no evaluado —</option><option value="C">C — Conforme</option><option value="NC">NC — No conforme</option><option value="OBS">OBS — Observación</option><option value="NV">NV — No verificable</option><option value="NA">NA — No aplica</option></select></div>`).join('');VISUAL_ITEMS.forEach(([k])=>{document.getElementById('vi-'+k).value=j[k]||''});document.getElementById('vi-conf').value=r.conformidad||'';document.getElementById('vi-obs').value=j.observacion_general||'';document.getElementById('visinsp-bg').style.display='flex';}
+function closeVisualInspection(){document.getElementById('visinsp-bg').style.display='none';curVisualEq=null;}
+async function saveVisualInspection(){if(!curVisualEq)return;const j={};VISUAL_ITEMS.forEach(([k])=>j[k]=document.getElementById('vi-'+k).value);j.observacion_general=document.getElementById('vi-obs').value.trim();j.grado=projectInspectionGrade()||'visual';j.norma=projectNorm();j.actualizado_en=new Date().toISOString();const eq=getEqDef(curVisualEq)||{},old=recs[curVisualEq]||{};const payload={equipo_id:curVisualEq,equipo_nombre:eqName(curVisualEq),piso:eqPiso(curVisualEq),grupo:eq.g||old.grupo||'',proyecto_id:projectId(),inspeccion_visual:j,conformidad:document.getElementById('vi-conf').value||old.conformidad||'',inspector_id:session.user.id,inspector_nombre:profile?.full_name||session.user.email,updated_at:new Date().toISOString()};try{let saved;if(old.id)saved=await must(sb.from('registros').update(payload).eq('proyecto_id',projectId()).eq('id',old.id).select().single());else saved=await must(sb.from('registros').insert(payload).select().single());recs[curVisualEq]=saved;allRaw=Object.values(recs);toast('Inspección visual guardada ✓','ok');closeVisualInspection();renderInspeccionVisual();renderEq();}catch(e){toast('Error guardando checklist: '+e.message,'err');}}
+
 function renderPolvos(){const b=document.getElementById('polvos-list');if(!b)return;b.innerHTML=polvosProyecto.length?polvosProyecto.map(p=>`<div style="border-top:1px solid #eee;padding:9px 0"><b>${esc(p.nombre)}</b> <span style="font:9px monospace;color:#888">${esc(p.grupo_polvo||'Grupo ND')}</span><div style="font:10px monospace;color:#6b7280">Kst ${p.kst??'ND'} · Pmax ${p.pmax??'ND'} bar · MIT nube ${p.mit_nube??'ND'}°C · MIT capa ${p.mit_capa??'ND'}°C · ${esc(p.fuente||'Sin fuente')}</div></div>`).join(''):'<div style="color:#888;font-size:11px">Sin caracterización registrada.</div>';}
 function openPolvoModal(){['po-name','po-kst','po-pmax','po-mitn','po-mitc','po-fuente'].forEach(x=>document.getElementById(x).value='');document.getElementById('po-grupo').value='';document.getElementById('polvo-bg').style.display='flex'}function closePolvoModal(){document.getElementById('polvo-bg').style.display='none'}
 async function savePolvo(){const nombre=document.getElementById('po-name').value.trim();if(!nombre){toast('Ingresa nombre','err');return;}const p={proyecto_id:projectId(),nombre,grupo_polvo:document.getElementById('po-grupo').value,kst:document.getElementById('po-kst').value||null,pmax:document.getElementById('po-pmax').value||null,mit_nube:document.getElementById('po-mitn').value||null,mit_capa:document.getElementById('po-mitc').value||null,fuente:document.getElementById('po-fuente').value.trim(),updated_at:new Date().toISOString()};try{await must(sb.from('sustancias_polvo').upsert(p,{onConflict:'proyecto_id,nombre'}));toast('Caracterización guardada','ok');closePolvoModal();await loadAtexModule();}catch(e){toast('Error: '+e.message,'err')}}
